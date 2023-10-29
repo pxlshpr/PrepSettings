@@ -16,6 +16,7 @@ public struct Settings: Codable, Hashable {
     public var metricType: GoalMetricType
     
     public var displayedMicros: [Micro]
+//    public var dailyValues: [Micro: DailyValue]
 }
 
 public extension Settings {
@@ -31,6 +32,7 @@ public extension Settings {
             expandedMicroGroups: [],
             metricType: .consumed,
             displayedMicros: []
+//            dailyValues: [:]
         )
     }
     
