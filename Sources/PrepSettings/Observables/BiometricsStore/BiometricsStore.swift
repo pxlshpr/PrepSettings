@@ -48,10 +48,10 @@ import PrepShared
         self.isCurrent = false
     }
 
-    public func loadCurrentBiometrics(_ currentBiometricsHandler: (() async throws -> Biometrics)? = nil) {
-        guard let currentBiometricsHandler else { return }
+    public func loadCurrentBiometrics(_ handler: @escaping (() async throws -> Biometrics)) {
+//        guard let currentBiometricsHandler else { return }
         Task {
-            let biometrics = try await currentBiometricsHandler()
+            let biometrics = try await handler()
             await MainActor.run {
                 self.biometrics = biometrics
                 post(.didLoadCurrentBiometrics)
