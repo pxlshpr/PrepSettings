@@ -44,7 +44,14 @@ public extension Biometrics {
             setQuantity(nil)
         }
 
-        guard let source = leanBodyMass?.source else { return }
+        guard let source = leanBodyMass?.source else {
+            leanBodyMass = .init(
+                source: .default,
+                equation: .default,
+                quantity: nil
+            )
+            return
+        }
 
         switch source {
         case .health:

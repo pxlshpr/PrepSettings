@@ -49,7 +49,6 @@ import PrepShared
     }
 
     public func loadCurrentBiometrics(_ handler: @escaping (() async throws -> Biometrics)) {
-//        guard let currentBiometricsHandler else { return }
         Task {
             let biometrics = try await handler()
             await MainActor.run {
