@@ -54,6 +54,7 @@ import PrepShared
             let biometrics = try await currentBiometricsHandler()
             await MainActor.run {
                 self.biometrics = biometrics
+                post(.didLoadCurrentBiometrics)
             }
         }
     }
