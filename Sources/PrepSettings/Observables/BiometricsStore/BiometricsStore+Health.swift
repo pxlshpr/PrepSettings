@@ -4,9 +4,27 @@ import PrepShared
 public extension BiometricsStore {
     func setAllFromHealth() async throws {
         try await HealthStore.requestPermissions(
-            characteristicTypeIdentifiers: [.biologicalSex, .dateOfBirth],
-            quantityTypeIdentifiers: [.activeEnergyBurned, .basalEnergyBurned, .bodyMass, .leanBodyMass, .height]
+            characteristicTypeIdentifiers: [
+                .biologicalSex,
+                .dateOfBirth
+            ],
+            quantityTypeIdentifiers: [
+                .activeEnergyBurned, 
+                .basalEnergyBurned,
+                .bodyMass,
+                .leanBodyMass,
+                .height
+            ]
         )
+        
+        /// Now that we have permissions, set the sources to `health`, which should also set the values themselves
+        weightSource = .health
+        ageSource = .health
+        heightSource = .health
+        leanBodyMassSource = .health
+        restingEnergySource = .health
+        activeEnergySource = .health
+        sexSource = .health
     }
 }
 public extension BiometricsStore {
