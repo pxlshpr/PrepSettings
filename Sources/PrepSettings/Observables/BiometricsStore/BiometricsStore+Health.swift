@@ -2,6 +2,14 @@ import SwiftUI
 import PrepShared
 
 public extension BiometricsStore {
+    func setAllFromHealth() async throws {
+        try await HealthStore.requestPermissions(
+            characteristicTypeIdentifiers: [.biologicalSex, .dateOfBirth],
+            quantityTypeIdentifiers: [.activeEnergyBurned, .basalEnergyBurned, .bodyMass, .leanBodyMass, .height]
+        )
+    }
+}
+public extension BiometricsStore {
 
     func setWeightFromHealth(
         using unit: BodyMassUnit? = nil,

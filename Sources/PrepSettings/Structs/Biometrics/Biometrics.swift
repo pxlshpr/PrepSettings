@@ -696,3 +696,16 @@ public extension Biometrics {
     }
 }
 
+public extension Biometrics {
+    var healthSourcedCount: Int {
+        var count = 0
+        if restingEnergy?.source == .health || restingEnergy == nil { count += 1 }
+        if activeEnergy?.source == .health || activeEnergy == nil { count += 1 }
+        if age?.source == .health || age == nil { count += 1 }
+        if sex?.source == .health || sex == nil { count += 1 }
+        if weight?.source == .health || weight == nil { count += 1 }
+        if height?.source == .health || height == nil { count += 1 }
+        if leanBodyMass?.source == .health || leanBodyMass == nil { count += 1 }
+        return count
+    }
+}
