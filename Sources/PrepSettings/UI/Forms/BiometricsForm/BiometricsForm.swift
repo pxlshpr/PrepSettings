@@ -1,6 +1,5 @@
 import SwiftUI
 import PrepShared
-import PrepSettings
 
 public struct BiometricsForm: View {
     

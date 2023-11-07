@@ -1,6 +1,5 @@
 import Foundation
 import PrepShared
-import PrepSettings
 
 protocol GenericSource: Pickable {
     var isHealth: Bool { get }

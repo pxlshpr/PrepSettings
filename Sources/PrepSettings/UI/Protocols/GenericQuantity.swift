@@ -1,6 +1,5 @@
 import Foundation
 import PrepShared
-import PrepSettings
 
 protocol GenericQuantity {
     var value: Double { get }

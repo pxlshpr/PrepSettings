@@ -1,6 +1,5 @@
 import SwiftUI
 import PrepShared
-import PrepSettings
 
 struct BiometricEnergyValueField<S: GenericSource>: View {
     

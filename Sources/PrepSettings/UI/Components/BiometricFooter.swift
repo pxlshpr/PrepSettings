@@ -1,6 +1,5 @@
 import SwiftUI
 import PrepShared
-import PrepSettings
 
 struct BiometricFooter<S: GenericSource>: View {
     

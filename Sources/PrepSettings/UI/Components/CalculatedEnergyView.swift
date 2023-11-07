@@ -1,6 +1,5 @@
 import SwiftUI
 import PrepShared
-import PrepSettings
 
 struct CalculatedEnergyView<Unit: BiometricUnit, S: GenericSource>: View {
     
