@@ -415,9 +415,7 @@ public extension BiometricsStore {
         if leanBodyMassSource.params.count == 1, let param = leanBodyMassSource.params.first {
             param.name
         } else {
-//            "Requirements"
-            "Parameters"
-//            "Variables"
+            "Health Data"
         }
     }
 
