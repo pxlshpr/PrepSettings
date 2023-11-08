@@ -1,19 +1,19 @@
 import SwiftUI
 import PrepShared
 
-struct BiometricLink: View {
+public struct BiometricLink: View {
     
     @Environment(BiometricsStore.self) var biometricsStore: BiometricsStore
     
     let type: BiometricType
     let isRequired: Bool
     
-    init(type: BiometricType, isRequired: Bool = false) {
+    public init(type: BiometricType, isRequired: Bool = false) {
         self.type = type
         self.isRequired = isRequired
     }
     
-    var body: some View {
+    public var body: some View {
         NavigationLink {
             Group {
                 switch type {
