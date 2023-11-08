@@ -48,6 +48,6 @@ public struct HealthSummary: View {
 
 #Preview {
     NavigationView {
-        HealthSummary(model: DocumentsBasedHealthModel)
+        HealthSummary(model: MockHealthModel)
     }
 }

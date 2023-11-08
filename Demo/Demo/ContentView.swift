@@ -11,7 +11,7 @@ import PrepSettings
 struct ContentView: View {
     
 //    @State var settingsStore = SettingsStore.shared
-    @State var model: HealthModel = DocumentsBasedHealthModel
+    @State var model: HealthModel = MockHealthModel
     
     init() {
 //        SettingsStore.configure(
