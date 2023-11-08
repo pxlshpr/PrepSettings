@@ -27,7 +27,8 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            BiometricsForm(biometricsStore, [.weight, .height])
+            BiometricsSummary(biometricsStore: biometricsStore)
+//            BiometricsForm(biometricsStore, [.weight, .height])
 //                .environment(settingsStore)
         }
     }
