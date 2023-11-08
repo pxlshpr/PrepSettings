@@ -7,8 +7,8 @@ public let MockHealthModel = HealthModel(
 
 public extension SettingsStore {
     /// Saves and fetches from a `.json` file encoded/decoded in the documents directory
-    func configureAsMock() {
-        SettingsStore.configure(
+    static func configureAsMock() {
+        configure(
             fetchHandler: fetchSettingsFromDocuments,
             saveHandler: saveSettingsInDocuments
         )
