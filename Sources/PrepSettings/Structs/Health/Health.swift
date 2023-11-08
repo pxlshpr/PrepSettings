@@ -79,7 +79,7 @@ public extension Health {
 }
 
 public extension Health {
-    var usesHealth: Bool {
+    var usesHealthKit: Bool {
         restingEnergy?.source == .healthKit
         || activeEnergy?.source == .healthKit
         || age?.source == .healthKit
@@ -91,7 +91,7 @@ public extension Health {
 }
 
 public extension RestingEnergyEquation {
-    func usesHealth(in health: Health) -> Bool {
+    func usesHealthKit(in health: Health) -> Bool {
         for param in self.params {
             switch param {
             case .sex:
@@ -114,7 +114,7 @@ public extension RestingEnergyEquation {
 }
 
 public extension LeanBodyMassEquation {
-    func usesHealth(in health: Health) -> Bool {
+    func usesHealthKit(in health: Health) -> Bool {
         for param in self.params {
             switch param {
             case .sex:
@@ -135,15 +135,15 @@ public extension LeanBodyMassEquation {
 public extension Health {
     var usesHealthKitForRestingEnergy: Bool {
         switch restingEnergySource {
-        case .equation:     restingEnergyEquation.usesHealth(in: self)
-        case .healthKit:       true
+        case .equation:     restingEnergyEquation.usesHealthKit(in: self)
+        case .healthKit:    true
         case .userEntered:  false
         }
     }
     
     var usesHealthKitForActiveEnergy: Bool {
         switch activeEnergySource {
-        case .healthKit:                       true
+        case .healthKit:                    true
         case .activityLevel, .userEntered:  false
         }
     }
@@ -159,9 +159,9 @@ public extension Health {
 
     var usesHealthKitForLeanBodyMass: Bool {
         switch leanBodyMassSource {
-        case .equation:         leanBodyMassEquation.usesHealth(in: self)
+        case .equation:         leanBodyMassEquation.usesHealthKit(in: self)
         case .fatPercentage:    usesHealthKitForWeight
-        case .healthKit:           true
+        case .healthKit:        true
         case .userEntered:      false
         }
     }
