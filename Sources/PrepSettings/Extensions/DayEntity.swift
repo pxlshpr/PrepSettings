@@ -2,23 +2,23 @@ import Foundation
 import PrepShared
 
 public extension DayEntity {
-    var biometrics: Biometrics? {
+    var health: Health? {
         get {
-            guard let biometricsData else { return nil }
+            guard let healthData else { return nil }
             do {
-                return try JSONDecoder().decode(Biometrics.self, from: biometricsData)
+                return try JSONDecoder().decode(Health.self, from: healthData)
             } catch {
                 /// Error decoding, so set to nil
-                self.biometricsData = nil
+                self.healthData = nil
                 return nil
             }
         }
         set {
             guard let newValue else {
-                self.biometricsData = nil
+                self.healthData = nil
                 return
             }
-            self.biometricsData = try! JSONEncoder().encode(newValue)
+            self.healthData = try! JSONEncoder().encode(newValue)
         }
     }
 }

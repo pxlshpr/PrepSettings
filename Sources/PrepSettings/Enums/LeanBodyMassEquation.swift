@@ -38,7 +38,7 @@ public extension LeanBodyMassEquation {
         }
     }
     
-    var params: [BiometricType] {
+    var params: [HealthType] {
         [.sex, .weight, .height]
     }
     

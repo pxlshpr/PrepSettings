@@ -15,7 +15,7 @@ let package = Package(
             targets: ["PrepSettings"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pxlshpr/PrepShared", from: "0.0.165"),
+        .package(url: "https://github.com/pxlshpr/PrepShared", from: "0.0.172"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

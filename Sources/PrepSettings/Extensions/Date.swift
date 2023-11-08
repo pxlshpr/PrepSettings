@@ -10,7 +10,7 @@ public extension Date {
 }
 
 public extension Date {
-    var biometricShortFormat: String {
+    var healthShortFormat: String {
         let dayString: String
         var timeString = ""
         if Calendar.current.isDateInToday(self) {
@@ -36,7 +36,7 @@ public extension Date {
         }
     }
 
-    var biometricFormat: String {
+    var healthFormat: String {
         let dayString: String
         var timeString = shortTime
         if Calendar.current.isDateInToday(self) { dayString = "Today" }
@@ -56,7 +56,7 @@ public extension Date {
         }
     }
     
-    var biometricEnergyFormat: String {
+    var healthEnergyFormat: String {
         let dayString: String
         if Calendar.current.isDateInToday(self) { dayString = "Today" }
         else if Calendar.current.isDateInYesterday(self) { dayString = "Yesterday" }

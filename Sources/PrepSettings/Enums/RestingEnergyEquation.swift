@@ -72,7 +72,7 @@ public extension RestingEnergyEquation {
         }
     }
 
-    var params: [BiometricType] {
+    var params: [HealthType] {
         switch self {
         case .katchMcardle, .cunningham:
             [.leanBodyMass]

@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-struct CalculatedEnergyView<Unit: BiometricUnit, S: GenericSource>: View {
+struct CalculatedEnergyView<Unit: HealthUnit, S: GenericSource>: View {
     
     let valueBinding: Binding<Double?>
     let intervalBinding: Binding<HealthInterval?>
@@ -52,7 +52,7 @@ struct CalculatedEnergyView<Unit: BiometricUnit, S: GenericSource>: View {
     }
 
     func dateView(_ date: Date) -> some View {
-        Text(date.biometricEnergyFormat)
+        Text(date.healthEnergyFormat)
             .font(.footnote)
             .foregroundStyle(.secondary)
             .padding(.vertical, 3)

@@ -8,6 +8,6 @@ protocol GenericQuantity {
 
 extension Quantity: GenericQuantity {
     var prefix: String? {
-        date?.biometricFormat
+        date?.healthFormat
     }
 }

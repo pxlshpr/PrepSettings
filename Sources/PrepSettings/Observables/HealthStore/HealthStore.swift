@@ -5,7 +5,6 @@ public class HealthStore {
     
     internal static let shared = HealthStore()
     internal static let store: HKHealthStore = HKHealthStore()
-    internal var updateBiometricsTask: Task<Void, Error>? = nil
     
     public static var defaultUnitHandler: ((QuantityType) -> HKUnit)? = nil
 }

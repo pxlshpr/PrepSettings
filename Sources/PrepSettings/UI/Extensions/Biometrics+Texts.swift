@@ -1,19 +1,19 @@
 import SwiftUI
 import PrepShared
 
-public extension Biometrics {
+public extension Health {
 
-    var restingEnergyBiometricsLinkText: some View {
-        biometricsLinkText(for: restingEnergyEquation.params)
+    var restingEnergyHealthLinkText: some View {
+        healthLinkText(for: restingEnergyEquation.params)
     }
 
-    var leanBodyMassBiometricsLinkText: some View {
-        biometricsLinkText(for: leanBodyMassSource.params)
+    var leanBodyMassHealthLinkText: some View {
+        healthLinkText(for: leanBodyMassSource.params)
     }
 
-    func biometricsLinkText(for types: [BiometricType]) -> some View {
+    func healthLinkText(for types: [HealthType]) -> some View {
         @ViewBuilder
-        func view(for type: BiometricType) -> some View {
+        func view(for type: HealthType) -> some View {
             if haveValue(for: type) {
                 textView(for: type)
                     .foregroundStyle(.secondary)
@@ -34,7 +34,7 @@ public extension Biometrics {
     }
     
     @ViewBuilder
-    func textView(for type: BiometricType) -> some View {
+    func textView(for type: HealthType) -> some View {
         switch type {
         case .sex:                  sexText
         case .age:                  ageText
@@ -60,7 +60,7 @@ public extension Biometrics {
         if let age = age?.value {
             HStack(spacing: 3) {
                 Text("\(age)")
-                    .font(BiometricFont)
+                    .font(HealthFont)
                     .contentTransition(.numericText(value: Double(age)))
                 Text("years")
             }
@@ -71,8 +71,8 @@ public extension Biometrics {
     var fatPercentageText: some View {
         if let fatPercentage {
             HStack(spacing: 3) {
-                Text(fatPercentage.biometricString)
-                    .font(BiometricFont)
+                Text(fatPercentage.healthString)
+                    .font(HealthFont)
                     .contentTransition(.numericText(value: fatPercentage))
                 Text("%")
             }
@@ -82,7 +82,7 @@ public extension Biometrics {
     func energyText(_ value: Double) -> some View {
         HStack(spacing: 3) {
             Text("\(value.formattedEnergy)")
-                .font(BiometricFont)
+                .font(HealthFont)
                 .contentTransition(.numericText(value: value))
             Text("\(energyUnit.abbreviation)")
         }
@@ -107,7 +107,7 @@ public extension Biometrics {
         if let maintenanceEnergy {
             HStack(spacing: 3) {
                 Text(maintenanceEnergy.formattedEnergy)
-                    .font(BiometricFont)
+                    .font(HealthFont)
                 Text(energyUnit.abbreviation)
             }
             .foregroundStyle(.secondary)
@@ -117,7 +117,7 @@ public extension Biometrics {
     @ViewBuilder
     var weightText: some View {
         if let value = weightQuantity?.value {
-            BiometricTextView(
+            HealthTextView(
                 unit: bodyMassUnit,
                 value: value,
                 secondComponent: value.fraction * PoundsPerStone
@@ -128,7 +128,7 @@ public extension Biometrics {
     @ViewBuilder
     var leanBodyMassText: some View {
         if let value = leanBodyMassQuantity?.value {
-            BiometricTextView(
+            HealthTextView(
                 unit: bodyMassUnit,
                 value: value,
                 secondComponent: value.fraction * PoundsPerStone
@@ -139,7 +139,7 @@ public extension Biometrics {
     @ViewBuilder
     var heightText: some View {
         if let value = heightQuantity?.value {
-            BiometricTextView(
+            HealthTextView(
                 unit: heightUnit,
                 value: value,
                 secondComponent: value.fraction * InchesPerFoot

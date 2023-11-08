@@ -16,27 +16,27 @@ extension GenericSource {
     }
 }
 
-extension BiometricSource: GenericSource {
-    var isHealth: Bool { self == .health }
+extension HealthSource: GenericSource {
+    var isHealth: Bool { self == .healthKit }
     var isManual: Bool { self == .userEntered }
 }
 
 extension AgeSource: GenericSource {
-    var isHealth: Bool { self == .health }
+    var isHealth: Bool { self == .healthKit }
     var isManual: Bool { self == .userEnteredAge }
 }
 
 extension RestingEnergySource: GenericSource {
-    var isHealth: Bool { self == .health }
+    var isHealth: Bool { self == .healthKit }
     var isManual: Bool { self == .userEntered }
 }
 
 extension ActiveEnergySource: GenericSource {
-    var isHealth: Bool { self == .health }
+    var isHealth: Bool { self == .healthKit }
     var isManual: Bool { self == .userEntered }
     var placeholder: String {
         switch self {
-        case .health:           "Unavailable"
+        case .healthKit:        "Unavailable"
         case .activityLevel:    "Resting energy required"
         case .userEntered:      "Not set"
         }
@@ -44,13 +44,13 @@ extension ActiveEnergySource: GenericSource {
 }
 
 extension LeanBodyMassSource: GenericSource {
-    var isHealth: Bool { self == .health }
+    var isHealth: Bool { self == .healthKit }
     var isManual: Bool { self == .userEntered }
     var placeholder: String {
         switch self {
-        case .health:           "Unavailable"
+        case .healthKit:        "Unavailable"
         case .userEntered:      "Not set"
-        case .equation:         "Biometrics required"
+        case .equation:         "Health data required"
         case .fatPercentage:    "Fat percentage required"
         }
     }

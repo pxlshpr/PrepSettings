@@ -2,7 +2,7 @@ import Foundation
 import PrepShared
 
 public enum LeanBodyMassSource: Int16, Codable, CaseIterable {
-    case health = 1
+    case healthKit = 1
     case equation
     case fatPercentage
     case userEntered
@@ -17,7 +17,7 @@ public extension LeanBodyMassSource {
         }
     }
     
-    var params: [BiometricType] {
+    var params: [HealthType] {
         switch self {
         case .equation:
             [.sex, .weight, .height]
@@ -32,7 +32,7 @@ public extension LeanBodyMassSource {
 extension LeanBodyMassSource: Pickable {
     public var menuImage: String {
         switch self {
-        case .health:           "heart.fill"
+        case .healthKit:        "heart.fill"
         case .equation:         "function"
         case .fatPercentage:    "function"
         case .userEntered:      ""
@@ -44,7 +44,7 @@ extension LeanBodyMassSource: Pickable {
     public var menuTitle: String {
         switch self {
         case .equation:         "Equation"
-        case .health:           "Health app"
+        case .healthKit:        "Health app"
         case .fatPercentage:    "Fat percentage"
         case .userEntered:      "Entered manually"
         }
