@@ -7,22 +7,11 @@ struct HealthFooter<S: GenericSource>: View {
     let type: HealthType
     let hasQuantity: Bool
     
-    @ViewBuilder
     var body: some View {
-        if let string {
-            Text(string)
-        } else {
-            EmptyView()
-        }
-    }
-    
-    var string: String? {
-        switch source.isHealth {
-        case true:
-            healthFooterString(for: type, hasQuantity: hasQuantity)
-        case false:
-            nil
-//            "Your will have to manually keep your \(type.abbreviation) updated here."
+        VStack(alignment: .leading) {
+            if let reason = type.reason {
+                Text(reason)
+            }
         }
     }
 }
@@ -34,4 +23,3 @@ func healthFooterString(for type: HealthType, hasQuantity: Bool) -> String {
         "Make sure you have allowed Prep to read your \(type.abbreviation) data in Settings > Privacy & Security > Health > Prep."
     }
 }
-

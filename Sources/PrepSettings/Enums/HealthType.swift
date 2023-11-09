@@ -1,7 +1,7 @@
 import Foundation
 import PrepShared
 
-public enum HealthType {
+public enum HealthType: CaseIterable {
     case maintenanceEnergy
     case restingEnergy
     case activeEnergy
@@ -11,6 +11,23 @@ public enum HealthType {
     case leanBodyMass
     case fatPercentage
     case height
+    case pregnancyStatus
+    case isSmoker
+}
+
+public extension HealthType {
+    static var summaryTypes: [HealthType] {
+        [
+            .maintenanceEnergy,
+            .age,
+            .sex,
+            .height,
+            .weight,
+            .leanBodyMass,
+            .pregnancyStatus,
+            .isSmoker
+        ]
+    }
 }
 
 public extension HealthType {
@@ -33,6 +50,8 @@ public extension HealthType {
         case .leanBodyMass:         "lean body mass"
         case .fatPercentage:        "fat %"
         case .height:               "height"
+        case .pregnancyStatus:      "pregnancy status"
+        case .isSmoker:             "smoker"
         }
     }
     
@@ -47,6 +66,8 @@ public extension HealthType {
         case .leanBodyMass:         "Lean Body Mass"
         case .fatPercentage:        "Fat Percentage"
         case .height:               "Height"
+        case .pregnancyStatus:      "Pregnancy Status"
+        case .isSmoker:             "Smoker"
         }
     }
 
@@ -71,6 +92,25 @@ public extension BodyMassType {
         switch self {
         case .weight:   .weight
         case .leanMass: .leanBodyMass
+        }
+    }
+}
+
+extension HealthType {
+    var reason: String? {
+        switch self {
+        case .maintenanceEnergy:
+            "Used to create goals relative to it."
+        case .sex:
+            "Used to calculate resting energy or lean body mass. Also used to pick daily values for micronutrients."
+        case .age:
+            "Used to calculate resting energy or pick daily values for micronutrients."
+        case .leanBodyMass:
+            "Used to create goals relative to it and calculate resting energy."
+        case .weight, .height:
+            "Used to calculate resting energy or lean body mass."
+        default:
+            nil
         }
     }
 }

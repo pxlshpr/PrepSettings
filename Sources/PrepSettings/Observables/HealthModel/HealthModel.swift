@@ -170,3 +170,13 @@ public extension HealthModel {
         }
     }
 }
+
+extension HealthModel {
+    func remove(_ type: HealthType) {
+        health.remove(type)
+    }
+    
+    func add(_ type: HealthType) {
+        health.add(type)
+    }
+}

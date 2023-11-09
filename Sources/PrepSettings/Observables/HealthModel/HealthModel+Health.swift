@@ -115,6 +115,7 @@ public extension HealthModel {
         
         let components = try await HealthStore.dateOfBirthComponents()
         
+        print(String(describing: components))
         if preservingExistingValue { guard components != nil else { return } }
 
         try Task.checkCancellation()

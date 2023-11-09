@@ -241,7 +241,7 @@ public extension HealthModel {
         if leanBodyMassSource.params.count == 1, let param = leanBodyMassSource.params.first {
             param.name
         } else {
-            "Health Data"
+            "Health Details"
         }
     }
 
@@ -259,12 +259,20 @@ public extension HealthModel {
 
     var ageValue: Int {
         get { health.ageValue ?? 0 }
-        set { health.ageValue = newValue }
+        set {
+            health.ageValue = newValue
+            health.age?.dateOfBirthComponents = newValue.dateOfBirthComponentsForAge
+        }
     }
 
     var sexValue: Sex? {
         get { health.sexValue }
         set { health.sexValue = newValue }
+    }
+
+    var pregnancyStatus: PregnancyStatus? {
+        get { health.pregnancyStatus }
+        set { health.pregnancyStatus = newValue }
     }
     
     var weightValue: Double {

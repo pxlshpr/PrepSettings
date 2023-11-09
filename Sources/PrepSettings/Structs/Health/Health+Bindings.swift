@@ -91,12 +91,15 @@ public extension Health {
     var ageSource: AgeSource {
         get { age?.source ?? .default }
         set {
-            age = Age(source: newValue)
-            //            guard age != nil else {
-            //                age = Age(source: newValue)
-            //                return
-            //            }
-            //            age?.source = newValue
+            
+            /// Either use the existing age or set the default age
+            let value = age?.value ?? newValue.defaultValue
+            
+            let components = switch newValue {
+            case .userEnteredDateOfBirth:   age?.dateOfBirthComponents
+            default:                        value.dateOfBirthComponentsForAge
+            }
+            age = Age(source: newValue, dateOfBirthComponents: components, value: value)
         }
     }
     
@@ -108,6 +111,10 @@ public extension Health {
                 return
             }
             sex?.source = newValue
+            if newValue != .healthKit, sex?.value == .other {
+                /// Reset this when changing from `HealthSource.healthKit` to `.userEntered` and we had `Sex.other` set
+                sex?.value = .female
+            }
         }
     }
     

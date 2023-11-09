@@ -1,6 +1,12 @@
 import Foundation
 import PrepShared
 
+let DefaultAge = 20
+let DefaultDateOfBirth = Date.now.moveYearBy(-DefaultAge)
+let DefaultWeightInKg = 62.0
+let DefaultHeightInCm = 170.0
+let DefaultFatPercentage = 22.0
+
 public enum AgeSource: Int16, Codable, CaseIterable {
     case healthKit = 1
     case userEnteredDateOfBirth
@@ -22,6 +28,10 @@ public extension AgeSource {
         case .userEnteredDateOfBirth:   "calendar"
         case .userEnteredAge:           ""
         }
+    }
+    
+    var defaultValue: Int {
+        DefaultAge
     }
 }
 

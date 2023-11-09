@@ -14,7 +14,7 @@ public struct HealthForm: View {
         self.title = if let types, let type = types.first, types.count == 1 {
             type.name
         } else {
-            "Health Data"
+            "Health Details"
         }
     }
     

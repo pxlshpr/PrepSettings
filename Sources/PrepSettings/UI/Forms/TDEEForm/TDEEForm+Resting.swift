@@ -2,6 +2,8 @@ import SwiftUI
 import HealthKit
 import PrepShared
 
+/// [ ] Add footer for when HealthKit values aren't available
+
 extension TDEEForm {
     
     struct RestingSection: View {
@@ -55,7 +57,7 @@ extension TDEEForm.RestingSection {
                 if params.count == 1, let param = params.first {
                     param.name
                 } else {
-                    "Health Data"
+                    "Health Details"
                 }
             }
             

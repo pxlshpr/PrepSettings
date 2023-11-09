@@ -45,16 +45,32 @@ public extension Health {
         case .restingEnergy:        restingEnergyText
         case .activeEnergy:         activeEnergyText
         case .maintenanceEnergy:    maintenanceText
+        case .pregnancyStatus:      pregnancyStatusText
+        case .isSmoker:             isSmokerText
         }
     }
     
     @ViewBuilder
     var sexText: some View {
-        if let sexValue, sexValue != .notSpecified {
+        if let sexValue, sexValue != .other {
             Text(sexValue.name)
         }
     }
+
+    @ViewBuilder
+    var pregnancyStatusText: some View {
+        if let pregnancyStatus {
+            Text(pregnancyStatus.name)
+        }
+    }
     
+    @ViewBuilder
+    var isSmokerText: some View {
+        if let isSmoker {
+            Text(isSmoker ? "Yes" : "No")
+        }
+    }
+
     @ViewBuilder
     var ageText: some View {
         if let age = age?.value {

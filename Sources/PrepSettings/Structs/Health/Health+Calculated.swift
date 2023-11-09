@@ -45,11 +45,11 @@ public extension Health {
         }
 
         guard let source = leanBodyMass?.source else {
-            leanBodyMass = .init(
-                source: .default,
-                equation: .default,
-                quantity: nil
-            )
+//            leanBodyMass = .init(
+//                source: .default,
+//                equation: .default,
+//                quantity: nil
+//            )
             return
         }
 
@@ -60,8 +60,7 @@ public extension Health {
             guard let equation = leanBodyMass?.equation,
                   let weightInKg,
                   let heightInCm,
-                  let sex = sex?.value,
-                  sex != .notSpecified
+                  let sex = sex?.value
             else {
                 clearQuantity()
                 return
