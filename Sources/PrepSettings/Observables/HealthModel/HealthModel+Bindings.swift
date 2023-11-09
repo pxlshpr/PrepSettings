@@ -247,6 +247,11 @@ public extension HealthModel {
 
     //MARK: Values
     
+    var isSmoker: Bool {
+        get { health.isSmoker ?? false }
+        set { health.isSmoker = newValue }
+    }
+    
     var restingEnergyValue: Double {
         get { health.restingEnergyValue ?? 0 }
         set { health.restingEnergyValue = newValue }

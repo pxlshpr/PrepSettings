@@ -71,6 +71,13 @@ public extension HealthType {
         }
     }
 
+    var nameWhenSetting: String {
+        switch self {
+        case .isSmoker: "Smoking Status"
+        default: name
+        }
+    }
+    
     var usesUnit: Bool {
         switch self {
         case .sex, .age, .fatPercentage: false
@@ -100,13 +107,13 @@ extension HealthType {
     var reason: String? {
         switch self {
         case .maintenanceEnergy:
-            "Used to create goals relative to it."
+            "Used to create goals."
         case .sex:
             "Used to calculate resting energy or lean body mass. Also used to pick daily values for micronutrients."
         case .age:
             "Used to calculate resting energy or pick daily values for micronutrients."
         case .leanBodyMass:
-            "Used to create goals relative to it and calculate resting energy."
+            "Used to create goals and calculate resting energy."
         case .weight, .height:
             "Used to calculate resting energy or lean body mass."
         default:

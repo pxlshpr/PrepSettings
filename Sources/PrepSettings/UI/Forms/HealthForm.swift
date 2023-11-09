@@ -33,15 +33,15 @@ public struct HealthForm: View {
     func section(for param: HealthType) -> some View {
         switch param {
         case .sex:
-            sexSection
+            HealthSexSection(model)
         case .age:
-            ageSection
+            HealthAgeSection(model)
         case .weight:
-            weightSection
+            HealthWeightSection(model)
         case .leanBodyMass:
-            leanBodyMassSection
+            HealthLeanBodyMassSection(model)
         case .height:
-            heightSection
+            HealthHeightSection(model)
         default:
             EmptyView()
         }

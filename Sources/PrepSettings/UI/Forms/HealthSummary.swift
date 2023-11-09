@@ -14,31 +14,62 @@ public struct HealthSummary: View {
     
     public var body: some View {
         Form {
-//            fetchAllFromHealthSection
-            Section {
-                TipView(tip, arrowEdge: .bottom)
-                    .listRowBackground(EmptyView())
-            }
-            .listSectionSpacing(.compact)
-            section(for: .maintenanceEnergy)
-            section(for: .weight)
-            section(for: .height)
-            
-            section(for: .age)
-            section(for: .sex)
-            section(for: .leanBodyMass)
-
+//            syncAllSection
+            content(for: .maintenanceEnergy)
+            content(for: .weight)
+            content(for: .height)
+            content(for: .age)
+            content(for: .sex)
+            content(for: .leanBodyMass)
             dailyValuesSection
 
-//            ForEach(HealthType.summaryTypes, id: \.self) {
-//                section(for: $0)
-//            }
         }
         .navigationTitle("Health Details")
         .navigationBarTitleDisplayMode(.large)
     }
     
-    func section(for type: HealthType) -> some View {
+    var syncAllSection: some View {
+//            Section {
+//                TipView(tip, arrowEdge: .bottom)
+//                    .listRowBackground(EmptyView())
+//            }
+        var section: some View {
+            Section {
+                HStack(alignment: .top) {
+                    VStack {
+                        Image(systemName: "heart.text.square")
+                            .font(.system(size: 50))
+                            .foregroundStyle(Color.accentColor)
+                        Spacer()
+                    }
+                    VStack(alignment: .leading) {
+                        Text("Health App data")
+                            .fontWeight(.semibold)
+                        Text("Use your data from the Health App and have them stay synced to any changes")
+                            .font(.system(.callout))
+                            .foregroundStyle(.secondary)
+                        Divider()
+                        Button("Use Health App") {
+                            Task(priority: .userInitiated) {
+                                try await model.setAllFromHealthKit()
+                            }
+                        }
+                        .fontWeight(.semibold)
+                        .padding(.top, 5)
+                    }
+                }
+                .padding(.top)
+            }
+        }
+        
+        return Group {
+            if model.health.healthSourcedCount > 1 {
+                section
+            }
+        }
+    }
+    
+    func content(for type: HealthType) -> some View {
         
         @ViewBuilder
         var footer: some View {
@@ -48,7 +79,7 @@ public struct HealthSummary: View {
         }
         
         var addButton: some View {
-            Button("Set \(type.name)") {
+            Button("Set \(type.nameWhenSetting)") {
                 withAnimation {
                     model.add(type)
                 }
@@ -59,15 +90,27 @@ public struct HealthSummary: View {
         var section: some View {
             switch type {
             case .age:
-                HealthAgeSection(model: model)
+                HealthAgeSection(model)
             case .weight:
-                HealthWeightSection(model: model)
+                HealthWeightSection(model)
             case .height:
-                HealthHeightSection(model: model)
+                HealthHeightSection(model)
             case .sex:
-                HealthSexSection(model: model)
+                HealthSexSection(model)
             case .leanBodyMass:
-                HealthLeanBodyMassSection(model: model)
+                HealthLeanBodyMassSection(model)
+            case .pregnancyStatus:
+                HealthTopRow(type: .pregnancyStatus, model: model)
+            case .isSmoker:
+                HealthTopRow(type: .isSmoker, model: model)
+            case .maintenanceEnergy:
+                Group {
+                    TDEEFormSections(model)
+//                    Divider()
+//                    Color.clear
+//                        .listRowBackground(EmptyView())
+//                        .listSectionSpacing(0)
+                }
             default:
                 Section {
                     link(type)
@@ -97,12 +140,12 @@ public struct HealthSummary: View {
         var footer: some View {
             Text("Used to pick daily values for micronutrients.")
         }
-        return Section(header: header, footer: footer) {
+        return Section(footer: footer) {
             if model.sexValue == .female {
-                link(.pregnancyStatus)
+                content(for: .pregnancyStatus)
             }
             if model.pregnancyStatus == nil || model.pregnancyStatus == .notPregnantOrLactating {
-                link(.isSmoker)
+                content(for: .isSmoker)
             }
         }
     }
@@ -110,29 +153,6 @@ public struct HealthSummary: View {
     func link(_ type: HealthType) -> some View {
         HealthLink(type: type)
             .environment(model)
-    }
-    
-    @ViewBuilder
-    var fetchAllFromHealthSection: some View {
-        if model.health.healthSourcedCount > 1 {
-            Section {
-                Button("Set all from Health app") {
-                    Task(priority: .userInitiated) {
-                        try await model.setAllFromHealthKit()
-                    }
-                }
-            }
-        }
-    }
-}
-
-#Preview {
-    NavigationView {
-        HealthSummary(model: MockHealthModel)
-    }
-    .task {
-        Tips.showAllTipsForTesting()
-        try? Tips.configure()
     }
 }
 
@@ -160,5 +180,15 @@ struct FetchAllFromHealthTip: Tip {
         [
             Tip.MaxDisplayCount(1),
         ]
+    }
+}
+
+#Preview {
+    NavigationView {
+        HealthSummary(model: MockHealthModel)
+    }
+    .task {
+        Tips.showAllTipsForTesting()
+        try? Tips.configure()
     }
 }

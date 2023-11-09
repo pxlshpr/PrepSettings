@@ -46,7 +46,8 @@ extension Health {
         case.leanBodyMass:
             leanBodyMassSource = .equation
         case .pregnancyStatus:
-            pregnancyStatus = .notPregnantOrLactating
+            pregnancyStatus = .pregnant
+            isSmoker = nil
         case .isSmoker:
             isSmoker = false
         case .maintenanceEnergy:

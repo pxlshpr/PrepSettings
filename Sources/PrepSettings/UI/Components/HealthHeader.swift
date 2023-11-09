@@ -9,11 +9,7 @@ struct HealthHeader: View {
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(type.name)
-                .font(.title3)
-                .textCase(.none)
-                .foregroundStyle(Color(.label))
-                .fontWeight(.semibold)
+            HealthHeaderText(type.name)
             Spacer()
             removeButton
         }
