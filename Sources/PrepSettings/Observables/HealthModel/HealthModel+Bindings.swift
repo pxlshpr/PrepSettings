@@ -142,28 +142,28 @@ public extension HealthModel {
     var weightSource: HealthSource {
         get { health.weightSource }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.weightSource = newValue
-                }
-                if newValue == .healthKit {
-                    try await setWeightFromHealthKit()
-                }
-            }
+//                }
+//                if newValue == .healthKit {
+//                    try await setWeightFromHealthKit()
+//                }
+//            }
         }
     }
 
     var heightSource: HealthSource {
         get { health.heightSource }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.heightSource = newValue
-                }
-                if newValue == .healthKit {
-                    try await setHeightFromHealthKit()
-                }
-            }
+//                }
+//                if newValue == .healthKit {
+//                    try await setHeightFromHealthKit()
+//                }
+//            }
         }
     }
 

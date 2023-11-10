@@ -22,6 +22,8 @@ import PrepShared
             handleChanges(from: oldValue)
         }
     }
+    
+    var typesBeingSetFromHealthKit: [HealthType] = []
 
     /// Current Health
     public init(
@@ -50,10 +52,33 @@ import PrepShared
         Task {
             let health = try await handler()
             await MainActor.run {
+                /// Ignoring changes so that we don't trigger permissions and health fetches implicitly (we should do it explicitly at the right time, and not when loading this)
+                ignoreChanges = true
                 self.health = health
+                ignoreChanges = false
                 post(.didLoadCurrentHealth)
             }
         }
+    }
+}
+
+public extension HealthModel {
+    func isSettingTypeFromHealthKit(_ type: HealthType) -> Bool {
+        typesBeingSetFromHealthKit.contains(type)
+    }
+    
+    func startSettingTypeFromHealthKit(_ type: HealthType) {
+        guard !isSettingTypeFromHealthKit(type) else { return }
+        typesBeingSetFromHealthKit.append(type)
+    }
+    
+    func stopSettingTypeFromHealthKit(_ type: HealthType) {
+        guard isSettingTypeFromHealthKit(type) else { return }
+        typesBeingSetFromHealthKit.removeAll(where: { $0 == type })
+    }
+    
+    var isSettingMaintenanceFromHealthKit: Bool {
+        isSettingTypeFromHealthKit(.restingEnergy) || isSettingTypeFromHealthKit(.activeEnergy)
     }
 }
 
@@ -78,7 +103,8 @@ public extension HealthModel {
         Task {
             switch heightSource {
             case .healthKit:
-                try await setHeightFromHealthKit(using: newValue)
+                break
+//                try await setHeightFromHealthKit(using: newValue)
             case .userEntered:
                 await MainActor.run {
                     if type != .height, let value = health.height?.quantity?.value {
@@ -99,7 +125,8 @@ public extension HealthModel {
         Task {
             switch restingEnergySource {
             case .healthKit:
-                try await setRestingEnergyFromHealthKit(using: newValue)
+//                try await setRestingEnergyFromHealthKit(using: newValue)
+                break
             case .equation:
                 break
             case .userEntered:
@@ -115,7 +142,8 @@ public extension HealthModel {
             
             switch activeEnergySource {
             case .healthKit:
-                try await setActiveEnergyFromHealthKit(using: newValue)
+                break
+//                try await setActiveEnergyFromHealthKit(using: newValue)
             case .activityLevel:
                 break
             case .userEntered:
@@ -140,7 +168,8 @@ public extension HealthModel {
         Task {
             switch weightSource {
             case .healthKit:
-                try await setWeightFromHealthKit(using: newValue)
+                break
+//                try await setWeightFromHealthKit(using: newValue)
             case .userEntered:
                 await MainActor.run {
                     if type != .weight, let value = health.weight?.quantity?.value {
@@ -152,7 +181,8 @@ public extension HealthModel {
             
             switch leanBodyMassSource {
             case .healthKit:
-                try await setLeanBodyMassFromHealthKit(using: newValue)
+                break
+//                try await setLeanBodyMassFromHealthKit(using: newValue)
             case .equation, .fatPercentage:
                 break
             case .userEntered:

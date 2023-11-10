@@ -11,16 +11,10 @@ struct HealthHeightSection: View {
     
     var body: some View {
         Section(footer: footer) {
-//            HealthSourcePicker(sourceBinding: $model.heightSource)
             HealthTopRow(type: .height, model: model)
             valueRow
             healthKitErrorCell
         }
-    }
-    
-    var header: some View {
-        HealthHeader(type: .height)
-            .environment(model)
     }
     
     var footer: some View {
@@ -33,7 +27,7 @@ struct HealthHeightSection: View {
     
     @ViewBuilder
     var healthKitErrorCell: some View {
-        if model.health.heightSource == .healthKit, model.health.height?.quantity == nil {
+        if model.shouldShowHealthKitError(for: .height) {
             HealthKitErrorCell(type: .height)
         }
     }
@@ -43,13 +37,17 @@ struct HealthHeightSection: View {
         if let height = model.health.height {
             HStack {
                 Spacer()
-                switch height.source {
-                case .healthKit:
-                    healthValue
-                case .userEntered:
-                    manualValue
+                if model.isSettingTypeFromHealthKit(.height) {
+                    ProgressView()
+                } else {
+                    switch height.source {
+                    case .healthKit:
+                        healthValue
+                    case .userEntered:
+                        manualValue
+                    }
                 }
-            }      
+            }
         }
     }
     

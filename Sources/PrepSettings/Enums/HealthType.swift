@@ -107,7 +107,7 @@ extension HealthType {
     var reason: String? {
         switch self {
         case .maintenanceEnergy:
-            "Used to create goals."
+            "Your maintenance energy can be used to create energy goals that are relative to it."
         case .sex:
             "Used to calculate resting energy or lean body mass. Also used to pick daily values for micronutrients."
         case .age:

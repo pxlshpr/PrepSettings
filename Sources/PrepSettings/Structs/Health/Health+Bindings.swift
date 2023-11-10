@@ -126,6 +126,7 @@ public extension Health {
                 return
             }
             weight?.source = newValue
+            weight?.quantity?.date = nil
         }
     }
     
@@ -137,6 +138,7 @@ public extension Health {
                 return
             }
             height?.source = newValue
+            height?.quantity?.date = nil
         }
     }
     

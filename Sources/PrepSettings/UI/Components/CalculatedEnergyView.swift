@@ -30,7 +30,7 @@ struct CalculatedEnergyView<Unit: HealthUnit, S: GenericSource>: View {
             }
             HStack {
                 HStack(spacing: 2) {
-                    HealthKitValue(valueBinding, source, showPrecision: false)
+                    HealthKitValueView(valueBinding, source, showPrecision: false)
                     if value != nil {
                         MenuPicker<Unit>(unitBinding)
                     }

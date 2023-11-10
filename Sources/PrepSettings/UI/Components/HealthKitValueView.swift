@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-struct HealthKitValue<S: GenericSource>: View {
+struct HealthKitValueView<S: GenericSource>: View {
     
     var binding: Binding<Double?>
     let source: S

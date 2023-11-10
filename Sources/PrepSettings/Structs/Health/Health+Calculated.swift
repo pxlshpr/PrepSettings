@@ -12,7 +12,7 @@ public extension Health {
         calculateLeanBodyMass()
         calculateRestingEnergy()
         calculateActiveEnergy()
-        
+
         updatedAt = Date.now
     }
     
@@ -98,7 +98,7 @@ public extension Health {
             }
         }
 
-        guard activeEnergySource == .activityLevel else { return }
+        guard activeEnergy != nil, activeEnergySource == .activityLevel else { return }
         guard let restingEnergyValue else {
             setValue(nil)
             return
@@ -116,7 +116,7 @@ public extension Health {
             }
         }
         
-        guard restingEnergySource == .equation else { return }
+        guard restingEnergy != nil, restingEnergySource == .equation else { return }
         
         let value: Double? = switch restingEnergyEquation {
         case .katchMcardle, .cunningham:

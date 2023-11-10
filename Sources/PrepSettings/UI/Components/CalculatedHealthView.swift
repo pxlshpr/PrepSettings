@@ -63,14 +63,14 @@ struct CalculatedHealthView<Unit: HealthUnit, S: GenericSource, Q: GenericQuanti
             }
             HStack {
                 HStack(spacing: 2) {
-                    HealthKitValue(valueBinding, source)
+                    HealthKitValueView(valueBinding, source)
                     if quantity != nil {
                         MenuPicker<Unit>(unitBinding)
                     }
                 }
                 if hasTwoComponents, quantity != nil {
                     HStack(spacing: 2) {
-                        HealthKitValue(secondComponentBinding, source)
+                        HealthKitValueView(secondComponentBinding, source)
                         if let string = Unit.secondaryUnit {
                             Text(string)
                                 .foregroundStyle(.secondary)

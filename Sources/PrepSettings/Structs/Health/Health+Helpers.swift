@@ -79,7 +79,7 @@ extension Health {
 extension Health {
     func hasType(_ type: HealthType) -> Bool {
         switch type {
-        case .maintenanceEnergy:    maintenanceEnergy != nil
+        case .maintenanceEnergy:    restingEnergy != nil && activeEnergy != nil
         case .activeEnergy:         activeEnergy != nil
         case .restingEnergy:        restingEnergy != nil
         case .sex:                  sex != nil

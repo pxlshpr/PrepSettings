@@ -141,12 +141,16 @@ extension TDEEFormSections.ActiveSection {
     
     var body: some View {
 //        Section(header: HealthHeaderText("Active Energy")) {
-        Section {
+        Section(footer: footer) {
 //            PickerField("Active Energy", $model.restingEnergySource)
 //            HealthSourcePicker(sourceBinding: $model.activeEnergySource)
             HealthTopRow(type: .activeEnergy, model: model)
             content
         }
+    }
+    
+    var footer: some View {
+        Text(HealthType.maintenanceEnergy.reason!)
     }
     
     @ViewBuilder

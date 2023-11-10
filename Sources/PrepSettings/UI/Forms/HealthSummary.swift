@@ -2,6 +2,45 @@ import SwiftUI
 import PrepShared
 import TipKit
 
+struct HealthBodyProfileTitle: View {
+    
+    @Bindable var model: HealthModel
+    
+    init(_ model: HealthModel) {
+        self.model = model
+    }
+    
+    @ViewBuilder
+    var body: some View {
+        if model.health.hasType(.maintenanceEnergy) {
+            content
+                .padding(.top)
+        } else {
+            content
+        }
+    }
+    
+    var content: some View {
+        Text("Body Profile")
+            .font(.title2)
+            .textCase(.none)
+            .foregroundStyle(Color(.label))
+            .fontWeight(.bold)
+    }
+}
+
+public extension Health {
+    var doesNotHaveAnyHealthKitBasedTypesSet: Bool {
+        restingEnergy == nil
+        && activeEnergy == nil
+        && age == nil
+        && sex == nil
+        && weight == nil
+        && height == nil
+        && leanBodyMass == nil
+    }
+}
+
 public struct HealthSummary: View {
     
     @Bindable var model: HealthModel
@@ -14,18 +53,34 @@ public struct HealthSummary: View {
     
     public var body: some View {
         Form {
-//            syncAllSection
-            content(for: .maintenanceEnergy)
+            syncAllSection
+//            content(for: .maintenanceEnergy)
             content(for: .weight)
             content(for: .height)
-            content(for: .age)
-            content(for: .sex)
-            content(for: .leanBodyMass)
-            dailyValuesSection
+//            content(for: .age)
+//            content(for: .sex)
+//            content(for: .leanBodyMass)
+//            dailyValuesSection
 
         }
         .navigationTitle("Health Details")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar { toolbarContent }
+    }
+    
+    var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Button("Clear Health Details") {
+                    withAnimation {
+                        model.health = Health()
+                        model.typesBeingSetFromHealthKit = []
+                    }
+                }
+            } label: {
+                Image(systemName: "switch.2")
+            }
+        }
     }
     
     var syncAllSection: some View {
@@ -43,14 +98,14 @@ public struct HealthSummary: View {
                         Spacer()
                     }
                     VStack(alignment: .leading) {
-                        Text("Health App data")
+                        Text("Health App")
                             .fontWeight(.semibold)
-                        Text("Use your data from the Health App and have them stay synced to any changes")
+                        Text("Fill in data from the Health App and have them stay synced to any changes")
                             .font(.system(.callout))
                             .foregroundStyle(.secondary)
                         Divider()
-                        Button("Use Health App") {
-                            Task(priority: .userInitiated) {
+                        Button("Fill from Health App") {
+                            Task(priority: .high) {
                                 try await model.setAllFromHealthKit()
                             }
                         }
@@ -63,7 +118,7 @@ public struct HealthSummary: View {
         }
         
         return Group {
-            if model.health.healthSourcedCount > 1 {
+            if model.health.doesNotHaveAnyHealthKitBasedTypesSet {
                 section
             }
         }
@@ -118,25 +173,29 @@ public struct HealthSummary: View {
             }
         }
         
+        var addSection: some View {
+            @ViewBuilder
+            var header: some View {
+                switch type {
+                case .weight:   HealthBodyProfileTitle(model)
+                default:        EmptyView()
+                }
+            }
+            return Section(header: header, footer: footer) {
+                addButton
+            }
+        }
+        
         return Group {
             if model.health.hasType(type) {
                 section
             } else {
-                Section(footer: footer) {
-                    addButton
-                }
+                addSection
             }
         }
     }
     
     var dailyValuesSection: some View {
-        var header: some View {
-            Text("Others")
-                .font(.title2)
-                .textCase(.none)
-                .foregroundStyle(Color(.label))
-                .fontWeight(.bold)
-        }
         var footer: some View {
             Text("Used to pick daily values for micronutrients.")
         }
@@ -182,6 +241,64 @@ struct FetchAllFromHealthTip: Tip {
         ]
     }
 }
+
+struct HealthKitErrorCell: View {
+    let type: HealthType
+    var body: some View {
+        HStack(alignment: .top) {
+//                Text("⚠️")
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 50))
+                .foregroundStyle(Color.accentColor)
+            VStack(alignment: .leading) {
+                Text(heading)
+                    .fontWeight(.semibold)
+                Text(message)
+                    .font(.system(.callout))
+                    .foregroundStyle(.secondary)
+                Text(location)
+                    .foregroundStyle(Color(.secondaryLabel))
+                    .font(.footnote)
+                    .padding(.vertical, 3)
+                    .padding(.horizontal, 5)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(.background.tertiary)
+                    )
+//                Divider()
+                Text(secondaryMessage)
+                    .font(.system(.callout))
+                    .foregroundStyle(Color(.secondaryLabel))
+//                Button("Open Settings") {
+//                    Task {
+//                        if let url = URL(string: UIApplication.openSettingsURLString) {
+//                            await UIApplication.shared.open(url)
+//                        }
+//                    }
+//                }
+//                .fontWeight(.semibold)
+//                .padding(.top, 5)
+            }
+        }
+    }
+    
+    var heading: String {
+        "Data unavailable"
+    }
+    
+    var message: String {
+        "Check that you have allowed Prep to read your \(type.abbreviation) in:"
+    }
+    
+    var secondaryMessage: String {
+        "If allowed, then there may be no \(type.abbreviation) data."
+    }
+    
+    var location: String {
+        "Settings > Privacy & Security > Health > Prep"
+    }
+}
+
 
 #Preview {
     NavigationView {

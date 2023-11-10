@@ -316,6 +316,32 @@ public extension Health {
 
 public extension Health {
     
+    func typeToFetchFromHealthKit(from old: Health) -> HealthType? {
+        if old.weightSource != .healthKit, weightSource == .healthKit {
+            return .weight
+        }
+        if old.leanBodyMassSource != .healthKit, leanBodyMassSource == .healthKit {
+            return .leanBodyMass
+        }
+        if old.heightSource != .healthKit, heightSource == .healthKit {
+            return .height
+        }
+        if old.restingEnergySource != .healthKit, restingEnergySource == .healthKit {
+            return .restingEnergy
+        }
+        if old.activeEnergySource != .healthKit, activeEnergySource == .healthKit {
+            return .activeEnergy
+        }
+        if old.sexSource != .healthKit, sexSource == .healthKit {
+            return .sex
+        }
+        if old.ageSource != .healthKit, ageSource == .healthKit {
+            return .age
+        }
+        return nil
+    }
+
+    //TODO: Remove this
     func quantityTypesToSync(from old: Health) -> [QuantityType] {
         var types: [QuantityType] = []
         if old.weightSource != .healthKit, weightSource == .healthKit {

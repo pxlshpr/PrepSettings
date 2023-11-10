@@ -17,12 +17,22 @@ struct HealthTopRow: View {
     @Bindable var model: HealthModel
     
     var body: some View {
-        HStack {
+        HStack(alignment: verticalAlignment) {
             removeButton
             Text(type.name)
-//                .fontWeight(.semibold)
+                .fontWeight(.semibold)
             Spacer()
             content
+                .multilineTextAlignment(.trailing)
+        }
+    }
+    
+    var verticalAlignment: VerticalAlignment {
+        switch type {
+        case .maintenanceEnergy:
+            model.isSettingMaintenanceFromHealthKit ? .center : .firstTextBaseline
+        default:
+            .firstTextBaseline
         }
     }
     
@@ -37,6 +47,7 @@ struct HealthTopRow: View {
                 Image(systemName: "minus.circle.fill")
                     .foregroundStyle(.red)
             }
+            .buttonStyle(.plain)
         }
     }
     
@@ -86,8 +97,16 @@ struct HealthTopRow: View {
                     .font(.system(.body, design: .default, weight: .semibold))
             }
         }
+        
+        var loadingContent: some View {
+            ProgressView()
+                .fixedSize(horizontal: true, vertical: false)
+        }
+        
         return Group {
-            if let message = model.health.tdeeRequiredString {
+            if model.isSettingMaintenanceFromHealthKit {
+                loadingContent
+            } else if let message = model.health.tdeeRequiredString {
                 emptyContent(message)
             } else if let value = model.health.maintenanceEnergy {
                 valueContent(value)

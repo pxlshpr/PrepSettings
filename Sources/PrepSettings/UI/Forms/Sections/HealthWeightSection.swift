@@ -11,7 +11,6 @@ struct HealthWeightSection: View {
     
     var body: some View {
         Section(header: header, footer: footer) {
-//            HealthSourcePicker(sourceBinding: $model.weightSource)
             HealthTopRow(type: .weight, model: model)
             valueRow
             healthKitErrorCell
@@ -19,14 +18,7 @@ struct HealthWeightSection: View {
     }
     
     var header: some View {
-//        HealthHeader(type: .weight)
-//            .environment(model)
-        Text("Body Profile")
-            .font(.title2)
-            .textCase(.none)
-            .foregroundStyle(Color(.label))
-            .fontWeight(.bold)
-            .padding(.top)
+        HealthBodyProfileTitle(model)
     }
     
     var footer: some View {
@@ -39,7 +31,7 @@ struct HealthWeightSection: View {
     
     @ViewBuilder
     var healthKitErrorCell: some View {
-        if model.health.weightSource == .healthKit, model.health.weight?.quantity == nil {
+        if model.shouldShowHealthKitError(for: .weight) {
             HealthKitErrorCell(type: .weight)
         }
     }
@@ -49,11 +41,15 @@ struct HealthWeightSection: View {
         if let weight = model.health.weight {
             HStack {
                 Spacer()
-                switch weight.source {
-                case .healthKit:
-                    healthValue
-                case .userEntered:
-                    manualValue
+                if model.isSettingTypeFromHealthKit(.weight) {
+                    ProgressView()
+                } else {
+                    switch weight.source {
+                    case .healthKit:
+                        healthValue
+                    case .userEntered:
+                        manualValue
+                    }
                 }
             }
         }
