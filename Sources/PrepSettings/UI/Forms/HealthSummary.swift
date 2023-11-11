@@ -55,10 +55,10 @@ public struct HealthSummary: View {
         Form {
             syncAllSection
             content(for: .maintenanceEnergy)
-            content(for: .weight)
-            content(for: .height)
             content(for: .age)
             content(for: .sex)
+            content(for: .height)
+            content(for: .weight)
             content(for: .leanBodyMass)
             dailyValuesSection
         }
@@ -176,7 +176,7 @@ public struct HealthSummary: View {
             @ViewBuilder
             var header: some View {
                 switch type {
-                case .weight:   HealthBodyProfileTitle(model)
+                case .age:   HealthBodyProfileTitle(model)
                 default:        EmptyView()
                 }
             }

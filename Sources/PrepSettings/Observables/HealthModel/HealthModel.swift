@@ -11,7 +11,7 @@ import PrepShared
     public var ignoreChanges: Bool = false
     
     internal let logger = Logger(subsystem: "HealthModel", category: "")
-    internal var saveHealthTask: Task<Void, Error>? = nil
+    internal var handleChangesTask: Task<Void, Error>? = nil
     
     var fetchCurrentHealthHandler: (() async throws -> Health)? = nil
     var saveHandler: ((Health, Bool) async throws -> ())

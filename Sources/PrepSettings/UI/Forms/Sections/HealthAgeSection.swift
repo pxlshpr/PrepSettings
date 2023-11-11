@@ -10,12 +10,16 @@ struct HealthAgeSection: View {
     }
     
     var body: some View {
-        Section(footer: footer) {
+        Section(header: header, footer: footer) {
             HealthTopRow(type: .age, model: model)
             dateOfBirthPickerField
             valueRow
             healthKitErrorCell
         }
+    }
+    
+    var header: some View {
+        HealthBodyProfileTitle(model)
     }
     
     var footer: some View {

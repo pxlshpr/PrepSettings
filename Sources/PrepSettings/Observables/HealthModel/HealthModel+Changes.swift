@@ -13,13 +13,12 @@ public extension HealthModel {
 //        let new = health
 
         logger.debug("Health changed, updating and saving")
-
-        saveHealthTask?.cancel()
-        saveHealthTask = Task {
+        handleChangesTask?.cancel()
+        handleChangesTask = Task {
             do {
                 try await handleChanges(from: old)
                 try Task.checkCancellation()
-                try await saveHandler(health, isCurrent)
+                try await saveHealth()
             } catch is CancellationError {
                 /// Task cancelled
                 logger.debug("Task was cancelled")
@@ -27,6 +26,10 @@ public extension HealthModel {
                 logger.error("Error updating health: \(error.localizedDescription)")
             }
         }
+    }
+    
+    func saveHealth() async throws {
+        try await saveHandler(health, isCurrent)
     }
     
     /// This is supposed to handle single changes only (eg. when we change the weight source), and not multiple different changes

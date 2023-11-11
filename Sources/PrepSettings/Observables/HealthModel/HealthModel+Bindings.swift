@@ -33,24 +33,24 @@ public extension HealthModel {
     var restingEnergyIntervalType: HealthIntervalType {
         get { health.restingEnergyIntervalType }
         set {
-//            Task {
-//                await MainActor.run {
+            Task {
+                await MainActor.run {
                     health.restingEnergyIntervalType = newValue
-//                }
-//                try await setRestingEnergyFromHealthKit()
-//            }
+                }
+                try await setTypeFromHealthKit(.restingEnergy)
+            }
         }
     }
     
     var activeEnergyIntervalType: HealthIntervalType {
         get { health.activeEnergyIntervalType }
         set {
-//            Task {
-//                await MainActor.run {
+            Task {
+                await MainActor.run {
                     health.activeEnergyIntervalType = newValue
-//                }
-//                try await setActiveEnergyFromHealthKit()
-//            }
+                }
+                try await setTypeFromHealthKit(.activeEnergy)
+            }
         }
     }
 
@@ -59,24 +59,24 @@ public extension HealthModel {
     var restingEnergyIntervalPeriod: HealthPeriod {
         get { health.restingEnergyIntervalPeriod }
         set {
-//            Task {
-//                await MainActor.run {
+            Task {
+                await MainActor.run {
                     health.restingEnergyIntervalPeriod = newValue
-//                }
-//                try await setRestingEnergyFromHealthKit()
-//            }
+                }
+                try await setTypeFromHealthKit(.restingEnergy)
+            }
         }
     }
 
     var activeEnergyIntervalPeriod: HealthPeriod {
         get { health.activeEnergyIntervalPeriod }
         set {
-//            Task {
-//                await MainActor.run {
+            Task {
+                await MainActor.run {
                     health.activeEnergyIntervalPeriod = newValue
-//                }
-//                try await setActiveEnergyFromHealthKit()
-//            }
+                }
+                try await setTypeFromHealthKit(.activeEnergy)
+            }
         }
     }
 
@@ -85,24 +85,28 @@ public extension HealthModel {
     var restingEnergyIntervalValue: Int {
         get { health.restingEnergyIntervalValue }
         set {
-//            Task {
-//                await MainActor.run {
-                    health.restingEnergyIntervalValue = newValue
-//                }
-//                try await setRestingEnergyFromHealthKit()
-//            }
+            Task {
+                await MainActor.run {
+                    withAnimation {
+                        health.restingEnergyIntervalValue = newValue
+                    }
+                }
+                try await setTypeFromHealthKit(.restingEnergy)
+            }
         }
     }
 
     var activeEnergyIntervalValue: Int {
         get { health.activeEnergyIntervalValue }
         set {
-//            Task {
-//                await MainActor.run {
-                    health.activeEnergyIntervalValue = newValue
-//                }
-//                try await setActiveEnergyFromHealthKit()
-//            }
+            Task {
+                await MainActor.run {
+                    withAnimation {
+                        health.activeEnergyIntervalValue = newValue
+                    }
+                }
+                try await setTypeFromHealthKit(.activeEnergy)
+            }
         }
     }
     

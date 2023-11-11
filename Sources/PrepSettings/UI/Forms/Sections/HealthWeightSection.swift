@@ -10,15 +10,11 @@ struct HealthWeightSection: View {
     }
     
     var body: some View {
-        Section(header: header, footer: footer) {
+        Section(footer: footer) {
             HealthTopRow(type: .weight, model: model)
             valueRow
             healthKitErrorCell
         }
-    }
-    
-    var header: some View {
-        HealthBodyProfileTitle(model)
     }
     
     var footer: some View {

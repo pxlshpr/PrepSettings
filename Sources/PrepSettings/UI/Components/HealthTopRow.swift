@@ -12,8 +12,14 @@ struct HealthTopRow: View {
             Text(type.name)
                 .fontWeight(.semibold)
             Spacer()
-            content
-                .multilineTextAlignment(.trailing)
+            /// Conditionally show the detail content (usually the source picker), only if we have the value, so that
+            /// we don't get shown the default source values for a split second during the removal animations.
+            if model.health.hasType(type) {
+                detailContent
+                    .multilineTextAlignment(.trailing)
+            } else {
+                EmptyView()
+            }
         }
     }
     
@@ -42,7 +48,7 @@ struct HealthTopRow: View {
     }
     
     @ViewBuilder
-    var content: some View {
+    var detailContent: some View {
         switch type {
         case .maintenanceEnergy:
             maintenanceContent

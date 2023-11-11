@@ -41,12 +41,8 @@ public extension HealthModel {
         }
         
         try await setFromHealthKit()
-
-        await MainActor.run {
-            withAnimation {
-                ignoreChanges = false
-            }
-        }
+        try await saveHealth()
+        ignoreChanges = false
     }
 }
 public extension HealthModel {
