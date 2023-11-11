@@ -11,18 +11,12 @@ struct HealthLeanBodyMassSection: View {
     
     var body: some View {
         Section(footer: footer) {
-//            HealthSourcePicker(sourceBinding: $model.leanBodyMassSource)
             HealthTopRow(type: .leanBodyMass, model: model)
             equationPicker
             healthLink
             fatPercentageField
             valueRow
         }
-    }
-    
-    var header: some View {
-        HealthHeader(type: .leanBodyMass)
-            .environment(model)
     }
     
     var footer: some View {
@@ -35,7 +29,7 @@ struct HealthLeanBodyMassSection: View {
     
     @ViewBuilder
     var healthKitErrorCell: some View {
-        if model.health.leanBodyMassSource == .healthKit, model.health.leanBodyMass?.quantity == nil {
+        if model.shouldShowHealthKitError(for: .leanBodyMass) {
             HealthKitErrorCell(type: .leanBodyMass)
         }
     }
@@ -106,11 +100,15 @@ struct HealthLeanBodyMassSection: View {
         if let leanBodyMass {
             HStack {
                 Spacer()
-                switch leanBodyMass.source {
-                case .healthKit, .equation, .fatPercentage:
-                    calculatedValue
-                case .userEntered:
-                    manualValue
+                if model.isSettingTypeFromHealthKit(.leanBodyMass) {
+                    ProgressView()
+                } else {
+                    switch leanBodyMass.source {
+                    case .healthKit, .equation, .fatPercentage:
+                        calculatedValue
+                    case .userEntered:
+                        manualValue
+                    }
                 }
             }
         }

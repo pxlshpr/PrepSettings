@@ -54,14 +54,13 @@ public struct HealthSummary: View {
     public var body: some View {
         Form {
             syncAllSection
-//            content(for: .maintenanceEnergy)
+            content(for: .maintenanceEnergy)
             content(for: .weight)
             content(for: .height)
-//            content(for: .age)
-//            content(for: .sex)
-//            content(for: .leanBodyMass)
-//            dailyValuesSection
-
+            content(for: .age)
+            content(for: .sex)
+            content(for: .leanBodyMass)
+            dailyValuesSection
         }
         .navigationTitle("Health Details")
         .navigationBarTitleDisplayMode(.large)

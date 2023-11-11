@@ -11,16 +11,10 @@ struct HealthSexSection: View {
     
     var body: some View {
         Section(footer: footer) {
-//            HealthSourcePicker(sourceBinding: $model.sexSource)
             HealthTopRow(type: .sex, model: model)
             valueRow
             healthKitErrorCell
         }
-    }
-    
-    var header: some View {
-        HealthHeader(type: .sex)
-            .environment(model)
     }
     
     var footer: some View {
@@ -33,28 +27,24 @@ struct HealthSexSection: View {
     
     @ViewBuilder
     var healthKitErrorCell: some View {
-        if model.health.sexSource == .healthKit {
-            switch model.health.sex?.value {
-            case .none:
-                HealthKitErrorCell(type: .sex)
-            case .some(let value):
-                switch value {
-                case .other:
-                    Text("⚠️ Your sex is specified as 'Other' in the Health app, but only Male or Female can be used in equations and when picking daily values.")
-                        .foregroundStyle(.secondary)
-                default:
-                    EmptyView()
-                }
-            }
+        if model.shouldShowHealthKitError(for: .sex) {
+            HealthKitErrorCell(type: .sex)
+        } else if model.health.sexSource == .healthKit, model.health.sex?.value == .other {
+            Text("⚠️ Your sex is specified as 'Other' in the Health app, but only Male or Female can be used in equations and when picking daily values.")
+                .foregroundStyle(.secondary)
         }
     }
     
     @ViewBuilder
     var valueRow: some View {
         if let sex = model.health.sex {
-            switch sex.source {
-            case .healthKit:    healthContent
-            case .userEntered:  pickerContent
+            if model.isSettingTypeFromHealthKit(.sex) {
+                ProgressView()
+            } else {
+                switch sex.source {
+                case .healthKit:    healthContent
+                case .userEntered:  pickerContent
+                }
             }
         }
     }

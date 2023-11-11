@@ -140,10 +140,7 @@ extension TDEEFormSections {
 extension TDEEFormSections.ActiveSection {
     
     var body: some View {
-//        Section(header: HealthHeaderText("Active Energy")) {
         Section(footer: footer) {
-//            PickerField("Active Energy", $model.restingEnergySource)
-//            HealthSourcePicker(sourceBinding: $model.activeEnergySource)
             HealthTopRow(type: .activeEnergy, model: model)
             content
         }
@@ -158,7 +155,7 @@ extension TDEEFormSections.ActiveSection {
         switch model.activeEnergySource {
         case .healthKit:           healthContent
         case .activityLevel:    activityContent
-        case .userEntered:      bottomRow
+        case .userEntered:      valueRow
         }
     }
     
@@ -176,25 +173,71 @@ extension TDEEFormSections.ActiveSection {
         return Group {
             PickerField("Use", $model.activeEnergyIntervalType)
             intervalField
-            bottomRow
+            valueRow
+            healthKitErrorCell
+        }
+    }
+    
+    @ViewBuilder
+    var healthKitErrorCell: some View {
+        if model.shouldShowHealthKitError(for: .activeEnergy) {
+            HealthKitErrorCell(type: .activeEnergy)
         }
     }
     
     var activityContent: some View {
         Group {
             PickerField("Activity level", $model.activeEnergyActivityLevel)
-            bottomRow
+            valueRow
         }
     }
 
-    var bottomRow: some View {
-        HealthEnergyValueField(
-            value: $model.health.activeEnergyValue,
-            energyUnit: $model.activeEnergyUnit,
-            interval: $model.activeEnergyInterval,
-            date: model.health.date,
-            source: model.activeEnergySource
-        )
+    var valueRow: some View {
+        var calculatedValue: some View {
+            CalculatedEnergyView(
+                valueBinding: $model.health.activeEnergyValue,
+                unitBinding: $model.activeEnergyUnit,
+                intervalBinding: $model.activeEnergyInterval,
+                date: model.health.date,
+                source: model.activeEnergySource
+            )
+        }
+        
+        var manualValue: some View {
+            let binding = Binding<Double>(
+                get: { model.health.activeEnergyValue ?? 0 },
+                set: { model.health.activeEnergyValue = $0 }
+            )
+
+            return HStack {
+                Spacer()
+                NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
+                MenuPicker<EnergyUnit>($model.activeEnergyUnit)
+            }
+        }
+        
+        return HStack {
+            Spacer()
+            if model.isSettingTypeFromHealthKit(.activeEnergy) {
+                ProgressView()
+            } else {
+                switch model.activeEnergySource.isManual {
+                case true:
+                    manualValue
+                case false:
+                    calculatedValue
+                }
+            }
+        }
+        
+        //TODO: Remove this
+//        HealthEnergyValueField(
+//            value: $model.health.activeEnergyValue,
+//            energyUnit: $model.activeEnergyUnit,
+//            interval: $model.activeEnergyInterval,
+//            date: model.health.date,
+//            source: model.activeEnergySource
+//        )
     }
 }
 
@@ -208,10 +251,7 @@ extension TDEEFormSections {
 extension TDEEFormSections.RestingSection {
     
     var body: some View {
-//        Section(header: HealthHeaderText("Resting Energy")) {
         Section {
-//            PickerField("Resting Energy", $model.restingEnergySource)
-//            HealthSourcePicker(sourceBinding: $model.restingEnergySource)
             HealthTopRow(type: .restingEnergy, model: model)
             content
         }
@@ -220,9 +260,9 @@ extension TDEEFormSections.RestingSection {
     @ViewBuilder
     var content: some View {
         switch model.restingEnergySource {
-        case .healthKit:       healthContent
+        case .healthKit:      healthContent
         case .equation:     equationContent
-        case .userEntered:  bottomRow
+        case .userEntered:  valueRow
         }
     }
     
@@ -240,7 +280,7 @@ extension TDEEFormSections.RestingSection {
         return Group {
             PickerField("Use", $model.restingEnergyIntervalType)
             intervalField
-            bottomRow
+            valueRow
         }
     }
 
@@ -272,18 +312,64 @@ extension TDEEFormSections.RestingSection {
         return Group {
             PickerField("Equation", $model.restingEnergyEquation)
             healthLink
-            bottomRow
+            valueRow
+            healthKitErrorCell
         }
     }
     
-    var bottomRow: some View {
-        HealthEnergyValueField(
-            value: $model.health.restingEnergyValue,
-            energyUnit: $model.restingEnergyUnit,
-            interval: $model.restingEnergyInterval,
-            date: model.health.date,
-            source: model.restingEnergySource
-        )
+    @ViewBuilder
+    var healthKitErrorCell: some View {
+        if model.shouldShowHealthKitError(for: .restingEnergy) {
+            HealthKitErrorCell(type: .restingEnergy)
+        }
+    }
+
+    var valueRow: some View {
+        var calculatedValue: some View {
+            CalculatedEnergyView(
+                valueBinding: $model.health.restingEnergyValue,
+                unitBinding: $model.restingEnergyUnit,
+                intervalBinding: $model.restingEnergyInterval,
+                date: model.health.date,
+                source: model.restingEnergySource
+            )
+        }
+        
+        var manualValue: some View {
+            let binding = Binding<Double>(
+                get: { model.health.restingEnergyValue ?? 0 },
+                set: { model.health.restingEnergyValue = $0 }
+            )
+
+            return HStack {
+                Spacer()
+                NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
+                MenuPicker<EnergyUnit>($model.restingEnergyUnit)
+            }
+        }
+        
+        return HStack {
+            Spacer()
+            if model.isSettingTypeFromHealthKit(.restingEnergy) {
+                ProgressView()
+            } else {
+                switch model.restingEnergySource.isManual {
+                case true:
+                    manualValue
+                case false:
+                    calculatedValue
+                }
+            }
+        }
+        
+        //TODO: Remove this
+//        HealthEnergyValueField(
+//            value: $model.health.restingEnergyValue,
+//            energyUnit: $model.restingEnergyUnit,
+//            interval: $model.restingEnergyInterval,
+//            date: model.health.date,
+//            source: model.restingEnergySource
+//        )
     }
 }
 

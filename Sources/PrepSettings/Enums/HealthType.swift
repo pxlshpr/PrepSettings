@@ -31,6 +31,17 @@ public extension HealthType {
 }
 
 public extension HealthType {
+    var canBeRemoved: Bool {
+        switch self {
+        case .restingEnergy, .activeEnergy, .fatPercentage:
+            false
+        default:
+            true
+        }
+    }
+}
+
+public extension HealthType {
     
     var usesPrecision: Bool {
         switch self {

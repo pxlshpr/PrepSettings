@@ -93,3 +93,12 @@ public extension ClosedRange<Date> {
         return days
     }
 }
+
+public extension Date {
+    var dateComponentsWithoutTime: DateComponents {
+        Calendar.current.dateComponents(
+            [.year, .month, .day],
+            from: self
+        )
+    }
+}

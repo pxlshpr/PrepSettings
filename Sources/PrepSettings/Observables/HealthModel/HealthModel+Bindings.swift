@@ -33,24 +33,24 @@ public extension HealthModel {
     var restingEnergyIntervalType: HealthIntervalType {
         get { health.restingEnergyIntervalType }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.restingEnergyIntervalType = newValue
-                }
-                try await setRestingEnergyFromHealthKit()
-            }
+//                }
+//                try await setRestingEnergyFromHealthKit()
+//            }
         }
     }
     
     var activeEnergyIntervalType: HealthIntervalType {
         get { health.activeEnergyIntervalType }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.activeEnergyIntervalType = newValue
-                }
-                try await setActiveEnergyFromHealthKit()
-            }
+//                }
+//                try await setActiveEnergyFromHealthKit()
+//            }
         }
     }
 
@@ -59,24 +59,24 @@ public extension HealthModel {
     var restingEnergyIntervalPeriod: HealthPeriod {
         get { health.restingEnergyIntervalPeriod }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.restingEnergyIntervalPeriod = newValue
-                }
-                try await setRestingEnergyFromHealthKit()
-            }
+//                }
+//                try await setRestingEnergyFromHealthKit()
+//            }
         }
     }
 
     var activeEnergyIntervalPeriod: HealthPeriod {
         get { health.activeEnergyIntervalPeriod }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.activeEnergyIntervalPeriod = newValue
-                }
-                try await setActiveEnergyFromHealthKit()
-            }
+//                }
+//                try await setActiveEnergyFromHealthKit()
+//            }
         }
     }
 
@@ -85,24 +85,24 @@ public extension HealthModel {
     var restingEnergyIntervalValue: Int {
         get { health.restingEnergyIntervalValue }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.restingEnergyIntervalValue = newValue
-                }
-                try await setRestingEnergyFromHealthKit()
-            }
+//                }
+//                try await setRestingEnergyFromHealthKit()
+//            }
         }
     }
 
     var activeEnergyIntervalValue: Int {
         get { health.activeEnergyIntervalValue }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.activeEnergyIntervalValue = newValue
-                }
-                try await setActiveEnergyFromHealthKit()
-            }
+//                }
+//                try await setActiveEnergyFromHealthKit()
+//            }
         }
     }
     
@@ -111,31 +111,31 @@ public extension HealthModel {
     var ageSource: AgeSource {
         get { health.ageSource }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.ageSource = newValue
-                }
-                if newValue == .healthKit {
-                    try await setAgeFromHealthKit()
-                }
+//                }
+//                if newValue == .healthKit {
+//                    try await setAgeFromHealthKit()
+//                }
 //                if newValue != .userEnteredDateOfBirth {
 //                    health.ageDateOfBirth = nil
 //                }
-            }
+//            }
         }
     }
     
     var sexSource: HealthSource {
         get { health.sexSource }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.sexSource = newValue
-                }
-                if newValue == .healthKit {
-                    try await setSexFromHealthKit()
-                }
-            }
+//                }
+//                if newValue == .healthKit {
+//                    try await setSexFromHealthKit()
+//                }
+//            }
         }
     }
 
@@ -170,51 +170,51 @@ public extension HealthModel {
     var leanBodyMassSource: LeanBodyMassSource {
         get { health.leanBodyMassSource }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.leanBodyMassSource = newValue
-                }
-                switch leanBodyMassSource {
-                case .healthKit:
-                    try await setLeanBodyMassFromHealthKit()
-                case .equation, .fatPercentage, .userEntered:
-                    break
-                }
-            }
+//                }
+//                switch leanBodyMassSource {
+//                case .healthKit:
+//                    try await setLeanBodyMassFromHealthKit()
+//                case .equation, .fatPercentage, .userEntered:
+//                    break
+//                }
+//            }
         }
     }
 
     var restingEnergySource: RestingEnergySource {
         get { health.restingEnergySource }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.restingEnergySource = newValue
-                }
-                switch restingEnergySource {
-                case .healthKit:
-                    try await setRestingEnergyFromHealthKit()
-                case .equation, .userEntered:
-                    break
-                }
-            }
+//                }
+//                switch restingEnergySource {
+//                case .healthKit:
+//                    try await setRestingEnergyFromHealthKit()
+//                case .equation, .userEntered:
+//                    break
+//                }
+//            }
         }
     }
     
     var activeEnergySource: ActiveEnergySource {
         get { health.activeEnergySource }
         set {
-            Task {
-                await MainActor.run {
+//            Task {
+//                await MainActor.run {
                     health.activeEnergySource = newValue
-                }
-                switch activeEnergySource {
-                case .healthKit:
-                    try await setActiveEnergyFromHealthKit()
-                case .activityLevel, .userEntered:
-                    break
-                }
-            }
+//                }
+//                switch activeEnergySource {
+//                case .healthKit:
+//                    try await setActiveEnergyFromHealthKit()
+//                case .activityLevel, .userEntered:
+//                    break
+//                }
+//            }
         }
     }
     

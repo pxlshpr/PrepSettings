@@ -92,19 +92,16 @@ public extension HealthModel {
 //        }
 //    }
     
-    func sourceIsHealthKit(for type: HealthType) -> Bool {
-        switch type {
-        case .weight: 	weightSource == .healthKit
-        case .height:   heightSource == .healthKit
-        default:        false
-        }
+
+    func valueIsNil(for type: HealthType) -> Bool {
+        health.valueIsNil(for: type)
     }
     
     func setFromHealthKit() async throws {
         
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             for type in HealthType.healthKitTypes {
-                if sourceIsHealthKit(for: type) {
+                if health.sourceIsHealthKit(for: type) {
                     taskGroup.addTask { try await self.setTypeFromHealthKit(type) }
                 }
             }
@@ -145,32 +142,90 @@ public extension HealthType {
     
     var supportsHealthKit: Bool {
         switch self {
-//        case .maintenanceEnergy:
-//        case .restingEnergy:
-//        case .activeEnergy:
-//        case .sex:
-//        case .age:
-        case .weight:   true
-//        case .leanBodyMass:
-//        case .fatPercentage:
-        case .height:   true
-//        case .pregnancyStatus:
-//        case .isSmoker:
-        default:        false
+        case .maintenanceEnergy, .fatPercentage, .pregnancyStatus, .isSmoker:
+            false
+        default:
+            true
         }
     }
 }
 
+import HealthKit
+
 public enum HealthKitValue {
     case weight(Quantity?)
     case height(Quantity?)
+    case leanBodyMass(Quantity?)
+    
+    case restingEnergy(Double?)
+    case activeEnergy(Double?)
+
+    case sex(HKBiologicalSex?)
+    case age(DateComponents?)
 }
 
 public extension HealthKitValue {
     var quantity: Quantity? {
         switch self {
-        case .weight(let quantity): quantity
-        case .height(let quantity): quantity
+        case .weight(let quantity):         quantity
+        case .height(let quantity):         quantity
+        case .leanBodyMass(let quantity):   quantity
+        default: nil
+        }
+    }
+    
+    var sex: Sex? {
+        switch self {
+        case .sex(let biologicalSex): biologicalSex?.sex
+        default: nil
+        }
+    }
+    
+    var dateComponents: DateComponents? {
+        switch self {
+        case .age(let dateComponents): dateComponents
+        default: nil
+        }
+    }
+
+    var double: Double? {
+        switch self {
+        case .activeEnergy(let double):     double
+        case .restingEnergy(let double):    double
+        default: nil
+        }
+    }
+
+}
+
+extension Health {
+    
+    func sourceIsHealthKit(for type: HealthType) -> Bool {
+        switch type {
+        case .weight:           weightSource == .healthKit
+        case .height:           heightSource == .healthKit
+        case .age:              ageSource == .healthKit
+        case .sex:              sexSource == .healthKit
+        case .leanBodyMass:     leanBodyMassSource == .healthKit
+        case .activeEnergy:     activeEnergySource == .healthKit
+        case .restingEnergy:    restingEnergySource == .healthKit
+        default:                false
+        }
+    }
+    
+    func valueIsNil(for type: HealthType) -> Bool {
+        switch type {
+        case .weight:               weight?.quantity == nil
+        case .height:               height?.quantity == nil
+        case .age:                  age?.value == nil
+        case .sex:                  sex?.value == nil
+        case .leanBodyMass:         leanBodyMass?.quantity == nil
+        case .activeEnergy:         activeEnergy?.value == nil
+        case .restingEnergy:        restingEnergy?.value == nil
+        case .maintenanceEnergy:    maintenanceEnergy == nil
+        case .pregnancyStatus:      pregnancyStatus == nil
+        case .isSmoker:             isSmoker == nil
+        case .fatPercentage:        fatPercentage == nil
         }
     }
 }

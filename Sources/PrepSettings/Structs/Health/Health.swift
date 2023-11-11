@@ -256,10 +256,7 @@ public extension Health {
                     dateOfBirthComponents = nil
                     return
                 }
-                dateOfBirthComponents = Calendar.current.dateComponents(
-                    [.year, .month, .day],
-                    from: newValue
-                )
+                dateOfBirthComponents = newValue.dateComponentsWithoutTime
             }
         }
     }
@@ -362,6 +359,7 @@ public extension Health {
         return types
     }
 
+    //TODO: Remove this
     func characteristicTypesToSync(from old: Health) -> [CharacteristicType] {
         var types: [CharacteristicType] = []
         if old.sexSource != .healthKit, sexSource == .healthKit {

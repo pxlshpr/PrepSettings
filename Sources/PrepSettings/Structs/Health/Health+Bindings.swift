@@ -259,14 +259,31 @@ public extension Health {
         }
     }
 
-    var ageDateOfBirth: Date? {
+    var ageHealthKitDateComponents: DateComponents? {
+        get { age?.dateOfBirthComponents }
+        set {
+            guard let newValue else {
+                age?.dateOfBirthComponents = nil
+                age?.value = nil
+                return
+            }
+            age = Age(
+                source: age?.source ?? .default,
+                dateOfBirthComponents: newValue,
+                value: newValue.age
+            )
+        }
+    }
+    
+    /// Only to be used when user is entering date
+    var ageUserEnteredDateOfBirth: Date? {
         get { age?.dateOfBirth }
         set {
             guard let newValue else {
                 age?.dateOfBirth = nil
                 return
             }
-            let components = Calendar.current.dateComponents([.year, .month, .day], from: newValue)
+            let components = newValue.dateComponentsWithoutTime
             age = Age(
                 source: .userEnteredDateOfBirth,
                 dateOfBirthComponents: components,
