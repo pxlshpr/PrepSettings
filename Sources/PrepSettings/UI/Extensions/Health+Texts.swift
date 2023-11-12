@@ -120,9 +120,9 @@ public extension Health {
     
     @ViewBuilder
     var maintenanceText: some View {
-        if let maintenanceEnergy {
+        if let estimatedEnergyBurn {
             HStack(spacing: 3) {
-                Text(maintenanceEnergy.formattedEnergy)
+                Text(estimatedEnergyBurn.formattedEnergy)
                     .font(HealthFont)
                 Text(energyUnit.abbreviation)
             }

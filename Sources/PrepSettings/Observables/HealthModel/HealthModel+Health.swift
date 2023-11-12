@@ -45,6 +45,10 @@ public extension HealthModel {
         ignoreChanges = false
     }
 }
+
+public extension HealthModel {
+}
+
 public extension HealthModel {
 
     func setTypeFromHealthKit(_ type: HealthType) async throws {
@@ -92,6 +96,9 @@ public extension HealthModel {
         case .activeEnergy:     .activeEnergy(400)
         case .sex:              .sex(.male)
         case .age:              .age(DefaultDateOfBirth.dateComponentsWithoutTime)
+        
+        case .energyBurn:       .energyBurn(2756)
+
         default: nil
         }
     }
@@ -113,7 +120,11 @@ public extension HealthModel {
         case .age: return .age(
             try await HealthStore.dateOfBirthComponents()
         )
-        case .restingEnergy: 
+        case .energyBurn:
+            //TODO: Do this
+            return .energyBurn(2693)
+
+        case .restingEnergy:
             guard let interval = health.restingEnergy?.interval else {
                 return nil
             }
@@ -172,6 +183,7 @@ public extension Health {
         case .height:           heightQuantity = value?.quantity
         case .leanBodyMass:     leanBodyMassQuantity = value?.quantity
             
+        case .energyBurn:       energyBurnCalculatedValue = value?.double
         case .restingEnergy:    restingEnergyValue = value?.double
         case .activeEnergy:     activeEnergyValue = value?.double
             

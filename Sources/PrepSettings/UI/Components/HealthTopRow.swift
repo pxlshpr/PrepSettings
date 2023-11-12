@@ -104,7 +104,7 @@ struct HealthTopRow: View {
                 loadingContent
             } else if let message = model.health.tdeeRequiredString {
                 emptyContent(message)
-            } else if let value = model.health.maintenanceEnergy {
+            } else if let value = model.health.estimatedEnergyBurn {
                 valueContent(value)
             } else {
                 EmptyView()

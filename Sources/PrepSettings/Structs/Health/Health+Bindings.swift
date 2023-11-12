@@ -4,6 +4,22 @@ import PrepShared
 
 public extension Health {
     
+    //MARK: Energy Burn
+    var energyBurnIsCalculated: Bool {
+        get { energyBurn?.isCalculated ?? false }
+        set {
+            guard energyBurn != nil else {
+                energyBurn = .init(isCalculated: newValue)
+                return
+            }
+            energyBurn?.isCalculated = newValue
+            /// If we've turned it off, clear the previous value
+            if !newValue {
+                energyBurn?.calculatedValue = nil
+            }
+        }
+    }
+    
     //MARK: Interval Types
     
     var restingEnergyIntervalType: HealthIntervalType {
@@ -219,6 +235,20 @@ public extension Health {
 //MARK: Values
 
 public extension Health {
+    
+    var energyBurnCalculatedValue: Double? {
+        get { energyBurn?.calculatedValue }
+        set {
+            guard energyBurn != nil else {
+                energyBurn = EnergyBurn(
+                    isCalculated: true,
+                    calculatedValue: newValue
+                )
+                return
+            }
+            energyBurn?.calculatedValue = newValue
+        }
+    }
     
     var activeEnergyValue: Double? {
         get { activeEnergy?.value }

@@ -9,6 +9,7 @@ public struct Health: Hashable, Codable {
     public var heightUnit: HeightUnit
     public var bodyMassUnit: BodyMassUnit
     
+    public var energyBurn: EnergyBurn?
     public var restingEnergy: RestingEnergy?
     public var activeEnergy: ActiveEnergy?
     public var age: Age?
@@ -29,6 +30,7 @@ public struct Health: Hashable, Codable {
         energyUnit: EnergyUnit = .default,
         heightUnit: HeightUnit = .default,
         bodyMassUnit: BodyMassUnit = .default,
+        energyBurn: EnergyBurn? = nil,
         restingEnergy: RestingEnergy? = nil,
         activeEnergy: ActiveEnergy? = nil,
         age: Age? = nil,
@@ -45,6 +47,7 @@ public struct Health: Hashable, Codable {
         self.energyUnit = energyUnit
         self.heightUnit = heightUnit
         self.bodyMassUnit = bodyMassUnit
+        self.energyBurn = energyBurn
         self.restingEnergy = restingEnergy
         self.activeEnergy = activeEnergy
         self.age = age
@@ -65,6 +68,7 @@ public extension Health {
         energyUnit == other.energyUnit
         && heightUnit == other.heightUnit
         && bodyMassUnit == other.bodyMassUnit
+        && energyBurn == other.energyBurn
         && restingEnergy == other.restingEnergy
         && activeEnergy == other.activeEnergy
         && age == other.age
@@ -168,6 +172,19 @@ public extension Health {
 }
 
 public extension Health {
+    
+    struct EnergyBurn: Hashable, Codable {
+        public var isCalculated: Bool
+        public var calculatedValue: Double?
+        
+        public init(
+            isCalculated: Bool = true,
+            calculatedValue: Double? = nil
+        ) {
+            self.isCalculated = isCalculated
+            self.calculatedValue = calculatedValue
+        }
+    }
     
     struct RestingEnergy: Hashable, Codable {
         public var source: RestingEnergySource
@@ -293,21 +310,21 @@ public extension Health {
 }
 
 public extension Health {
-    var maintenanceEnergy: Double? {
+    var estimatedEnergyBurn: Double? {
         guard let activeEnergyValue, let restingEnergyValue else {
             return nil
         }
         return activeEnergyValue + restingEnergyValue
     }
     
-    var maintenanceEnergyInKcal: Double? {
-        guard let maintenanceEnergy else { return nil }
-        return energyUnit.convert(maintenanceEnergy, to: .kcal)
+    var estimatedEnergyBurnInKcal: Double? {
+        guard let estimatedEnergyBurn else { return nil }
+        return energyUnit.convert(estimatedEnergyBurn, to: .kcal)
     }
     
-    var maintenanceEnergyFormatted: String {
-        guard let maintenanceEnergy else { return "" }
-        return maintenanceEnergy.formattedEnergy
+    var estimatedEnergyBurnFormatted: String {
+        guard let estimatedEnergyBurn else { return "" }
+        return estimatedEnergyBurn.formattedEnergy
     }
 }
 

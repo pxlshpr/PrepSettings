@@ -28,6 +28,21 @@ public extension HealthModel {
         set { setBodyMassUnit(newValue, whileEditing: .leanBodyMass) }
     }
     
+    //MARK: Energy Burn
+    var energyBurnIsCalculated: Bool {
+        get { health.energyBurnIsCalculated }
+        set {
+            Task {
+                await MainActor.run {
+                    withAnimation {
+                        health.energyBurnIsCalculated = newValue
+                    }
+                }
+                try await setTypeFromHealthKit(.energyBurn)
+            }
+        }
+    }
+    
     //MARK: Interval Types
     
     var restingEnergyIntervalType: HealthIntervalType {
@@ -250,6 +265,11 @@ public extension HealthModel {
     }
 
     //MARK: Values
+    
+    var energyBurnCalculatedValue: Double? {
+        get { health.energyBurnCalculatedValue }
+        set { health.energyBurnCalculatedValue = newValue }
+    }
     
     var isSmoker: Bool {
         get { health.isSmoker ?? false }

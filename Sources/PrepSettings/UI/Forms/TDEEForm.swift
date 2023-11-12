@@ -45,6 +45,83 @@ public struct TDEEForm: View {
 
  */
 
+public struct TDEEEstimateForm: View {
+    @Bindable var model: HealthModel
+    
+    public init(_ model: HealthModel) {
+        self.model = model
+    }
+    
+    public var body: some View {
+        Form {
+            estimateSection
+//                .listSectionSpacing(0)
+            symbol("=")
+//                .listSectionSpacing(0)
+            RestingEnergySection(model: model)
+//                .listSectionSpacing(0)
+            symbol("+")
+//                .listSectionSpacing(0)
+            ActiveEnergySection(model: model)
+//                .listSectionSpacing(0)
+        }
+//        .navigationTitle("Estimated Energy Expenditure")
+//        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Energy Expenditure")
+    }
+    
+    func symbol(_ string: String) -> some View {
+        Text(string)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .font(.system(.title, design: .rounded, weight: .semibold))
+            .foregroundColor(.secondary)
+            .listRowBackground(EmptyView())
+    }
+    
+    var estimateSection: some View {
+        Section {
+            HStack {
+                Text("Estimate")
+                Spacer()
+                EnergyBurnEstimateText(model)
+            }
+        }
+    }
+}
+
+struct EnergyBurnEstimateText: View {
+    @Bindable var model: HealthModel
+    
+    init(_ model: HealthModel) {
+        self.model = model
+    }
+    
+    var value: Double? {
+        model.health.estimatedEnergyBurn
+    }
+
+    @ViewBuilder
+    var body: some View {
+        if let requiredString = model.health.tdeeRequiredString {
+            Text(requiredString)
+                .foregroundStyle(Color(.tertiaryLabel))
+        } else if let value {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(value.formattedEnergy)
+                    .animation(.default, value: value)
+                    .contentTransition(.numericText(value: value))
+                    .font(.system(.body, design: .monospaced, weight: .bold))
+                    .foregroundStyle(.secondary)
+                Text(model.health.energyUnit.abbreviation)
+                    .foregroundStyle(.secondary)
+                    .font(.system(.body, design: .default, weight: .semibold))
+            }
+        } else {
+            EmptyView()
+        }
+    }
+}
+
 public struct TDEEFormSections: View {
     
     @Bindable var model: HealthModel
@@ -73,46 +150,23 @@ public struct TDEEFormSections: View {
         }
     }
     
-    var adaptiveSection: some View {
-        Section {
-            Text("Adaptive")
-            Spacer()
-            
-        }
-    }
-    
     var health: Health {
         model.health
     }
     
-    func symbol(_ string: String) -> some View {
-        Text(string)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .font(.system(.title, design: .rounded, weight: .semibold))
-            .foregroundColor(.secondary)
-            .listRowBackground(EmptyView())
-    }
-    
     var estimateSection: some View {
-        let value: Double = 2000
-        
         var footer: some View {
             Text("Used when there isn't sufficient weight or nutrition data to make a calculation.")
         }
         
         return Section(footer: footer) {
-            HStack {
-                Text("Estimate")
-                Spacer()
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(value.formattedEnergy)
-                        .animation(.default, value: value)
-                        .contentTransition(.numericText(value: value))
-                        .font(.system(.body, design: .monospaced, weight: .bold))
-                        .foregroundStyle(.secondary)
-                    Text(model.health.energyUnit.abbreviation)
-                        .foregroundStyle(.secondary)
-                        .font(.system(.body, design: .default, weight: .semibold))
+            NavigationLink {
+                TDEEEstimateForm(model)
+            } label: {
+                HStack {
+                    Text("Estimate")
+                    Spacer()
+                    EnergyBurnEstimateText(model)
                 }
             }
         }
@@ -140,10 +194,10 @@ public struct TDEEFormSections: View {
         
         var adaptiveRow: some View {
             HStack {
-                Text("Calculate using weight")
+                Text("Use Adaptive Calculation")
                     .layoutPriority(1)
                 Spacer()
-                Toggle("", isOn: .constant(true))
+                Toggle("", isOn: $model.energyBurnIsCalculated)
             }
         }
         
@@ -152,12 +206,13 @@ public struct TDEEFormSections: View {
         }
 
         var adaptiveFooter: some View {
-            Text("Calculate your \(HealthType.energyBurn.abbreviation) based on your weight change and energy consumption over the past week. [Learn More…](https://example.com)")
+            Text("Continuously calculate your \(HealthType.energyBurn.abbreviation) based on your weight change and food intake over the past week. [Learn More.](https://example.com)")
         }
 
         return Group {
             Section(footer: footer) {
-                HealthTopRow(type: .energyBurn, model: model)
+                EnergyBurnRow(model)
+//                HealthTopRow(type: .energyBurn, model: model)
             }
             Section(footer: adaptiveFooter) {
                 adaptiveRow
@@ -187,7 +242,7 @@ public struct TDEEFormSections: View {
                 Text(requiredString)
                     .foregroundStyle(Color(.tertiaryLabel))
             } else {
-                if let maintenanceEnergy = health.maintenanceEnergy {
+                if let maintenanceEnergy = health.estimatedEnergyBurn {
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(maintenanceEnergy.formattedEnergy)
                             .animation(.default, value: maintenanceEnergy)
@@ -205,15 +260,10 @@ public struct TDEEFormSections: View {
     }
 }
 
-extension TDEEFormSections {
-    
-    struct ActiveSection: View {
-        @Bindable var model: HealthModel
-    }
-}
+struct ActiveEnergySection: View {
 
-extension TDEEFormSections.ActiveSection {
-    
+    @Bindable var model: HealthModel
+
     var body: some View {
         Section(footer: footer) {
             HealthTopRow(type: .activeEnergy, model: model)
@@ -316,14 +366,9 @@ extension TDEEFormSections.ActiveSection {
     }
 }
 
-extension TDEEFormSections {
+struct RestingEnergySection: View {
     
-    struct RestingSection: View {
-        @Bindable var model: HealthModel
-    }
-}
-
-extension TDEEFormSections.RestingSection {
+    @Bindable var model: HealthModel
     
     var body: some View {
         Section(footer: footer) {
@@ -471,5 +516,153 @@ struct HealthHeaderText: View {
             .font(.system(isLarge ? .title2 : .title3, design: .rounded, weight: .bold))
             .textCase(.none)
             .foregroundStyle(Color(.label))
+    }
+}
+
+struct EnergyBurnRow: View {
+    
+    let type = HealthType.energyBurn
+    @Bindable var model: HealthModel
+    
+    init(_ model: HealthModel) {
+        self.model = model
+    }
+    
+    var body: some View {
+        VStack {
+            topRow
+            /// Conditionally show the bottom row, only if we have the value, so that we don't get shown the default source values for a split second during the removal animations.
+            if model.health.hasType(type) {
+                bottomRow
+            } else {
+                EmptyView()
+            }
+        }
+    }
+    
+    var topRow: some View {
+        HStack(alignment: verticalAlignment) {
+            removeButton
+            Text(type.name)
+                .fontWeight(.semibold)
+            Spacer()
+        }
+    }
+    
+    var bottomRow: some View {
+        HStack(alignment: .top) {
+            calculatedTag
+            Spacer()
+            detail
+                .multilineTextAlignment(.trailing)
+        }
+    }
+    
+    var calculatedTag: some View {
+        var string: String {
+            if model.energyBurnIsCalculated {
+                "Calculated"
+            } else {
+                "Estimated"
+            }
+        }
+        
+        var foregroundColor: Color {
+            Color(model.energyBurnIsCalculated ? .white : .secondaryLabel)
+        }
+        
+        var backgroundColor: Color {
+            model.energyBurnIsCalculated ? Color.accentColor : Color(.systemBackground)
+        }
+        
+        var fontWeight: Font.Weight {
+            model.energyBurnIsCalculated ? .semibold : .regular
+        }
+        
+        return Text(string)
+            .foregroundStyle(foregroundColor)
+            .font(.footnote)
+            .fontWeight(fontWeight)
+            .padding(.vertical, 3)
+            .padding(.horizontal, 5)
+            .background(RoundedRectangle(cornerRadius: 6)
+                .fill(backgroundColor))
+    }
+    
+    var verticalAlignment: VerticalAlignment {
+        switch type {
+        case .energyBurn:
+            model.isSettingMaintenanceFromHealthKit ? .center : .firstTextBaseline
+        default:
+            .firstTextBaseline
+        }
+    }
+    
+    @ViewBuilder
+    var removeButton: some View {
+        if type.canBeRemoved {
+            Button {
+                withAnimation {
+                    model.remove(type)
+                }
+            } label: {
+                Image(systemName: "minus.circle.fill")
+                    .foregroundStyle(.red)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+    
+    var detail: some View {
+        func emptyContent(_ message: String) -> some View {
+            Text(message)
+                .foregroundStyle(.tertiary)
+        }
+        
+        func valueContent(_ value: Double) -> some View {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(value.formattedEnergy)
+                    .animation(.default, value: value)
+                    .contentTransition(.numericText(value: value))
+//                    .font(.system(.body, design: .monospaced, weight: .bold))
+                    .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+                    .foregroundStyle(.secondary)
+                Text(model.health.energyUnit.abbreviation)
+                    .foregroundStyle(.secondary)
+                    .font(.system(.body, design: .default, weight: .semibold))
+            }
+        }
+        
+        var loadingContent: some View {
+            ProgressView()
+                .fixedSize(horizontal: true, vertical: false)
+        }
+        
+        var value: Double? {
+            if model.energyBurnIsCalculated, let value = model.energyBurnCalculatedValue {
+                return value
+            } else {
+                return model.health.estimatedEnergyBurn
+            }
+        }
+        
+        @ViewBuilder
+        var content: some View {
+            if model.isSettingMaintenanceFromHealthKit {
+                loadingContent
+            } else if let message = model.health.tdeeRequiredString {
+                emptyContent(message)
+            } else if let value {
+                valueContent(value)
+            } else {
+                EmptyView()
+            }
+        }
+        
+        return ZStack(alignment: .trailing) {
+            content
+            valueContent(0)
+                .opacity(0)
+        }
     }
 }
