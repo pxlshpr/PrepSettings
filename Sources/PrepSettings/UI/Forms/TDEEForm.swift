@@ -211,7 +211,7 @@ public struct TDEEFormSections: View {
         }
 
         var adaptiveFooter: some View {
-            Text("Continuously calculate your \(HealthType.energyBurn.abbreviation) based on your weight change and food intake over the past week. [Learn More.](https://example.com)")
+            Text("Adaptively calculate your \(HealthType.energyBurn.abbreviation) based on your weight change and food intake over the prior week. [Learn More.](https://example.com)")
         }
 
         return Group {
