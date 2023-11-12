@@ -155,8 +155,11 @@ public struct TDEEFormSections: View {
     }
     
     var estimateSection: some View {
+        @ViewBuilder
         var footer: some View {
-            Text("Used when there isn't sufficient weight or nutrition data to make a calculation.")
+            if model.energyBurnIsCalculated {
+                Text("Used when there isn't sufficient weight or nutrition data to make a calculation.")
+            }
         }
         
         return Section(footer: footer) {
