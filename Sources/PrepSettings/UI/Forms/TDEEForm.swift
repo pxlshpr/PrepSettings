@@ -624,6 +624,10 @@ struct EnergyBurnRow: View {
                 .foregroundStyle(.tertiary)
         }
         
+        var foregroundColor: Color {
+            .primary
+        }
+        
         func valueContent(_ value: Double) -> some View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value.formattedEnergy)
@@ -631,9 +635,9 @@ struct EnergyBurnRow: View {
                     .contentTransition(.numericText(value: value))
 //                    .font(.system(.body, design: .monospaced, weight: .bold))
                     .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(foregroundColor)
                 Text(model.health.energyUnit.abbreviation)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(foregroundColor)
                     .font(.system(.body, design: .default, weight: .semibold))
             }
         }
