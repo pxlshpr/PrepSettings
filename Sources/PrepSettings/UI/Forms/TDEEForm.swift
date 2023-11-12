@@ -19,6 +19,32 @@ public struct TDEEForm: View {
     }
 }
 
+/**
+ Energy burn algorithm:
+ 
+ getWeightMovingAverage(from date: Date, in unit: WeightUnit = .kg) -> Double?
+ 1. Fetch all weights for the past week from the date provided (including it)
+     - Fetch from our backend, getting HealthDetails for each Day
+     - Fail if we have 0 entires
+ 2. For each day, calculate average daily weight (average out any values on that day)
+ 3. Now get the moving average for the weight by averaging out the daily values
+
+ getTotalConsumedCalories(from date: Date, in unit: EnergyUnit = .kcal) -> Double?
+ 1. Fetch consumed calories over the past week from the date provided (not including it)
+     - Fetch from our backend, getting the energyInKcals for each Day
+     - Fail if we have 0 entires
+ 2. If we have less than 7 values, get the average and use this for the missing days
+ 3. Sum all the day's values
+
+ calculateEnergyBurn(for date: Date, in unit: EnergyUnit = .kcal) -> Result<Double, EnergyBurnError>
+ 1. weightDelta = getWeightMovingAverage(from: date) - getWeightMovingAverage(from: date-7days)
+ 2. Convert to pounds, then convert to weightDeltaInCalories using 1lb = 3500 kcal
+ 3. calories = getTotalConsumedCalories(from: date)
+ 4. Now burn = calories - weightDelta
+ 5. If we had an error, it would have been weightDelta or calories not being calculable because of not having at least 1 entry in the window
+
+ */
+
 public struct TDEEFormSections: View {
     
     @Bindable var model: HealthModel
@@ -30,15 +56,28 @@ public struct TDEEFormSections: View {
     public var body: some View {
         Group {
             maintenanceSection
-                .listSectionSpacing(0)
-            symbol("=")
-                .listSectionSpacing(0)
-            RestingSection(model: model)
-                .listSectionSpacing(0)
-            symbol("+")
-                .listSectionSpacing(0)
-            ActiveSection(model: model)
-                .listSectionSpacing(0)
+//                .listSectionSpacing(0)
+//            Color.clear
+//                .listRowBackground(EmptyView())
+            estimateSection
+//                .listSectionSpacing(0)
+//            symbol("=")
+//                .listSectionSpacing(0)
+//            RestingSection(model: model)
+//                .listSectionSpacing(0)
+//            symbol("+")
+//                .listSectionSpacing(0)
+//            ActiveSection(model: model)
+//                .listSectionSpacing(0)
+//            adaptiveSection
+        }
+    }
+    
+    var adaptiveSection: some View {
+        Section {
+            Text("Adaptive")
+            Spacer()
+            
         }
     }
     
@@ -52,6 +91,31 @@ public struct TDEEFormSections: View {
             .font(.system(.title, design: .rounded, weight: .semibold))
             .foregroundColor(.secondary)
             .listRowBackground(EmptyView())
+    }
+    
+    var estimateSection: some View {
+        let value: Double = 2000
+        
+        var footer: some View {
+            Text("Used when there isn't sufficient weight or nutrition data to make a calculation.")
+        }
+        
+        return Section(footer: footer) {
+            HStack {
+                Text("Estimate")
+                Spacer()
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(value.formattedEnergy)
+                        .animation(.default, value: value)
+                        .contentTransition(.numericText(value: value))
+                        .font(.system(.body, design: .monospaced, weight: .bold))
+                        .foregroundStyle(.secondary)
+                    Text(model.health.energyUnit.abbreviation)
+                        .foregroundStyle(.secondary)
+                        .font(.system(.body, design: .default, weight: .semibold))
+                }
+            }
+        }
     }
 
     var maintenanceSection: some View {
@@ -74,19 +138,30 @@ public struct TDEEFormSections: View {
 //            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         
-        return Section {
-            HealthTopRow(type: .maintenanceEnergy, model: model)
-//            HStack {
-//                Text("Maintenance Energy")
-//                Spacer()
-//                if let message = health.tdeeRequiredString {
-//                    emptyContent(message)
-//                } else if let value = health.maintenanceEnergy {
-//                    valueContent(value)
-//                } else {
-//                    EmptyView()
-//                }
-//            }
+        var adaptiveRow: some View {
+            HStack {
+                Text("Calculate using weight")
+                    .layoutPriority(1)
+                Spacer()
+                Toggle("", isOn: .constant(true))
+            }
+        }
+        
+        var footer: some View {
+            Text("Your \(HealthType.energyBurn.abbreviation) is used in energy goals, when targeting a desired weight change.")
+        }
+
+        var adaptiveFooter: some View {
+            Text("Calculate your \(HealthType.energyBurn.abbreviation) based on your weight change and energy consumption over the past week. [Learn More…](https://example.com)")
+        }
+
+        return Group {
+            Section(footer: footer) {
+                HealthTopRow(type: .energyBurn, model: model)
+            }
+            Section(footer: adaptiveFooter) {
+                adaptiveRow
+            }
         }
     }
     var maintenanceSection_: some View {
@@ -96,7 +171,7 @@ public struct TDEEFormSections: View {
                 Spacer()
                 Button("Remove") {
                     withAnimation {
-                        model.remove(.maintenanceEnergy)
+                        model.remove(.energyBurn)
                     }
                 }
                 .textCase(.none)
@@ -104,7 +179,7 @@ public struct TDEEFormSections: View {
         }
         
         var footer: some View {
-            Text(HealthType.maintenanceEnergy.reason!)
+            Text(HealthType.energyBurn.reason!)
         }
         
         return Section(header: header) {
@@ -147,7 +222,7 @@ extension TDEEFormSections.ActiveSection {
     }
     
     var footer: some View {
-        Text(HealthType.maintenanceEnergy.reason!)
+        Text(HealthType.activeEnergy.reason!)
     }
     
     @ViewBuilder
@@ -251,12 +326,16 @@ extension TDEEFormSections {
 extension TDEEFormSections.RestingSection {
     
     var body: some View {
-        Section {
+        Section(footer: footer) {
             HealthTopRow(type: .restingEnergy, model: model)
             content
         }
     }
     
+    var footer: some View {
+        Text(HealthType.restingEnergy.reason!)
+    }
+
     @ViewBuilder
     var content: some View {
         switch model.restingEnergySource {
@@ -373,10 +452,9 @@ extension TDEEFormSections.RestingSection {
     }
 }
 
-
 #Preview {
     NavigationView {
-        TDEEForm(MockHealthModel)
+        HealthSummary(model: MockHealthModel)
     }
 }
 

@@ -145,7 +145,7 @@ public extension HealthType {
     
     var supportsHealthKit: Bool {
         switch self {
-        case .maintenanceEnergy, .fatPercentage, .pregnancyStatus, .isSmoker:
+        case .energyBurn, .fatPercentage, .pregnancyStatus, .isSmoker:
             false
         default:
             true
@@ -225,7 +225,7 @@ extension Health {
         case .leanBodyMass:         leanBodyMass?.quantity == nil
         case .activeEnergy:         activeEnergy?.value == nil
         case .restingEnergy:        restingEnergy?.value == nil
-        case .maintenanceEnergy:    maintenanceEnergy == nil
+        case .energyBurn:    maintenanceEnergy == nil
         case .pregnancyStatus:      pregnancyStatus == nil
         case .isSmoker:             isSmoker == nil
         case .fatPercentage:        fatPercentage == nil

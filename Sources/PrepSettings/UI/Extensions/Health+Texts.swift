@@ -44,7 +44,7 @@ public extension Health {
         case .fatPercentage:        fatPercentageText
         case .restingEnergy:        restingEnergyText
         case .activeEnergy:         activeEnergyText
-        case .maintenanceEnergy:    maintenanceText
+        case .energyBurn:    maintenanceText
         case .pregnancyStatus:      pregnancyStatusText
         case .isSmoker:             isSmokerText
         }

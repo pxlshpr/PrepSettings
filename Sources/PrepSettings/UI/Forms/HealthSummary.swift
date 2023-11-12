@@ -12,7 +12,7 @@ struct HealthBodyProfileTitle: View {
     
     @ViewBuilder
     var body: some View {
-        if model.health.hasType(.maintenanceEnergy) {
+        if model.health.hasType(.energyBurn) {
             content
                 .padding(.top)
         } else {
@@ -54,7 +54,7 @@ public struct HealthSummary: View {
     public var body: some View {
         Form {
             syncAllSection
-            content(for: .maintenanceEnergy)
+            content(for: .energyBurn)
             content(for: .age)
             content(for: .sex)
             content(for: .height)
@@ -157,7 +157,7 @@ public struct HealthSummary: View {
                 HealthTopRow(type: .pregnancyStatus, model: model)
             case .isSmoker:
                 HealthTopRow(type: .isSmoker, model: model)
-            case .maintenanceEnergy:
+            case .energyBurn:
                 Group {
                     TDEEFormSections(model)
 //                    Divider()
@@ -302,9 +302,5 @@ struct HealthKitErrorCell: View {
 #Preview {
     NavigationView {
         HealthSummary(model: MockHealthModel)
-    }
-    .task {
-        Tips.showAllTipsForTesting()
-        try? Tips.configure()
     }
 }
