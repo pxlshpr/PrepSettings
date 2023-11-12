@@ -1,7 +1,9 @@
 import SwiftUI
 import PrepShared
 
-/// [ ] Add footer for when HealthKit values aren't available
+/// [ ] Design the Energy Expenditure cell for when we don't have enough weight data
+/// [ ] Consider having another tag below the one for Calculated/Estimated and have it say the message, e.g. "Insufficient weight data" or "Insufficient food data"
+/// [ ] If user taps this tag, pop up a small message elaborating (e.g. "You need to have at least [2 weight measurements/1 day with food logged] over the [past two weeks/two weeks prior] to calculate your expenditure."
 
 public struct TDEEForm: View {
     @Bindable var model: HealthModel
