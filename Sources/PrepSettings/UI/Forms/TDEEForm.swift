@@ -69,7 +69,7 @@ public struct TDEEEstimateForm: View {
         }
 //        .navigationTitle("Estimated Energy Expenditure")
 //        .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle("Energy Expenditure")
+        .navigationTitle("Maintenance Energy")
     }
     
     func symbol(_ string: String) -> some View {
@@ -83,7 +83,7 @@ public struct TDEEEstimateForm: View {
     var estimateSection: some View {
         Section {
             HStack {
-                Text("Estimate")
+                Text("Estimated")
                 Spacer()
                 EnergyBurnEstimateText(model)
             }
@@ -159,7 +159,7 @@ public struct TDEEFormSections: View {
     var estimateSection: some View {
         @ViewBuilder
         var footer: some View {
-            if model.energyBurnIsCalculated {
+            if model.maintenanceEnergyIsCalculated {
                 Text("Used when there isn't sufficient weight or nutrition data to make a calculation.")
             }
         }
@@ -169,7 +169,7 @@ public struct TDEEFormSections: View {
                 TDEEEstimateForm(model)
             } label: {
                 HStack {
-                    Text("Estimate")
+                    Text("Estimated")
                     Spacer()
                     EnergyBurnEstimateText(model)
                 }
@@ -202,22 +202,22 @@ public struct TDEEFormSections: View {
                 Text("Use Adaptive Calculation")
                     .layoutPriority(1)
                 Spacer()
-                Toggle("", isOn: $model.energyBurnIsCalculated)
+                Toggle("", isOn: $model.maintenanceEnergyIsCalculated)
             }
         }
         
         var footer: some View {
-            Text("Your \(HealthType.energyBurn.abbreviation) is used in energy goals, when targeting a desired weight change.")
+//            Text("Your \(HealthType.maintenanceEnergy.abbreviation) is used in energy goals, when targeting a desired weight change.")
+            Text(HealthType.maintenanceEnergy.reason!)
         }
 
         var adaptiveFooter: some View {
-            Text("Adaptively calculate your \(HealthType.energyBurn.abbreviation) based on your weight change and food intake over the prior week. [Learn More.](https://example.com)")
+            Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and food intake over the prior week. [Learn More.](https://example.com)")
         }
 
         return Group {
             Section(footer: footer) {
-                EnergyBurnRow(model)
-//                HealthTopRow(type: .energyBurn, model: model)
+                MaintenanceEnergyRow(model)
             }
             Section(footer: adaptiveFooter) {
                 adaptiveRow
@@ -231,7 +231,7 @@ public struct TDEEFormSections: View {
                 Spacer()
                 Button("Remove") {
                     withAnimation {
-                        model.remove(.energyBurn)
+                        model.remove(.maintenanceEnergy)
                     }
                 }
                 .textCase(.none)
@@ -239,7 +239,7 @@ public struct TDEEFormSections: View {
         }
         
         var footer: some View {
-            Text(HealthType.energyBurn.reason!)
+            Text(HealthType.maintenanceEnergy.reason!)
         }
         
         return Section(header: header) {
@@ -524,9 +524,9 @@ struct HealthHeaderText: View {
     }
 }
 
-struct EnergyBurnRow: View {
+struct MaintenanceEnergyRow: View {
     
-    let type = HealthType.energyBurn
+    let type = HealthType.maintenanceEnergy
     @Bindable var model: HealthModel
     
     init(_ model: HealthModel) {
@@ -565,23 +565,25 @@ struct EnergyBurnRow: View {
     
     var calculatedTag: some View {
         var string: String {
-            if model.energyBurnIsCalculated {
-                "Calculated"
+            if model.maintenanceEnergyIsCalculated {
+//                "Calculated"
+                "Adaptive"
+//                "Adaptively Calculated"
             } else {
                 "Estimated"
             }
         }
         
         var foregroundColor: Color {
-            Color(model.energyBurnIsCalculated ? .white : .secondaryLabel)
+            Color(model.maintenanceEnergyIsCalculated ? .white : .secondaryLabel)
         }
         
         var backgroundColor: Color {
-            model.energyBurnIsCalculated ? Color.accentColor : Color(.systemBackground)
+            model.maintenanceEnergyIsCalculated ? Color.accentColor : Color(.systemBackground)
         }
         
         var fontWeight: Font.Weight {
-            model.energyBurnIsCalculated ? .semibold : .regular
+            model.maintenanceEnergyIsCalculated ? .semibold : .regular
         }
         
         return Text(string)
@@ -596,7 +598,7 @@ struct EnergyBurnRow: View {
     
     var verticalAlignment: VerticalAlignment {
         switch type {
-        case .energyBurn:
+        case .maintenanceEnergy:
             model.isSettingMaintenanceFromHealthKit ? .center : .firstTextBaseline
         default:
             .firstTextBaseline
@@ -648,7 +650,7 @@ struct EnergyBurnRow: View {
         }
         
         var value: Double? {
-            if model.energyBurnIsCalculated, let value = model.energyBurnCalculatedValue {
+            if model.maintenanceEnergyIsCalculated, let value = model.maintenanceEnergyCalculatedValue {
                 return value
             } else {
                 return model.health.estimatedEnergyBurn

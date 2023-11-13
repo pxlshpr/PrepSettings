@@ -97,7 +97,7 @@ public extension HealthModel {
         case .sex:              .sex(.male)
         case .age:              .age(DefaultDateOfBirth.dateComponentsWithoutTime)
         
-        case .energyBurn:       .energyBurn(2756)
+        case .maintenanceEnergy:       .maintenanceEnergy(2756)
 
         default: nil
         }
@@ -120,9 +120,9 @@ public extension HealthModel {
         case .age: return .age(
             try await HealthStore.dateOfBirthComponents()
         )
-        case .energyBurn:
+        case .maintenanceEnergy:
             //TODO: Do this
-            return .energyBurn(2693)
+            return .maintenanceEnergy(2693)
 
         case .restingEnergy:
             guard let interval = health.restingEnergy?.interval else {
@@ -183,7 +183,7 @@ public extension Health {
         case .height:           heightQuantity = value?.quantity
         case .leanBodyMass:     leanBodyMassQuantity = value?.quantity
             
-        case .energyBurn:       energyBurnCalculatedValue = value?.double
+        case .maintenanceEnergy:       maintenanceEnergyCalculatedValue = value?.double
         case .restingEnergy:    restingEnergyValue = value?.double
         case .activeEnergy:     activeEnergyValue = value?.double
             

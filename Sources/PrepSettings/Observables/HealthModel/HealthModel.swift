@@ -78,9 +78,9 @@ public extension HealthModel {
     }
     
     var isSettingMaintenanceFromHealthKit: Bool {
-        if health.energyBurnIsCalculated, isSettingTypeFromHealthKit(.energyBurn) {
+        if health.maintenanceEnergyIsCalculated, isSettingTypeFromHealthKit(.maintenanceEnergy) {
             return true
-        } else if !(health.energyBurnIsCalculated && health.energyBurnCalculatedValue != nil) {
+        } else if !(health.maintenanceEnergyIsCalculated && health.maintenanceEnergyCalculatedValue != nil) {
             return isSettingTypeFromHealthKit(.restingEnergy) || isSettingTypeFromHealthKit(.activeEnergy)
         }
         return false

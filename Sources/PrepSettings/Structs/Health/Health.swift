@@ -9,7 +9,7 @@ public struct Health: Hashable, Codable {
     public var heightUnit: HeightUnit
     public var bodyMassUnit: BodyMassUnit
     
-    public var energyBurn: EnergyBurn?
+    public var maintenanceEnergy: EnergyBurn?
     public var restingEnergy: RestingEnergy?
     public var activeEnergy: ActiveEnergy?
     public var age: Age?
@@ -30,7 +30,7 @@ public struct Health: Hashable, Codable {
         energyUnit: EnergyUnit = .default,
         heightUnit: HeightUnit = .default,
         bodyMassUnit: BodyMassUnit = .default,
-        energyBurn: EnergyBurn? = nil,
+        maintenanceEnergy: EnergyBurn? = nil,
         restingEnergy: RestingEnergy? = nil,
         activeEnergy: ActiveEnergy? = nil,
         age: Age? = nil,
@@ -47,7 +47,7 @@ public struct Health: Hashable, Codable {
         self.energyUnit = energyUnit
         self.heightUnit = heightUnit
         self.bodyMassUnit = bodyMassUnit
-        self.energyBurn = energyBurn
+        self.maintenanceEnergy = maintenanceEnergy
         self.restingEnergy = restingEnergy
         self.activeEnergy = activeEnergy
         self.age = age
@@ -68,7 +68,7 @@ public extension Health {
         energyUnit == other.energyUnit
         && heightUnit == other.heightUnit
         && bodyMassUnit == other.bodyMassUnit
-        && energyBurn == other.energyBurn
+        && maintenanceEnergy == other.maintenanceEnergy
         && restingEnergy == other.restingEnergy
         && activeEnergy == other.activeEnergy
         && age == other.age

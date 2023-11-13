@@ -22,7 +22,7 @@ public extension Health {
         case .fatPercentage:        fatPercentage != nil
         case .restingEnergy:        restingEnergy?.value != nil
         case .activeEnergy:         activeEnergy?.value != nil
-        case .energyBurn:    haveValue(for: .restingEnergy) && haveValue(for: .activeEnergy)
+        case .maintenanceEnergy:    haveValue(for: .restingEnergy) && haveValue(for: .activeEnergy)
         case .pregnancyStatus:      pregnancyStatus != nil
         case .isSmoker:             isSmoker != nil
         }
@@ -50,7 +50,7 @@ extension Health {
             isSmoker = nil
         case .isSmoker:
             isSmoker = false
-        case .energyBurn:
+        case .maintenanceEnergy:
             restingEnergy = .init(source: .userEntered, value: 1600)
             activeEnergy = .init(source: .userEntered, value: 400)
         default:
@@ -60,7 +60,7 @@ extension Health {
     
     mutating func remove(_ type: HealthType) {
         switch type {
-        case .energyBurn:
+        case .maintenanceEnergy:
             restingEnergy = nil
             activeEnergy = nil
         case .sex:              sex = nil
@@ -79,7 +79,7 @@ extension Health {
 extension Health {
     func hasType(_ type: HealthType) -> Bool {
         switch type {
-        case .energyBurn:    restingEnergy != nil && activeEnergy != nil
+        case .maintenanceEnergy:    restingEnergy != nil && activeEnergy != nil
         case .activeEnergy:         activeEnergy != nil
         case .restingEnergy:        restingEnergy != nil
         case .sex:                  sex != nil

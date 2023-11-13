@@ -2,7 +2,7 @@ import Foundation
 import PrepShared
 
 public enum HealthType: CaseIterable {
-    case energyBurn
+    case maintenanceEnergy
     case restingEnergy
     case activeEnergy
     case sex
@@ -18,7 +18,7 @@ public enum HealthType: CaseIterable {
 public extension HealthType {
     static var summaryTypes: [HealthType] {
         [
-            .energyBurn,
+            .maintenanceEnergy,
             .age,
             .sex,
             .height,
@@ -52,35 +52,33 @@ public extension HealthType {
     
     var abbreviation: String {
         switch self {
-//        case .energyBurn:       "daily energy burn"
-        case .energyBurn:       "energy expenditure"
-        case .restingEnergy:    "resting energy"
-        case .activeEnergy:     "active energy"
-        case .sex:              "biological sex"
-        case .age:              "age"
-        case .weight:           "weight"
-        case .leanBodyMass:     "lean body mass"
-        case .fatPercentage:    "fat %"
-        case .height:           "height"
-        case .pregnancyStatus:  "pregnancy status"
-        case .isSmoker:         "smoker"
+        case .maintenanceEnergy:    "maintenance energy"
+        case .restingEnergy:        "resting energy"
+        case .activeEnergy:         "active energy"
+        case .sex:                  "biological sex"
+        case .age:                  "age"
+        case .weight:               "weight"
+        case .leanBodyMass:         "lean body mass"
+        case .fatPercentage:        "fat %"
+        case .height:               "height"
+        case .pregnancyStatus:      "pregnancy status"
+        case .isSmoker:             "smoker"
         }
     }
     
     var name: String {
         switch self {
-//        case .energyBurn:       "Daily Energy Burn"
-        case .energyBurn:       "Energy Expenditure"
-        case .restingEnergy:    "Resting Energy"
-        case .activeEnergy:     "Active Energy"
-        case .sex:              "Biological Sex"
-        case .age:              "Age"
-        case .weight:           "Weight"
-        case .leanBodyMass:     "Lean Body Mass"
-        case .fatPercentage:    "Fat Percentage"
-        case .height:           "Height"
-        case .pregnancyStatus:  "Pregnancy Status"
-        case .isSmoker:         "Smoker"
+        case .maintenanceEnergy:    "Maintenance Energy"
+        case .restingEnergy:        "Resting Energy"
+        case .activeEnergy:         "Active Energy"
+        case .sex:                  "Biological Sex"
+        case .age:                  "Age"
+        case .weight:               "Weight"
+        case .leanBodyMass:         "Lean Body Mass"
+        case .fatPercentage:        "Fat Percentage"
+        case .height:               "Height"
+        case .pregnancyStatus:      "Pregnancy Status"
+        case .isSmoker:             "Smoker"
         }
     }
 
@@ -123,8 +121,9 @@ extension HealthType {
             "The estimated energy you burn when your body is completely at rest."
         case .activeEnergy:
             "The estimated energy you burn while being active."
-        case .energyBurn:
-            "Your daily energy burn is used in energy goals targeting a desired weight change."
+        case .maintenanceEnergy:
+//            "Your daily energy burn is used in energy goals targeting a desired weight change."
+            "The daily energy needed to maintain your body weight. Used in energy goals to target a desired weight change."
         case .sex:
             "Used to calculate resting energy or lean body mass. Also used to pick daily values for micronutrients."
         case .age:

@@ -25,7 +25,7 @@ struct HealthTopRow: View {
     
     var verticalAlignment: VerticalAlignment {
         switch type {
-        case .energyBurn:
+        case .maintenanceEnergy:
             model.isSettingMaintenanceFromHealthKit ? .center : .firstTextBaseline
         default:
             .firstTextBaseline
@@ -50,7 +50,7 @@ struct HealthTopRow: View {
     @ViewBuilder
     var detailContent: some View {
         switch type {
-        case .energyBurn:
+        case .maintenanceEnergy:
             maintenanceContent
         case .restingEnergy:
             MenuPicker($model.restingEnergySource)

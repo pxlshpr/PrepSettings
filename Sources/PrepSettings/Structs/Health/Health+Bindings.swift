@@ -5,17 +5,17 @@ import PrepShared
 public extension Health {
     
     //MARK: Energy Burn
-    var energyBurnIsCalculated: Bool {
-        get { energyBurn?.isCalculated ?? false }
+    var maintenanceEnergyIsCalculated: Bool {
+        get { maintenanceEnergy?.isCalculated ?? false }
         set {
-            guard energyBurn != nil else {
-                energyBurn = .init(isCalculated: newValue)
+            guard maintenanceEnergy != nil else {
+                maintenanceEnergy = .init(isCalculated: newValue)
                 return
             }
-            energyBurn?.isCalculated = newValue
+            maintenanceEnergy?.isCalculated = newValue
             /// If we've turned it off, clear the previous value
             if !newValue {
-                energyBurn?.calculatedValue = nil
+                maintenanceEnergy?.calculatedValue = nil
             }
         }
     }
@@ -236,17 +236,17 @@ public extension Health {
 
 public extension Health {
     
-    var energyBurnCalculatedValue: Double? {
-        get { energyBurn?.calculatedValue }
+    var maintenanceEnergyCalculatedValue: Double? {
+        get { maintenanceEnergy?.calculatedValue }
         set {
-            guard energyBurn != nil else {
-                energyBurn = EnergyBurn(
+            guard maintenanceEnergy != nil else {
+                maintenanceEnergy = EnergyBurn(
                     isCalculated: true,
                     calculatedValue: newValue
                 )
                 return
             }
-            energyBurn?.calculatedValue = newValue
+            maintenanceEnergy?.calculatedValue = newValue
         }
     }
     

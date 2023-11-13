@@ -145,7 +145,7 @@ public extension HealthType {
     
     var supportsHealthKit: Bool {
         switch self {
-        case .energyBurn, .fatPercentage, .pregnancyStatus, .isSmoker:
+        case .maintenanceEnergy, .fatPercentage, .pregnancyStatus, .isSmoker:
             false
         default:
             true
@@ -163,7 +163,7 @@ public enum HealthKitValue {
     case restingEnergy(Double?)
     case activeEnergy(Double?)
     
-    case energyBurn(Double?)
+    case maintenanceEnergy(Double?)
 
     case sex(HKBiologicalSex?)
     case age(DateComponents?)
@@ -195,7 +195,7 @@ public extension HealthKitValue {
 
     var double: Double? {
         switch self {
-        case .energyBurn(let double):    double
+        case .maintenanceEnergy(let double):    double
         case .activeEnergy(let double):     double
         case .restingEnergy(let double):    double
         default: nil
@@ -228,7 +228,7 @@ extension Health {
         case .leanBodyMass:         leanBodyMass?.quantity == nil
         case .activeEnergy:         activeEnergy?.value == nil
         case .restingEnergy:        restingEnergy?.value == nil
-        case .energyBurn:    estimatedEnergyBurn == nil
+        case .maintenanceEnergy:    estimatedEnergyBurn == nil
         case .pregnancyStatus:      pregnancyStatus == nil
         case .isSmoker:             isSmoker == nil
         case .fatPercentage:        fatPercentage == nil

@@ -29,16 +29,16 @@ public extension HealthModel {
     }
     
     //MARK: Energy Burn
-    var energyBurnIsCalculated: Bool {
-        get { health.energyBurnIsCalculated }
+    var maintenanceEnergyIsCalculated: Bool {
+        get { health.maintenanceEnergyIsCalculated }
         set {
             Task {
                 await MainActor.run {
                     withAnimation {
-                        health.energyBurnIsCalculated = newValue
+                        health.maintenanceEnergyIsCalculated = newValue
                     }
                 }
-                try await setTypeFromHealthKit(.energyBurn)
+                try await setTypeFromHealthKit(.maintenanceEnergy)
             }
         }
     }
@@ -266,9 +266,9 @@ public extension HealthModel {
 
     //MARK: Values
     
-    var energyBurnCalculatedValue: Double? {
-        get { health.energyBurnCalculatedValue }
-        set { health.energyBurnCalculatedValue = newValue }
+    var maintenanceEnergyCalculatedValue: Double? {
+        get { health.maintenanceEnergyCalculatedValue }
+        set { health.maintenanceEnergyCalculatedValue = newValue }
     }
     
     var isSmoker: Bool {
