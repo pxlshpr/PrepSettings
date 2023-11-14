@@ -11,7 +11,7 @@ struct MaintenanceEnergyRow: View {
     let type = HealthType.maintenanceEnergy
     @Bindable var model: HealthModel
     
-    @State var showingAdaptiveDetails: Bool = true
+    @State var showingAdaptiveDetails: Bool = false
 
     init(_ model: HealthModel) {
         self.model = model
@@ -29,50 +29,23 @@ struct MaintenanceEnergyRow: View {
                 }
             }
             errorRow
+            viewDataRow
         }
         .sheet(isPresented: $showingAdaptiveDetails) { adaptiveDetails }
     }
     
     var adaptiveDetails: some View {
-        NavigationStack {
-            List {
-                Section("\(showingWeight ? "Weight" : "Dietary Energy") Data") {
-                    ForEach(0...6, id: \.self) {
-                        cell(daysAgo: $0)
-                    }
-                }
-            }
-            .navigationTitle("Calculation Data")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbarContent }
-        }
-        .presentationDetents([.medium, .large])
-    }
-    
-    @State var showingWeight = true
-    
-    func cell(daysAgo: Int) -> some View {
-        HStack {
-            Text(Date.now.healthShortFormat)
-        }
-    }
-    
-    var toolbarContent: some ToolbarContent {
-        Group {
-            ToolbarItem(placement: .principal) {
-                Picker("", selection: $showingWeight) {
-                    Text("Weight").tag(true)
-                    Text("Dietary Energy").tag(false)
-                }
-                .pickerStyle(.segmented)
-            }
-        }
+        AdaptiveDataList()
+            .presentationDetents([.medium, .large])
     }
     
     @ViewBuilder
     var errorRow: some View {
         if let error = model.health.maintenanceEnergy?.error {
-            AdaptiveCalculationErrorCell(error: error)
+            AdaptiveCalculationErrorCell(
+                error: error,
+                showingAdaptiveDetails: $showingAdaptiveDetails
+            )
         }
     }
     
@@ -96,13 +69,27 @@ struct MaintenanceEnergyRow: View {
         }
     }
     
-    var calculatedTag: some View {
-        
-        var showingAdaptive: Bool {
-            model.maintenanceEnergyIsCalculated 
-            && model.maintenanceEnergyCalculatedValue != nil
-            && model.maintenanceEnergyCalculationError == nil
+    @ViewBuilder
+    var viewDataRow: some View {
+        if showingAdaptive {
+            Button {
+                showingAdaptiveDetails = true
+            } label: {
+                Text("View Data")
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color.accentColor)
+            }
+            .buttonStyle(.plain)
         }
+    }
+    
+    var showingAdaptive: Bool {
+        model.maintenanceEnergyIsCalculated
+        && model.maintenanceEnergyCalculatedValue != nil
+        && model.maintenanceEnergyCalculationError == nil
+    }
+    
+    var calculatedTag: some View {
         
         var string: String {
             showingAdaptive ? "Adaptive" : "Estimated"
@@ -120,27 +107,12 @@ struct MaintenanceEnergyRow: View {
             showingAdaptive ? .semibold : .regular
         }
         
-        var label: some View {
-            TagView(
-                string: string,
-                foregroundColor: foregroundColor,
-                backgroundColor: backgroundColor,
-                fontWeight: fontWeight
-            )
-        }
-        
-        return Group {
-            if showingAdaptive {
-                Button {
-                    showingAdaptiveDetails = true
-                } label: {
-                    label
-                }
-                .buttonStyle(.plain)
-            } else {
-                label
-            }
-        }
+        return TagView(
+            string: string,
+            foregroundColor: foregroundColor,
+            backgroundColor: backgroundColor,
+            fontWeight: fontWeight
+        )
     }
     
     var verticalAlignment: VerticalAlignment {
@@ -271,6 +243,7 @@ public enum MaintenanceCalculationError: Int, Codable {
 struct AdaptiveCalculationErrorCell: View {
     
     let error: MaintenanceCalculationError
+    @Binding var showingAdaptiveDetails: Bool
     
     var body: some View {
         HStack(alignment: .top) {
@@ -288,63 +261,23 @@ struct AdaptiveCalculationErrorCell: View {
 //                    .font(.system(.callout))
 //                    .foregroundStyle(Color(.secondaryLabel))
                 Divider()
-                button
+                setDataButton
             }
         }
     }
     
-    @ViewBuilder
-    var button: some View {
-//        switch error {
-//        case .noWeightData:
-//            weightButtons
-//        case .noNutritionData:
-//            selectFromHealthButton
-//        case .noWeightOrNutritionData:
-            Group {
-                weightButton
-//                Divider()
-                selectFromHealthButton
-            }
-//        }
-    }
-    
-    func menuLabel(_ title: String) -> some View {
-        Text(title)
-            .fontWeight(.semibold)
-            .padding(.top, 5)
-    }
-    
-    func button(_ title: String, action: @escaping () -> ()) -> some View {
-        Button(title) {
-            action()
+    var setDataButton: some View {
+        Button {
+            showingAdaptiveDetails = true
+        } label: {
+            Text("View Data")
+                .fontWeight(.semibold)
+                .foregroundStyle(Color.accentColor)
         }
-        .fontWeight(.semibold)
+        .buttonStyle(.plain)
         .padding(.top, 5)
     }
     
-    var selectFromHealthButton: some View {
-        Menu {
-            Button("Select from Health App") {
-            }
-            Button("Enter manually") {
-            }
-        } label: {
-            menuLabel("Set Dietary Energy")
-        }
-    }
-    
-    var weightButton: some View {
-        Menu {
-            Button("Set today's weight") {
-            }
-            Button("Set last week's weight") {
-            }
-        } label: {
-            menuLabel("Set Weight")
-        }
-    }
-
     var secondaryMessage: String {
         "Your estimated maintenance energy is being used instead."
     }
