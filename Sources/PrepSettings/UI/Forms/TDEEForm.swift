@@ -587,6 +587,8 @@ struct FetchAllFromHealthTip: Tip {
 }
 
 
+/// [ ] Animation from progress view to setting an adaptive value is missing
+/// [ ] Fix up the value row while testing having estimate's components missing (resting or active), because their texts might need alignment
 struct MaintenanceEnergyRow: View {
     
     @Environment(\.colorScheme) var colorScheme

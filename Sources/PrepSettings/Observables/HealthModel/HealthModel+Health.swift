@@ -97,7 +97,12 @@ public extension HealthModel {
         case .sex:              .sex(.male)
         case .age:              .age(DefaultDateOfBirth.dateComponentsWithoutTime)
         
-        case .maintenanceEnergy:       .maintenanceEnergy(nil, .noWeightData)
+        case .maintenanceEnergy:
+            if [1, 2].randomElement() == 1 {
+                .maintenanceEnergy(nil, .noWeightData)
+            } else {
+                .maintenanceEnergy(2693, nil)
+            }
 
         default: nil
         }
@@ -121,9 +126,11 @@ public extension HealthModel {
             try await HealthStore.dateOfBirthComponents()
         )
         case .maintenanceEnergy:
-            //TODO: Do this
-            return .maintenanceEnergy(nil, .noWeightData)
-//            return .maintenanceEnergy(2693)
+            if [1, 2].randomElement() == 1 {
+                return .maintenanceEnergy(nil, .noWeightData)
+            } else {
+                return .maintenanceEnergy(2693, nil)
+            }
 
         case .restingEnergy:
             guard let interval = health.restingEnergy?.interval else {

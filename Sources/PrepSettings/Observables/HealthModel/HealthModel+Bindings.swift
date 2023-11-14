@@ -38,7 +38,15 @@ public extension HealthModel {
                         health.maintenanceEnergyIsCalculated = newValue
                     }
                 }
-                try await setTypeFromHealthKit(.maintenanceEnergy)
+                if newValue {
+                    try await setTypeFromHealthKit(.maintenanceEnergy)
+                } else {
+                    await MainActor.run {
+                        withAnimation {
+                            health.maintenanceEnergyCalculationError = nil
+                        }
+                    }
+                }
             }
         }
     }
