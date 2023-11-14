@@ -550,31 +550,3 @@ struct TagView: View {
                 .fill(backgroundColor ?? Color(colorScheme == .dark ? .systemGray4 : .systemGray5)))
     }
 }
-
-struct AdaptiveCalculationErrorCell: View {
-    
-    let error: MaintenanceCalculationError
-    
-    var body: some View {
-        HStack(alignment: .top) {
-            Image(systemName: "info.circle")
-                .font(.system(size: 50))
-                .foregroundStyle(Color.accentColor)
-            VStack(alignment: .leading) {
-                Text(error.title)
-                    .fontWeight(.semibold)
-                Text(error.message)
-                    .font(.system(.callout))
-                    .foregroundStyle(.secondary)
-                Divider()
-                Text(secondaryMessage)
-                    .font(.system(.callout))
-                    .foregroundStyle(Color(.secondaryLabel))
-            }
-        }
-    }
-    
-    var secondaryMessage: String {
-        "Your estimate is being used instead."
-    }
-}

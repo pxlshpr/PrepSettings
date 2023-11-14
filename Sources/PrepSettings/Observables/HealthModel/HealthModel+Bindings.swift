@@ -278,7 +278,12 @@ public extension HealthModel {
         get { health.maintenanceEnergyCalculatedValue }
         set { health.maintenanceEnergyCalculatedValue = newValue }
     }
-    
+
+    var maintenanceEnergyCalculationError: MaintenanceCalculationError? {
+        get { health.maintenanceEnergyCalculationError }
+        set { health.maintenanceEnergyCalculationError = newValue }
+    }
+
     var isSmoker: Bool {
         get { health.isSmoker ?? false }
         set { health.isSmoker = newValue }

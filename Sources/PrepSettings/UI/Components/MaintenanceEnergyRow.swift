@@ -11,6 +11,8 @@ struct MaintenanceEnergyRow: View {
     let type = HealthType.maintenanceEnergy
     @Bindable var model: HealthModel
     
+    @State var showingAdaptiveDetails: Bool = true
+
     init(_ model: HealthModel) {
         self.model = model
     }
@@ -27,6 +29,43 @@ struct MaintenanceEnergyRow: View {
                 }
             }
             errorRow
+        }
+        .sheet(isPresented: $showingAdaptiveDetails) { adaptiveDetails }
+    }
+    
+    var adaptiveDetails: some View {
+        NavigationStack {
+            List {
+                Section("\(showingWeight ? "Weight" : "Dietary Energy") Data") {
+                    ForEach(0...6, id: \.self) {
+                        cell(daysAgo: $0)
+                    }
+                }
+            }
+            .navigationTitle("Calculation Data")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { toolbarContent }
+        }
+        .presentationDetents([.medium, .large])
+    }
+    
+    @State var showingWeight = true
+    
+    func cell(daysAgo: Int) -> some View {
+        HStack {
+            Text(Date.now.healthShortFormat)
+        }
+    }
+    
+    var toolbarContent: some ToolbarContent {
+        Group {
+            ToolbarItem(placement: .principal) {
+                Picker("", selection: $showingWeight) {
+                    Text("Weight").tag(true)
+                    Text("Dietary Energy").tag(false)
+                }
+                .pickerStyle(.segmented)
+            }
         }
     }
     
@@ -60,17 +99,13 @@ struct MaintenanceEnergyRow: View {
     var calculatedTag: some View {
         
         var showingAdaptive: Bool {
-            model.maintenanceEnergyIsCalculated && model.maintenanceEnergyCalculatedValue != nil
+            model.maintenanceEnergyIsCalculated 
+            && model.maintenanceEnergyCalculatedValue != nil
+            && model.maintenanceEnergyCalculationError == nil
         }
         
         var string: String {
-            if showingAdaptive {
-//                "Calculated"
-                "Adaptive"
-//                "Adaptively Calculated"
-            } else {
-                "Estimated"
-            }
+            showingAdaptive ? "Adaptive" : "Estimated"
         }
         
         var foregroundColor: Color {
@@ -85,12 +120,27 @@ struct MaintenanceEnergyRow: View {
             showingAdaptive ? .semibold : .regular
         }
         
-        return TagView(
-            string: string,
-            foregroundColor: foregroundColor,
-            backgroundColor: backgroundColor,
-            fontWeight: fontWeight
-        )
+        var label: some View {
+            TagView(
+                string: string,
+                foregroundColor: foregroundColor,
+                backgroundColor: backgroundColor,
+                fontWeight: fontWeight
+            )
+        }
+        
+        return Group {
+            if showingAdaptive {
+                Button {
+                    showingAdaptiveDetails = true
+                } label: {
+                    label
+                }
+                .buttonStyle(.plain)
+            } else {
+                label
+            }
+        }
     }
     
     var verticalAlignment: VerticalAlignment {
@@ -194,11 +244,12 @@ public enum MaintenanceCalculationError: Int, Codable {
     var message: String {
         switch self {
         case .noWeightData:
-            "You do not have any weight data over the prior week to make an adaptive calculation."
+//            "You do not have enough weight data over the prior week to make a calculation."
+            "You do not have enough weight data to make a calculation."
         case .noNutritionData:
-            "You do not have any nutrition data over the prior week to make an adaptive calculation."
+            "You do not have any nutrition data to make a calculation."
         case .noWeightOrNutritionData:
-            "You do not have any weight or nutrition data over the prior week to make an adaptive calculation."
+            "You do not have enough weight and nutrition data to make an adaptive calculation."
         }
     }
     
@@ -211,6 +262,91 @@ public enum MaintenanceCalculationError: Int, Codable {
         case .noWeightOrNutritionData:
             "Insufficient Data"
         }
+    }
+}
+
+/// [ ] If there is no weight data—show "
+/// [ ] When this is the first time user is using this, let them
+/// [ ] Always give the user
+struct AdaptiveCalculationErrorCell: View {
+    
+    let error: MaintenanceCalculationError
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 50))
+                .foregroundStyle(Color.accentColor)
+            VStack(alignment: .leading) {
+                Text(error.title)
+                    .fontWeight(.semibold)
+                Text(error.message  + " " + secondaryMessage)
+                    .font(.system(.callout))
+                    .foregroundStyle(.secondary)
+//                Divider()
+//                Text(secondaryMessage)
+//                    .font(.system(.callout))
+//                    .foregroundStyle(Color(.secondaryLabel))
+                Divider()
+                button
+            }
+        }
+    }
+    
+    @ViewBuilder
+    var button: some View {
+//        switch error {
+//        case .noWeightData:
+//            weightButtons
+//        case .noNutritionData:
+//            selectFromHealthButton
+//        case .noWeightOrNutritionData:
+            Group {
+                weightButton
+//                Divider()
+                selectFromHealthButton
+            }
+//        }
+    }
+    
+    func menuLabel(_ title: String) -> some View {
+        Text(title)
+            .fontWeight(.semibold)
+            .padding(.top, 5)
+    }
+    
+    func button(_ title: String, action: @escaping () -> ()) -> some View {
+        Button(title) {
+            action()
+        }
+        .fontWeight(.semibold)
+        .padding(.top, 5)
+    }
+    
+    var selectFromHealthButton: some View {
+        Menu {
+            Button("Select from Health App") {
+            }
+            Button("Enter manually") {
+            }
+        } label: {
+            menuLabel("Set Dietary Energy")
+        }
+    }
+    
+    var weightButton: some View {
+        Menu {
+            Button("Set today's weight") {
+            }
+            Button("Set last week's weight") {
+            }
+        } label: {
+            menuLabel("Set Weight")
+        }
+    }
+
+    var secondaryMessage: String {
+        "Your estimated maintenance energy is being used instead."
     }
 }
 
