@@ -502,12 +502,6 @@ struct RestingEnergySection: View {
     }
 }
 
-#Preview {
-    NavigationView {
-        HealthSummary(model: MockHealthModel)
-    }
-}
-
 struct HealthHeaderText: View {
     let string: String
     let isLarge: Bool
@@ -524,25 +518,106 @@ struct HealthHeaderText: View {
     }
 }
 
+struct TagView: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    let string: String
+    let foregroundColor: Color
+    let backgroundColor: Color?
+    let fontWeight: Font.Weight
+    
+    init(
+        string: String,
+        foregroundColor: Color = Color(.secondaryLabel),
+        backgroundColor: Color? = nil,
+        fontWeight: Font.Weight = .regular
+    ) {
+        self.string = string
+        self.foregroundColor = foregroundColor
+        self.backgroundColor = backgroundColor
+        self.fontWeight = fontWeight
+    }
+    
+    var body: some View {
+        Text(string)
+            .foregroundStyle(foregroundColor)
+            .font(.footnote)
+            .fontWeight(fontWeight)
+            .padding(.vertical, 3)
+            .padding(.horizontal, 5)
+            .background(RoundedRectangle(cornerRadius: 6)
+                .fill(backgroundColor ?? Color(colorScheme == .dark ? .systemGray4 : .systemGray5)))
+    }
+}
+
+struct FetchAllFromHealthTip: Tip {
+    
+   @Parameter static var isDisplayed: Bool = false
+    
+    var title: Text {
+        Text("Health App data")
+    }
+    var message: Text? {
+        Text("Use your data from the Health App and have them stay synced to any changes.")
+    }
+    var image: Image? {
+        Image(systemName: "heart.text.square")
+    }
+    
+    var actions: [Action] {
+        [
+            Tip.Action(
+                id: "sync-all",
+                title: "Use Health App"
+            )
+        ]
+    }
+    
+    var rules: [Rule] {
+        #Rule(Self.$isDisplayed) { $0 == true }
+    }
+    
+    var options: [TipOption] {
+        [
+            Tip.IgnoresDisplayFrequency(true)
+//            Tip.MaxDisplayCount(1),
+        ]
+    }
+}
+
+
 struct MaintenanceEnergyRow: View {
+    
+    @Environment(\.colorScheme) var colorScheme
     
     let type = HealthType.maintenanceEnergy
     @Bindable var model: HealthModel
     
+    private let tip = FetchAllFromHealthTip()
+
     init(_ model: HealthModel) {
         self.model = model
     }
     
     var body: some View {
-        VStack {
-            topRow
-            /// Conditionally show the bottom row, only if we have the value, so that we don't get shown the default source values for a split second during the removal animations.
-            if model.health.hasType(type) {
-                bottomRow
-            } else {
-                EmptyView()
+        Group {
+            VStack {
+                topRow
+                /// Conditionally show the bottom row, only if we have the value, so that we don't get shown the default source values for a split second during the removal animations.
+                if model.health.hasType(type) {
+                    bottomRow
+                } else {
+                    EmptyView()
+                }
             }
+            errorRow
         }
+    }
+    
+    @ViewBuilder
+    var errorRow: some View {
+        HealthKitErrorCell(type: .maintenanceEnergy)
     }
     
     var topRow: some View {
@@ -561,11 +636,18 @@ struct MaintenanceEnergyRow: View {
             detail
                 .multilineTextAlignment(.trailing)
         }
+        .popoverTip(tip)
     }
     
     var calculatedTag: some View {
+        
+        var showingAdaptive: Bool {
+            false
+//            model.maintenanceEnergyIsCalculated && model.maintenanceEnergyCalculatedValue != nil
+        }
+        
         var string: String {
-            if model.maintenanceEnergyIsCalculated {
+            if showingAdaptive {
 //                "Calculated"
                 "Adaptive"
 //                "Adaptively Calculated"
@@ -575,25 +657,23 @@ struct MaintenanceEnergyRow: View {
         }
         
         var foregroundColor: Color {
-            Color(model.maintenanceEnergyIsCalculated ? .white : .secondaryLabel)
+            Color(showingAdaptive ? .white : .secondaryLabel)
         }
         
         var backgroundColor: Color {
-            model.maintenanceEnergyIsCalculated ? Color.accentColor : Color(.systemBackground)
+            showingAdaptive ? Color.accentColor : Color(colorScheme == .dark ? .systemGray4 : .systemGray5)
         }
         
         var fontWeight: Font.Weight {
-            model.maintenanceEnergyIsCalculated ? .semibold : .regular
+            showingAdaptive ? .semibold : .regular
         }
         
-        return Text(string)
-            .foregroundStyle(foregroundColor)
-            .font(.footnote)
-            .fontWeight(fontWeight)
-            .padding(.vertical, 3)
-            .padding(.horizontal, 5)
-            .background(RoundedRectangle(cornerRadius: 6)
-                .fill(backgroundColor))
+        return TagView(
+            string: string,
+            foregroundColor: foregroundColor,
+            backgroundColor: backgroundColor,
+            fontWeight: fontWeight
+        )
     }
     
     var verticalAlignment: VerticalAlignment {
@@ -677,3 +757,16 @@ struct MaintenanceEnergyRow: View {
         }
     }
 }
+
+import TipKit
+
+#Preview {
+    NavigationView {
+        HealthSummary(model: MockHealthModel)
+            .task {
+                try? Tips.resetDatastore()
+                try? Tips.configure()
+            }
+    }
+}
+

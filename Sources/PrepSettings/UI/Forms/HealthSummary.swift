@@ -45,8 +45,6 @@ public struct HealthSummary: View {
     
     @Bindable var model: HealthModel
     
-    var tip = FetchAllFromHealthTip()
-    
     public init(model: HealthModel) {
         self.model = model
     }
@@ -214,33 +212,6 @@ public struct HealthSummary: View {
     }
 }
 
-struct FetchAllFromHealthTip: Tip {
-    var title: Text {
-        Text("Health App data")
-    }
-    var message: Text? {
-        Text("Use your data from the Health App and have them stay synced to any changes.")
-    }
-    var image: Image? {
-        Image(systemName: "heart.text.square")
-    }
-    
-    var actions: [Action] {
-        [
-            Tip.Action(
-                id: "sync-all",
-                title: "Use Health App"
-            )
-        ]
-    }
-    
-    var options: [TipOption] {
-        [
-            Tip.MaxDisplayCount(1),
-        ]
-    }
-}
-
 struct HealthKitErrorCell: View {
     let type: HealthType
     var body: some View {
@@ -255,15 +226,16 @@ struct HealthKitErrorCell: View {
                 Text(message)
                     .font(.system(.callout))
                     .foregroundStyle(.secondary)
-                Text(location)
-                    .foregroundStyle(Color(.secondaryLabel))
-                    .font(.footnote)
-                    .padding(.vertical, 3)
-                    .padding(.horizontal, 5)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(.background.tertiary)
-                    )
+                TagView(string: location)
+//                Text(location)
+//                    .foregroundStyle(Color(.secondaryLabel))
+//                    .font(.footnote)
+//                    .padding(.vertical, 3)
+//                    .padding(.horizontal, 5)
+//                    .background(
+//                        RoundedRectangle(cornerRadius: 6)
+//                            .fill(.background.tertiary)
+//                    )
 //                Divider()
                 Text(secondaryMessage)
                     .font(.system(.callout))
