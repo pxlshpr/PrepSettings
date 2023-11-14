@@ -99,7 +99,7 @@ public extension HealthModel {
         
         case .maintenanceEnergy:
             if [1, 2].randomElement() == 1 {
-                .maintenanceEnergy(nil, .noWeightData)
+                .maintenanceEnergy(0, .noWeightData)
             } else {
                 .maintenanceEnergy(2693, nil)
             }
@@ -127,7 +127,7 @@ public extension HealthModel {
         )
         case .maintenanceEnergy:
             if [1, 2].randomElement() == 1 {
-                return .maintenanceEnergy(nil, .noWeightData)
+                return .maintenanceEnergy(0, .noWeightData)
             } else {
                 return .maintenanceEnergy(2693, nil)
             }
