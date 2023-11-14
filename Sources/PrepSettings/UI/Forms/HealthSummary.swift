@@ -216,7 +216,6 @@ struct HealthKitErrorCell: View {
     let type: HealthType
     var body: some View {
         HStack(alignment: .top) {
-//                Text("⚠️")
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 50))
                 .foregroundStyle(Color.accentColor)
@@ -227,28 +226,9 @@ struct HealthKitErrorCell: View {
                     .font(.system(.callout))
                     .foregroundStyle(.secondary)
                 TagView(string: location)
-//                Text(location)
-//                    .foregroundStyle(Color(.secondaryLabel))
-//                    .font(.footnote)
-//                    .padding(.vertical, 3)
-//                    .padding(.horizontal, 5)
-//                    .background(
-//                        RoundedRectangle(cornerRadius: 6)
-//                            .fill(.background.tertiary)
-//                    )
-//                Divider()
                 Text(secondaryMessage)
                     .font(.system(.callout))
                     .foregroundStyle(Color(.secondaryLabel))
-//                Button("Open Settings") {
-//                    Task {
-//                        if let url = URL(string: UIApplication.openSettingsURLString) {
-//                            await UIApplication.shared.open(url)
-//                        }
-//                    }
-//                }
-//                .fontWeight(.semibold)
-//                .padding(.top, 5)
             }
         }
     }

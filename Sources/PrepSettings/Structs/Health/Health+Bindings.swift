@@ -240,13 +240,28 @@ public extension Health {
         get { maintenanceEnergy?.calculatedValue }
         set {
             guard maintenanceEnergy != nil else {
-                maintenanceEnergy = EnergyBurn(
+                maintenanceEnergy = MaintenanceEnergy(
                     isCalculated: true,
                     calculatedValue: newValue
                 )
                 return
             }
             maintenanceEnergy?.calculatedValue = newValue
+        }
+    }
+    
+    var maintenanceEnergyCalculationError: MaintenanceCalculationError? {
+        get { maintenanceEnergy?.error }
+        set {
+            guard maintenanceEnergy != nil else {
+                maintenanceEnergy = MaintenanceEnergy(
+                    isCalculated: true,
+                    calculatedValue: nil,
+                    error: newValue
+                )
+                return
+            }
+            maintenanceEnergy?.error = newValue
         }
     }
     

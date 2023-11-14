@@ -97,7 +97,7 @@ public extension HealthModel {
         case .sex:              .sex(.male)
         case .age:              .age(DefaultDateOfBirth.dateComponentsWithoutTime)
         
-        case .maintenanceEnergy:       .maintenanceEnergy(2756)
+        case .maintenanceEnergy:       .maintenanceEnergy(nil, .noWeightData)
 
         default: nil
         }
@@ -122,7 +122,8 @@ public extension HealthModel {
         )
         case .maintenanceEnergy:
             //TODO: Do this
-            return .maintenanceEnergy(2693)
+            return .maintenanceEnergy(nil, .noWeightData)
+//            return .maintenanceEnergy(2693)
 
         case .restingEnergy:
             guard let interval = health.restingEnergy?.interval else {
@@ -183,12 +184,16 @@ public extension Health {
         case .height:           heightQuantity = value?.quantity
         case .leanBodyMass:     leanBodyMassQuantity = value?.quantity
             
-        case .maintenanceEnergy:       maintenanceEnergyCalculatedValue = value?.double
         case .restingEnergy:    restingEnergyValue = value?.double
         case .activeEnergy:     activeEnergyValue = value?.double
             
         case .sex:              sexValue = value?.sex
         case .age:              ageHealthKitDateComponents = value?.dateComponents
+
+        case .maintenanceEnergy:
+            maintenanceEnergyCalculatedValue = value?.double
+            maintenanceEnergyCalculationError = value?.maintenanceCalculationError
+
         default:                break
         }
     }

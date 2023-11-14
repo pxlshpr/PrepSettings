@@ -9,7 +9,7 @@ public struct Health: Hashable, Codable {
     public var heightUnit: HeightUnit
     public var bodyMassUnit: BodyMassUnit
     
-    public var maintenanceEnergy: EnergyBurn?
+    public var maintenanceEnergy: MaintenanceEnergy?
     public var restingEnergy: RestingEnergy?
     public var activeEnergy: ActiveEnergy?
     public var age: Age?
@@ -30,7 +30,7 @@ public struct Health: Hashable, Codable {
         energyUnit: EnergyUnit = .default,
         heightUnit: HeightUnit = .default,
         bodyMassUnit: BodyMassUnit = .default,
-        maintenanceEnergy: EnergyBurn? = nil,
+        maintenanceEnergy: MaintenanceEnergy? = nil,
         restingEnergy: RestingEnergy? = nil,
         activeEnergy: ActiveEnergy? = nil,
         age: Age? = nil,
@@ -173,16 +173,19 @@ public extension Health {
 
 public extension Health {
     
-    struct EnergyBurn: Hashable, Codable {
+    struct MaintenanceEnergy: Hashable, Codable {
         public var isCalculated: Bool
         public var calculatedValue: Double?
+        public var error: MaintenanceCalculationError?
         
         public init(
             isCalculated: Bool = true,
-            calculatedValue: Double? = nil
+            calculatedValue: Double? = nil,
+            error: MaintenanceCalculationError? = nil
         ) {
             self.isCalculated = isCalculated
             self.calculatedValue = calculatedValue
+            self.error = error
         }
     }
     

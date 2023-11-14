@@ -163,7 +163,7 @@ public enum HealthKitValue {
     case restingEnergy(Double?)
     case activeEnergy(Double?)
     
-    case maintenanceEnergy(Double?)
+    case maintenanceEnergy(Double?, MaintenanceCalculationError?)
 
     case sex(HKBiologicalSex?)
     case age(DateComponents?)
@@ -195,9 +195,16 @@ public extension HealthKitValue {
 
     var double: Double? {
         switch self {
-        case .maintenanceEnergy(let double):    double
-        case .activeEnergy(let double):     double
-        case .restingEnergy(let double):    double
+        case .maintenanceEnergy(let double, _):     double
+        case .activeEnergy(let double):             double
+        case .restingEnergy(let double):            double
+        default: nil
+        }
+    }
+
+    var maintenanceCalculationError: MaintenanceCalculationError? {
+        switch self {
+        case .maintenanceEnergy(_, let error): error
         default: nil
         }
     }

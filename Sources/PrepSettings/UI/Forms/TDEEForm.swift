@@ -617,21 +617,25 @@ struct MaintenanceEnergyRow: View {
     
     @ViewBuilder
     var errorRow: some View {
-        HealthKitErrorCell(type: .maintenanceEnergy)
+        if let error = model.health.maintenanceEnergy?.error {
+            AdaptiveCalculationErrorCell(error: error)
+        }
     }
     
     var topRow: some View {
         HStack(alignment: verticalAlignment) {
             removeButton
             Text(type.name)
+//            Text(type.name + " Energy")
                 .fontWeight(.semibold)
             Spacer()
+            calculatedTag
         }
     }
     
     var bottomRow: some View {
         HStack(alignment: .top) {
-            calculatedTag
+//            calculatedTag
             Spacer()
             detail
                 .multilineTextAlignment(.trailing)
@@ -642,8 +646,7 @@ struct MaintenanceEnergyRow: View {
     var calculatedTag: some View {
         
         var showingAdaptive: Bool {
-            false
-//            model.maintenanceEnergyIsCalculated && model.maintenanceEnergyCalculatedValue != nil
+            model.maintenanceEnergyIsCalculated && model.maintenanceEnergyCalculatedValue != nil
         }
         
         var string: String {
@@ -757,6 +760,63 @@ struct MaintenanceEnergyRow: View {
         }
     }
 }
+
+public enum MaintenanceCalculationError: Int, Codable {
+    case noWeightData = 1
+    case noNutritionData
+    case noWeightOrNutritionData
+    
+    var message: String {
+        switch self {
+        case .noWeightData:
+            "You do not have any weight data over the prior week to make an adaptive calculation."
+        case .noNutritionData:
+            "You do not have any nutrition data over the prior week to make an adaptive calculation."
+        case .noWeightOrNutritionData:
+            "You do not have any weight or nutrition data over the prior week to make an adaptive calculation."
+        }
+    }
+    
+    var title: String {
+        switch self {
+        case .noWeightData:
+            "Insufficient Weight Data"
+        case .noNutritionData:
+            "Insufficient Nutrition Data"
+        case .noWeightOrNutritionData:
+            "Insufficient Data"
+        }
+    }
+}
+
+struct AdaptiveCalculationErrorCell: View {
+    
+    let error: MaintenanceCalculationError
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 50))
+                .foregroundStyle(Color.accentColor)
+            VStack(alignment: .leading) {
+                Text(error.title)
+                    .fontWeight(.semibold)
+                Text(error.message)
+                    .font(.system(.callout))
+                    .foregroundStyle(.secondary)
+                Divider()
+                Text(secondaryMessage)
+                    .font(.system(.callout))
+                    .foregroundStyle(Color(.secondaryLabel))
+            }
+        }
+    }
+    
+    var secondaryMessage: String {
+        "Your estimate is being used instead."
+    }
+}
+
 
 import TipKit
 
