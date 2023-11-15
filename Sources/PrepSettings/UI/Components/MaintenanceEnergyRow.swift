@@ -29,7 +29,7 @@ struct MaintenanceEnergyRow: View {
                 }
             }
             errorRow
-            viewDataRow
+            viewDataButton
         }
         .sheet(isPresented: $showingAdaptiveDetails) { adaptiveDetails }
     }
@@ -61,8 +61,9 @@ struct MaintenanceEnergyRow: View {
     }
     
     var bottomRow: some View {
-        HStack(alignment: .top) {
+        HStack {
 //            calculatedTag
+//            viewDataButton
             Spacer()
             detail
                 .multilineTextAlignment(.trailing)
@@ -70,16 +71,17 @@ struct MaintenanceEnergyRow: View {
     }
     
     @ViewBuilder
-    var viewDataRow: some View {
+    var viewDataButton: some View {
         if showingAdaptive {
             Button {
                 showingAdaptiveDetails = true
             } label: {
-                Text("View Data")
+                Text("Show Data")
                     .fontWeight(.semibold)
                     .foregroundStyle(Color.accentColor)
             }
             .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
     }
     
@@ -270,7 +272,7 @@ struct AdaptiveCalculationErrorCell: View {
         Button {
             showingAdaptiveDetails = true
         } label: {
-            Text("View Data")
+            Text("Show Data")
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.accentColor)
         }
