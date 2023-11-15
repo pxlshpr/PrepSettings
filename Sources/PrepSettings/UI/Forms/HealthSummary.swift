@@ -252,7 +252,7 @@ struct HealthKitErrorCell: View {
 
 
 #Preview {
-    NavigationView {
+    NavigationStack {
         HealthSummary(model: MockHealthModel)
     }
 }

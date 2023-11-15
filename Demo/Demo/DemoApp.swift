@@ -1,38 +1,28 @@
 import SwiftUI
 import TipKit
+import PrepSettings
 
 @main
 struct DemoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear(perform: appeared)
         }
     }
     
-    init() {
-        // Optional configure tips for testing.
-        setupTipsForTesting()
-
-        // Configure and load all tips in the app.
-        try? Tips.configure()
+    func appeared() {
+        testAdaptiveHealthKitFetch()
     }
     
-    private func setupTipsForTesting() {
-        // Show all defined tips in the app.
-//        Tips.showAllTipsForTesting()
-
-        do {
-
-            // Show some tips, but not all.
-            // try? Tips.showTipsForTesting([tip1, tip2, tip3])
-
-            // Hide all tips defined in the app.
-            // try? Tips.hideAllTipsForTesting()
-
-            // Purge all TipKit-related data.
-            try Tips.resetDatastore()
-        } catch {
-            print(error)
+    func testAdaptiveHealthKitFetch() {
+        guard !isPreview else { return }
+        Task {
+            guard let data = try await HealthStore.adaptiveWeightData(for: Date(fromDateString: "2023_02_26")!) else {
+                print("No data")
+                return
+            }
+            print(data)
         }
     }
 }

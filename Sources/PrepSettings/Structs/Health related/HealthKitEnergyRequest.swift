@@ -18,7 +18,9 @@ struct HealthKitEnergyRequest {
         self.interval = interval
         self.date = date
     }
-    
+}
+
+extension HealthKitEnergyRequest {
     var intervalType: HealthIntervalType { interval.intervalType }
     var typeIdentifier: HKQuantityTypeIdentifier { energyType.healthKitTypeIdentifier }
     var quantityType: HKQuantityType { HKQuantityType(typeIdentifier)}
@@ -30,7 +32,14 @@ struct HealthKitEnergyRequest {
     
     var startDate: Date { interval.startDate(with: date) }
     var dateRange: ClosedRange<Date> { interval.dateRange(with: date) }
-    
+}
+
+extension HealthKitEnergyRequest {
+    /// [ ] write function for daily totals over an interval
+    /// [ ] then use that to create AdaptiveDietaryEnergyData
+}
+
+extension HealthKitEnergyRequest {
     func dailyAverage() async throws -> Double {
         
         try await requestPersmissions()

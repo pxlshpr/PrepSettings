@@ -1,6 +1,6 @@
 import Foundation
 
-public struct AdaptiveDietaryEnergyDataPoints: Hashable, Codable {
+public struct AdaptiveDietaryEnergyData: Hashable, Codable {
     static let DefaultNumberOfPoints = 7
     
     public let numberOfDays: Int
@@ -11,7 +11,7 @@ public struct AdaptiveDietaryEnergyDataPoints: Hashable, Codable {
     }
 }
 
-extension AdaptiveDietaryEnergyDataPoints: CustomStringConvertible {
+extension AdaptiveDietaryEnergyData: CustomStringConvertible {
     public var description: String {
         var string = ""
         for day in 0..<numberOfDays {
@@ -25,7 +25,7 @@ extension AdaptiveDietaryEnergyDataPoints: CustomStringConvertible {
     }
 }
 
-public extension AdaptiveDietaryEnergyDataPoints {
+public extension AdaptiveDietaryEnergyData {
     mutating func setPoint(at index: Int, with point: AdaptiveDataPoint) {
         points[index] = point
     }
@@ -39,7 +39,7 @@ public extension AdaptiveDietaryEnergyDataPoints {
     }
 }
 
-public extension AdaptiveDietaryEnergyDataPoints {
+public extension AdaptiveDietaryEnergyData {
     
     var average: Double? {
         let values = points.values.map { $0.value }

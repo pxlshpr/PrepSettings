@@ -3,7 +3,7 @@ import XCTest
 
 final class AdaptiveDataPointsTests: XCTestCase {
     func testDietaryEnergyDataPoints() throws {
-        var dietaryEnergy = AdaptiveDietaryEnergyDataPoints()
+        var dietaryEnergy = AdaptiveDietaryEnergyData()
         dietaryEnergy.setPoint(at: 0, with: .init(.healthKit, 2000))
         dietaryEnergy.setPoint(at: 1, with: .init(.healthKit, 2000))
         dietaryEnergy.setPoint(at: 3, with: .init(.healthKit, 3000))

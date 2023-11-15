@@ -178,8 +178,8 @@ public extension Health {
         public var calculatedValue: Double?
         public var error: MaintenanceCalculationError?
         
-        public var weightDataPoints: [AdaptiveDataPoint]?
-        public var dietaryEnergyDataPoints: [AdaptiveDataPoint]?
+        public var weightData: AdaptiveWeightData?
+        public var dietaryEnergyData: AdaptiveDietaryEnergyData?
 
         public init(
             isCalculated: Bool = true,

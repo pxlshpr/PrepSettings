@@ -11,7 +11,7 @@ struct MaintenanceEnergyRow: View {
     let type = HealthType.maintenanceEnergy
     @Bindable var model: HealthModel
     
-    @State var showingAdaptiveDetails: Bool = false
+//    @State var showingAdaptiveDetails: Bool = false
 
     init(_ model: HealthModel) {
         self.model = model
@@ -28,24 +28,17 @@ struct MaintenanceEnergyRow: View {
                     EmptyView()
                 }
             }
+            viewDataRow
             errorRow
-            viewDataButton
+//            viewDataButton
         }
-        .sheet(isPresented: $showingAdaptiveDetails) { adaptiveDetails }
-    }
-    
-    var adaptiveDetails: some View {
-        AdaptiveDataList()
-            .presentationDetents([.medium, .large])
+//        .sheet(isPresented: $showingAdaptiveDetails) { adaptiveDetails }
     }
     
     @ViewBuilder
     var errorRow: some View {
         if let error = model.health.maintenanceEnergy?.error {
-            AdaptiveCalculationErrorCell(
-                error: error,
-                showingAdaptiveDetails: $showingAdaptiveDetails
-            )
+            AdaptiveCalculationErrorCell(error)
         }
     }
     
@@ -70,21 +63,15 @@ struct MaintenanceEnergyRow: View {
         }
     }
     
-    @ViewBuilder
-    var viewDataButton: some View {
-        if showingAdaptive {
-            Button {
-                showingAdaptiveDetails = true
-            } label: {
-                Text("Show Data")
-                    .fontWeight(.semibold)
-                    .foregroundStyle(Color.accentColor)
-            }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity, alignment: .center)
+    var viewDataRow: some View {
+        NavigationLink {
+            AdaptiveDataList()
+        } label: {
+            Text("Show Data")
         }
     }
-    
+
+
     var showingAdaptive: Bool {
         model.maintenanceEnergyIsCalculated
         && model.maintenanceEnergyCalculatedValue != nil
@@ -245,7 +232,10 @@ public enum MaintenanceCalculationError: Int, Codable {
 struct AdaptiveCalculationErrorCell: View {
     
     let error: MaintenanceCalculationError
-    @Binding var showingAdaptiveDetails: Bool
+    
+    init(_ error: MaintenanceCalculationError) {
+        self.error = error
+    }
     
     var body: some View {
         HStack(alignment: .top) {
@@ -262,23 +252,23 @@ struct AdaptiveCalculationErrorCell: View {
 //                Text(secondaryMessage)
 //                    .font(.system(.callout))
 //                    .foregroundStyle(Color(.secondaryLabel))
-                Divider()
-                setDataButton
+//                Divider()
+//                setDataButton
             }
         }
     }
     
-    var setDataButton: some View {
-        Button {
-            showingAdaptiveDetails = true
-        } label: {
-            Text("Show Data")
-                .fontWeight(.semibold)
-                .foregroundStyle(Color.accentColor)
-        }
-        .buttonStyle(.plain)
-        .padding(.top, 5)
-    }
+//    var setDataButton: some View {
+//        Button {
+//            showingAdaptiveDetails = true
+//        } label: {
+//            Text("Show Data")
+//                .fontWeight(.semibold)
+//                .foregroundStyle(Color.accentColor)
+//        }
+//        .buttonStyle(.plain)
+//        .padding(.top, 5)
+//    }
     
     var secondaryMessage: String {
         "Your estimated maintenance energy is being used instead."
@@ -286,7 +276,7 @@ struct AdaptiveCalculationErrorCell: View {
 }
 
 #Preview {
-    NavigationView {
+    NavigationStack {
         HealthSummary(model: MockHealthModel)
     }
 }

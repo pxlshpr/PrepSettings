@@ -10,21 +10,14 @@ import PrepSettings
 /// [ ] Add pregnancy status and smoking status to Settings Health form
 struct ContentView: View {
     
-//    @State var settingsStore = SettingsStore.shared
     @State var model: HealthModel = MockHealthModel
     
-    init() {
-//        SettingsStore.configure(
-//            fetchHandler: Self.fetchSettings,
-//            saveHandler: Self.saveSettings
-//        )
-    }
-    
     var body: some View {
-        NavigationView {
-            HealthSummary(model: model)
-//            HealthForm(model, [.weight, .height])
-//                .environment(settingsStore)
+        NavigationStack {
+//            Text("Demo")
+//                .sheet(isPresented: .constant(true)) {
+                    HealthSummary(model: model)
+//                }
         }
     }
 }

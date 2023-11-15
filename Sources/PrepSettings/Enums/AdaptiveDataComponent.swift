@@ -1,6 +1,6 @@
 import Foundation
 
-public enum AdaptiveDataComponent: Int, Hashable, Codable {
+public enum AdaptiveDataComponent: Int, Hashable, Codable, CaseIterable {
     case weight = 1
     case dietaryEnergy
 }

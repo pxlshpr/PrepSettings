@@ -2,6 +2,26 @@ import HealthKit
 import PrepShared
 
 extension HealthStore {
+    public static func adaptiveWeightData(
+        in unit: BodyMassUnit = .kg,
+        for date: Date = Date.now
+        //TODO: Add numberOfDays to get delta for and numberOfDays to average each day by
+    ) async throws -> AdaptiveWeightData? {
+        try await HealthKitQuantityRequest(.weight, unit.healthKitUnit, date)
+            .adaptiveWeightData()
+    }
+    
+    public static func adaptiveDietaryEnergyData(
+        for interval: HealthInterval = .init(0, .day),
+        on date: Date = Date.now,
+        in unit: EnergyUnit = .kcal
+    ) async throws -> Double {
+        try await HealthKitEnergyRequest(.dietary, unit, interval, date)
+            .dailyAverage()
+    }
+}
+
+extension HealthStore {
     
     static func weight(
         in unit: BodyMassUnit = .kg,

@@ -1,42 +1,144 @@
 import SwiftUI
 import PrepShared
 
+public enum AdaptiveDataSection: Int, Hashable, Codable, CaseIterable {
+    case summary = 1
+    case weight
+    case dietaryEnergy
+}
+
+public extension AdaptiveDataSection {
+    var name: String {
+        switch self {
+        case .summary:          "Summary"
+        case .weight:           "Weight"
+        case .dietaryEnergy:    "Dietary Energy"
+        }
+    }
+}
+
 struct AdaptiveDataList: View {
     
-    @State var component: AdaptiveDataComponent = .weight
+    @State var section: AdaptiveDataSection = .summary
     @State var useMovingAverageForWeight = true
 
     var body: some View {
-        NavigationStack {
-            list
-                .navigationTitle("Calculation Data")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar { toolbarContent }
-        }
+        list
+            .navigationTitle("Adaptive Calculation")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { toolbarContent }
     }
     
     var list: some View {
         List {
-            switch component {
-            case .weight:
-                Section("Kilograms") {
-                    ForEach([0, 6], id: \.self) {
-                        cell(daysAgo: $0)
-                    }
-                }
-            case .dietaryEnergy:
-                Section("Kilocalories") {
-                    ForEach(0...6, id: \.self) {
-                        cell(daysAgo: $0)
-                    }
-                }
+            content
+        }
+    }
+    
+    @ViewBuilder
+    var content: some View {
+//        summaryContent
+//        componentPickerSection
+//            .listRowBackground(EmptyView())
+//            .listSectionSpacing(0)
+        switch section {
+        case .weight:           weightContent
+        case .dietaryEnergy:    dietaryEnergyContent
+        case .summary:          summaryContent
+        }
+    }
+    
+    @ViewBuilder
+    var weightContent: some View {
+        Section("Kilograms") {
+            ForEach([0, 6], id: \.self) {
+                cell(daysAgo: $0)
             }
-            if component == .weight {
-                Section(footer: movingAverageFooter) {
-                    HStack {
-                        Toggle("Use moving average", isOn: $useMovingAverageForWeight)
-                    }
-                }
+        }
+        Section(footer: movingAverageFooter) {
+            HStack {
+                Toggle("Use Moving Average", isOn: $useMovingAverageForWeight)
+            }
+        }
+        fillAllFromHealthAppSection
+    }
+    
+    @ViewBuilder
+    var dietaryEnergyContent: some View {
+        Section("Kilocalories") {
+            ForEach(0...6, id: \.self) {
+                cell(daysAgo: $0)
+            }
+        }
+        fillAllFromHealthAppSection
+    }
+    
+    @ViewBuilder
+    var summaryContent: some View {
+        Section {
+            HStack {
+                Text("Number of days")
+                Spacer()
+                Text("7")
+                    .foregroundStyle(.secondary)
+                Image(systemName: "chevron.up.chevron.down")
+                    .imageScale(.small)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        Section(footer: Text("Change in your weight since 7 days ago, converted to energy.")) {
+            HStack {
+                Text("Weight Change")
+                Spacer()
+                Text("- 0.69 kg")
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Conversion")
+                Spacer()
+                Text("1 lb = 3500 kcal")
+                    .foregroundStyle(.secondary)
+                Image(systemName: "chevron.right")
+                    .imageScale(.small)
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Equivalent Energy")
+                Spacer()
+                Text("- 5,291 kcal")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        Section(footer: Text("Total dietary energy that was consumed over the 7 days leading up to this date.")) {
+            HStack {
+                Text("Total Dietary Energy")
+                Spacer()
+                Text("22,146 kcal")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        Section(footer: Text("Total energy consumption that would have resulted in no change in weight.")) {
+            HStack {
+                Text("Total Maintenance")
+                Spacer()
+                Text("27,437 kcal")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        Section(footer: Text("Daily energy consumption that would have resulted in no change in weight, ie. your maintenance.")) {
+            HStack {
+                Text("Daily Maintenance")
+                Spacer()
+                Text("3,920 kcal")
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+    
+    var fillAllFromHealthAppSection: some View {
+        Section {
+            Button("Fill All from Health app") {
+                
             }
         }
     }
@@ -46,7 +148,7 @@ struct AdaptiveDataList: View {
     }
     
     //TODO: Next
-    /// [ ] Store data points in health (2 for weight, and 7 for dietary energy)
+    /// [x] Store data points in health (2 for weight, and 7 for dietary energy)
     /// [ ] Now write the automatic healthkit fetching code that grabs the values from HealthKit
     /// [ ] Now test the maintenance thing for a date in the past where we have health kit data
     /// [ ] Feed in data points that are stored in health here in the cell
@@ -59,26 +161,20 @@ struct AdaptiveDataList: View {
             .init(.userEntered, 0)
         }
         return NavigationLink {
-            AdaptiveDataForm(dataPoint, component, Date.now)
+            AdaptiveDataForm(dataPoint, section == .weight ? .weight : .dietaryEnergy, Date.now)
         } label: {
             AdaptiveDataCell(dataPoint, Date.now)
         }
     }
     
     var toolbarContent: some ToolbarContent {
-        Group {
-            ToolbarItem(placement: .principal) {
-                Picker("", selection: $component) {
-                    Text("Weight").tag(AdaptiveDataComponent.weight)
-                    Text("Dietary Energy").tag(AdaptiveDataComponent.dietaryEnergy)
-                }
-                .pickerStyle(.segmented)
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Button("Fill from Health App") {
-                    
+        ToolbarItem(placement: .bottomBar) {
+            Picker("", selection: $section) {
+                ForEach(AdaptiveDataSection.allCases, id: \.self) {
+                    Text($0.name).tag($0)
                 }
             }
+            .pickerStyle(.segmented)
         }
     }
 }
@@ -205,14 +301,16 @@ let MockDataPoints: [AdaptiveDataPoint] = [
 
 #Preview {
     NavigationStack {
-        List {
-            ForEach(MockDataPoints, id: \.self) { dataPoint in
-                NavigationLink {
-                    AdaptiveDataForm(dataPoint, .dietaryEnergy, Date.now)
-                } label: {
-                    AdaptiveDataCell(dataPoint, Date.now)
-                }
-            }
-        }
+        AdaptiveDataList()
+//        HealthSummary(model: MockHealthModel)
+//        List {
+//            ForEach(MockDataPoints, id: \.self) { dataPoint in
+//                NavigationLink {
+//                    AdaptiveDataForm(dataPoint, .dietaryEnergy, Date.now)
+//                } label: {
+//                    AdaptiveDataCell(dataPoint, Date.now)
+//                }
+//            }
+//        }
     }
 }
