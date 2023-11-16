@@ -27,6 +27,7 @@ struct AdaptiveDataList: View {
             .navigationTitle("Adaptive Calculation")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
+            .navigationBarBackButtonHidden(isEditing)
     }
     
     var list: some View {
@@ -73,33 +74,67 @@ struct AdaptiveDataList: View {
         fillAllFromHealthAppSection
     }
     
-    @ViewBuilder
-    var summaryContent: some View {
-        Section {
+    var conversionSection: some View {
+        var footer: some View {
+            VStack(alignment: .leading) {
+                Text("This is ")
+            }
+        }
+        return Section(header: Text("Weight to Energy"), footer: footer) {
             HStack {
-                Text("Number of days")
+                Text("Ratio")
                 Spacer()
-                Text("7")
+                Text("0.45 kg = 3500 kcal")
                     .foregroundStyle(.secondary)
-                Image(systemName: "chevron.up.chevron.down")
+                Image(systemName: "chevron.right")
                     .imageScale(.small)
                     .foregroundStyle(.secondary)
             }
         }
-        Section(footer: Text("Change in your weight since 7 days ago, converted to energy.")) {
+    }
+    
+    @State var showingWeightConversionInfo = false
+    
+    var weightSection: some View {
+        var footer: some View {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Change in your weight over the prior 7 days, converted to energy.")
+                Button("Learn More") {
+                    showingWeightConversionInfo = true
+                }
+                .font(.footnote)
+            }
+            .sheet(isPresented: $showingWeightConversionInfo) {
+                NavigationStack {
+                    Form {
+                        Text("The conversion is done using the old research that 1 lb of body fat equals 3500 kcal.")
+                        Text("This is no longer considered accurate, and you usually lose a mix of fat, lean tissue and water.")
+                        Text("We are still using this value as it's the best estimation we have to be able to make a calculation.")
+                        Text("If you consume a certain amount based on that calculation, and your weight change isn't what you desire it to be—you could keep amending the deficit or surplus until your desired weight change is achieved.")
+                        Text("Other factors like inaccuracies in logging your food could also contribute to a less accurate calculation—which is why having this calculation periodically adapt to your observed weight change is more useful than getting it precisely correct.")
+                        Text("Also, as your weight change plateaus, this conversion would be even less relevant since the energy change would be 0 regardless.")
+                    }
+                    .font(.callout)
+                    .navigationTitle("Weight to Energy Conversion")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") {
+                                showingWeightConversionInfo = false
+                            }
+                            .fontWeight(.semibold)
+                        }
+                    }
+                }
+                .presentationDetents([.medium, .large])
+            }
+        }
+        
+        return Section(footer: footer) {
             HStack {
                 Text("Weight Change")
                 Spacer()
                 Text("- 0.69 kg")
-                    .foregroundStyle(.secondary)
-            }
-            HStack {
-                Text("Conversion")
-                Spacer()
-                Text("1 lb = 3500 kcal")
-                    .foregroundStyle(.secondary)
-                Image(systemName: "chevron.right")
-                    .imageScale(.small)
                     .foregroundStyle(.secondary)
             }
             HStack {
@@ -109,6 +144,20 @@ struct AdaptiveDataList: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
+    
+    @ViewBuilder
+    var summaryContent: some View {
+        Section(footer: Text("Days over which to calculate your maintenance calories.")) {
+            HStack {
+                Text("Number of days")
+                Spacer()
+                Text("7")
+                    .foregroundStyle(isEditing ? Color.accentColor : Color.primary)
+            }
+        }
+//        conversionSection
+        weightSection
         Section(footer: Text("Total dietary energy that was consumed over the 7 days leading up to this date.")) {
             HStack {
                 Text("Total Dietary Energy")
@@ -167,14 +216,31 @@ struct AdaptiveDataList: View {
         }
     }
     
+    @State var isEditing = false
+    
     var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .bottomBar) {
-            Picker("", selection: $section) {
-                ForEach(AdaptiveDataSection.allCases, id: \.self) {
-                    Text($0.name).tag($0)
+        Group {
+            ToolbarItem(placement: .bottomBar) {
+                Picker("", selection: $section) {
+                    ForEach(AdaptiveDataSection.allCases, id: \.self) {
+                        Text($0.name).tag($0)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(isEditing ? "Done" : "Edit") {
+                    isEditing.toggle()
+                }
+                .fontWeight(isEditing ? .semibold : .regular)
+            }
+            if isEditing {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        isEditing = false
+                    }
                 }
             }
-            .pickerStyle(.segmented)
         }
     }
 }
@@ -300,8 +366,17 @@ let MockDataPoints: [AdaptiveDataPoint] = [
 ]
 
 #Preview {
-    NavigationStack {
-        AdaptiveDataList()
+    Text("Health Details")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                NavigationLink {
+                    AdaptiveDataList()
+                } label: {
+                    Text("Show Data")
+                }
+            }
+        }
+        
 //        HealthSummary(model: MockHealthModel)
 //        List {
 //            ForEach(MockDataPoints, id: \.self) { dataPoint in
@@ -312,5 +387,4 @@ let MockDataPoints: [AdaptiveDataPoint] = [
 //                }
 //            }
 //        }
-    }
 }
