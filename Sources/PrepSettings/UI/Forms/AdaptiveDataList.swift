@@ -21,6 +21,7 @@ struct AdaptiveDataList: View {
     
     @State var section: AdaptiveDataSection = .summary
     @State var useMovingAverageForWeight = true
+    @State var showingWeightConversionInfo = false
 
     var body: some View {
         list
@@ -38,62 +39,13 @@ struct AdaptiveDataList: View {
     
     @ViewBuilder
     var content: some View {
-//        summaryContent
-//        componentPickerSection
-//            .listRowBackground(EmptyView())
-//            .listSectionSpacing(0)
-        switch section {
-        case .weight:           weightContent
-        case .dietaryEnergy:    dietaryEnergyContent
-        case .summary:          summaryContent
+        daysSection
+        if !isEditing {
+            weightSection
+            dietaryEnergySection
+            calculationSections
         }
     }
-    
-    @ViewBuilder
-    var weightContent: some View {
-        Section("Kilograms") {
-            ForEach([0, 6], id: \.self) {
-                cell(daysAgo: $0)
-            }
-        }
-        Section(footer: movingAverageFooter) {
-            HStack {
-                Toggle("Use Moving Average", isOn: $useMovingAverageForWeight)
-            }
-        }
-        fillAllFromHealthAppSection
-    }
-    
-    @ViewBuilder
-    var dietaryEnergyContent: some View {
-        Section("Kilocalories") {
-            ForEach(0...6, id: \.self) {
-                cell(daysAgo: $0)
-            }
-        }
-        fillAllFromHealthAppSection
-    }
-    
-    var conversionSection: some View {
-        var footer: some View {
-            VStack(alignment: .leading) {
-                Text("This is ")
-            }
-        }
-        return Section(header: Text("Weight to Energy"), footer: footer) {
-            HStack {
-                Text("Ratio")
-                Spacer()
-                Text("0.45 kg = 3500 kcal")
-                    .foregroundStyle(.secondary)
-                Image(systemName: "chevron.right")
-                    .imageScale(.small)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-    
-    @State var showingWeightConversionInfo = false
     
     var weightSection: some View {
         var footer: some View {
@@ -143,14 +95,14 @@ struct AdaptiveDataList: View {
                     Form {
                         Section("Kilograms") {
                             ForEach([0, 6], id: \.self) {
-                                cell(daysAgo: $0)
+                                cell(daysAgo: $0, component: .weight)
                             }
                         }
-                        Section(footer: movingAverageFooter) {
-                            HStack {
-                                Toggle("Use Moving Average", isOn: $useMovingAverageForWeight)
-                            }
-                        }
+//                        Section(footer: movingAverageFooter) {
+//                            HStack {
+//                                Toggle("Use Moving Average", isOn: $useMovingAverageForWeight)
+//                            }
+//                        }
                         fillAllFromHealthAppSection
                     }
                     .navigationTitle("Weight")
@@ -202,7 +154,7 @@ struct AdaptiveDataList: View {
                 Form {
                     Section("Kilocalories") {
                         ForEach(0...6, id: \.self) {
-                            cell(daysAgo: $0)
+                            cell(daysAgo: $0, component: .dietaryEnergy)
                         }
                     }
                     fillAllFromHealthAppSection
@@ -242,16 +194,6 @@ struct AdaptiveDataList: View {
         }
     }
     
-    @ViewBuilder
-    var summaryContent: some View {
-        daysSection
-        if !isEditing {
-            weightSection
-            dietaryEnergySection
-            calculationSections
-        }
-    }
-    
     var fillAllFromHealthAppSection: some View {
         Section {
             Button("Fill All from Health app") {
@@ -273,12 +215,12 @@ struct AdaptiveDataList: View {
     /// [ ] Now complete the form, with bindings for picker and value
     /// [ ] Make sure the data is only saved when the user actually taps on "Save" (simply going back shouldn't save it\
     /// [ ] Add the field in HealthSummary for date (when not today) – but first try showing today as well
-    func cell(daysAgo: Int) -> some View {
+    func cell(daysAgo: Int, component: AdaptiveDataComponent) -> some View {
         var dataPoint: AdaptiveDataPoint {
             .init(.userEntered, 0)
         }
         return NavigationLink {
-            AdaptiveDataForm(dataPoint, section == .weight ? .weight : .dietaryEnergy, Date.now)
+            AdaptiveDataForm(dataPoint, component, Date.now)
         } label: {
             AdaptiveDataCell(dataPoint, Date.now)
         }
