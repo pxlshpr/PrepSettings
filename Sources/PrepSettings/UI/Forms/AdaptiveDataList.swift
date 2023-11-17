@@ -24,7 +24,7 @@ struct AdaptiveDataList: View {
 
     var body: some View {
         list
-            .navigationTitle("Adaptive Calculation")
+            .navigationTitle("Maintenance Energy")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
             .navigationBarBackButtonHidden(isEditing)
@@ -130,25 +130,51 @@ struct AdaptiveDataList: View {
             }
         }
         
-        return Section(footer: footer) {
-            HStack {
-                Text("Weight Change")
-                Spacer()
-                Text("- 0.69 kg")
-                    .foregroundStyle(.secondary)
-            }
-            HStack {
-                Text("Equivalent Energy")
-                Spacer()
-                Text("- 5,291 kcal")
-                    .foregroundStyle(.secondary)
+        var header: some View {
+            Text("Weight")
+                .font(.system(.title3, design: .rounded, weight: .bold))
+                .foregroundStyle(Color(.label))
+                .textCase(.none)
+        }
+
+        return Group {
+            Section(header: header, footer: footer) {
+                NavigationLink {
+                    Form {
+                        Section("Kilograms") {
+                            ForEach([0, 6], id: \.self) {
+                                cell(daysAgo: $0)
+                            }
+                        }
+                        Section(footer: movingAverageFooter) {
+                            HStack {
+                                Toggle("Use Moving Average", isOn: $useMovingAverageForWeight)
+                            }
+                        }
+                        fillAllFromHealthAppSection
+                    }
+                    .navigationTitle("Weight")
+                } label: {
+                    Text("Show All Data")
+                }
+                HStack {
+                    Text("Weight Change")
+                    Spacer()
+                    Text("- 0.69 kg")
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
+                    Text("Equivalent Energy")
+                    Spacer()
+                    Text("- 5,291 kcal")
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
     
-    @ViewBuilder
-    var summaryContent: some View {
-        Section(footer: Text("Days over which to calculate your maintenance calories.")) {
+    var daysSection: some View {
+        Section(footer: Text("Days over which to calculate your maintenance energy.")) {
             HStack {
                 Text("Number of days")
                 Spacer()
@@ -156,9 +182,35 @@ struct AdaptiveDataList: View {
                     .foregroundStyle(isEditing ? Color.accentColor : Color.primary)
             }
         }
-//        conversionSection
-        weightSection
-        Section(footer: Text("Total dietary energy that was consumed over the 7 days leading up to this date.")) {
+    }
+    
+    var dietaryEnergySection: some View {
+        
+        var header: some View {
+            Text("Dietary Energy")
+                .font(.system(.title3, design: .rounded, weight: .bold))
+                .foregroundStyle(Color(.label))
+                .textCase(.none)
+        }
+        
+        var footer: some View {
+            Text("The energy you consumed over the 7 days leading up to this date.")
+        }
+        
+        return Section(header: header, footer: footer) {
+            NavigationLink {
+                Form {
+                    Section("Kilocalories") {
+                        ForEach(0...6, id: \.self) {
+                            cell(daysAgo: $0)
+                        }
+                    }
+                    fillAllFromHealthAppSection
+                }
+                .navigationTitle("Dietary Energy")
+            } label: {
+                Text("Show All Data")
+            }
             HStack {
                 Text("Total Dietary Energy")
                 Spacer()
@@ -166,21 +218,37 @@ struct AdaptiveDataList: View {
                     .foregroundStyle(.secondary)
             }
         }
-        Section(footer: Text("Total energy consumption that would have resulted in no change in weight.")) {
+    }
+    
+    @ViewBuilder
+    var calculationSections: some View {
+//        Section(footer: Text("Total energy consumption that would have resulted in no change in weight.")) {
+//            HStack {
+//                Text("Total Maintenance")
+//                Spacer()
+//                Text("27,437 kcal")
+//                    .foregroundStyle(.secondary)
+//            }
+//        }
+//        Section(footer: Text("Daily energy consumption that would have resulted in no change in weight, ie. your maintenance.")) {
+        Section(footer: Text("The energy you would have to consume daily to maintain your weight.")) {
+//        Section {
             HStack {
-                Text("Total Maintenance")
-                Spacer()
-                Text("27,437 kcal")
-                    .foregroundStyle(.secondary)
-            }
-        }
-        Section(footer: Text("Daily energy consumption that would have resulted in no change in weight, ie. your maintenance.")) {
-            HStack {
-                Text("Daily Maintenance")
+                Text("Maintenance Energy")
                 Spacer()
                 Text("3,920 kcal")
                     .foregroundStyle(.secondary)
             }
+        }
+    }
+    
+    @ViewBuilder
+    var summaryContent: some View {
+        daysSection
+        if !isEditing {
+            weightSection
+            dietaryEnergySection
+            calculationSections
         }
     }
     
@@ -193,7 +261,7 @@ struct AdaptiveDataList: View {
     }
     
     var movingAverageFooter: some View {
-        Text("Use a 7-day moving average of your weight data when available. This makes the calculation more accurate by accounting for daily changes in your weight due to factors like fluid loss.")
+        Text("Use a 7-day moving average of your weight data when available.\n\nThis makes the calculation less affected by cyclical fluctuations in your weight due to factors like fluid loss.")
     }
     
     //TODO: Next
@@ -220,17 +288,19 @@ struct AdaptiveDataList: View {
     
     var toolbarContent: some ToolbarContent {
         Group {
-            ToolbarItem(placement: .bottomBar) {
-                Picker("", selection: $section) {
-                    ForEach(AdaptiveDataSection.allCases, id: \.self) {
-                        Text($0.name).tag($0)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
+//            ToolbarItem(placement: .bottomBar) {
+//                Picker("", selection: $section) {
+//                    ForEach(AdaptiveDataSection.allCases, id: \.self) {
+//                        Text($0.name).tag($0)
+//                    }
+//                }
+//                .pickerStyle(.segmented)
+//            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(isEditing ? "Done" : "Edit") {
-                    isEditing.toggle()
+                    withAnimation {
+                        isEditing.toggle()
+                    }
                 }
                 .fontWeight(isEditing ? .semibold : .regular)
             }
@@ -369,11 +439,11 @@ let MockDataPoints: [AdaptiveDataPoint] = [
     Text("Health Details")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                NavigationLink {
+//                NavigationLink {
                     AdaptiveDataList()
-                } label: {
-                    Text("Show Data")
-                }
+//                } label: {
+//                    Text("Show Data")
+//                }
             }
         }
         
