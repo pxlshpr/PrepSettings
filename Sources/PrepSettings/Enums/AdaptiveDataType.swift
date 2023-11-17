@@ -7,6 +7,14 @@ public enum AdaptiveDataType: Int, Hashable, Codable {
     case averaged
 }
 
+public extension AdaptiveDataType {
+    static func options(for component: AdaptiveDataComponent) -> [AdaptiveDataType] {
+        switch component {
+        case .weight:           [.healthKit, .userEntered]
+        case .dietaryEnergy:    allCases
+        }
+    }
+}
 extension AdaptiveDataType: Pickable {
     public var pickedTitle: String { name }
     public var menuTitle: String { name }

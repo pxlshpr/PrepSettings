@@ -30,11 +30,70 @@ struct AdaptiveDataForm: View {
         Form {
             Section {
                 typeRow
+                movingAverageRow
                 valueRow
             }
+//            useMovingAverageSection
+            movingAverageWeights
         }
         .navigationTitle(model.date.adaptiveMaintenanceDateString)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarContent }
+    }
+    
+    @State var useMovingAverageForWeight: Bool = true
+
+    @ViewBuilder
+    var movingAverageRow: some View {
+        if model.component == .weight {
+            HStack {
+                Toggle("Moving Average", isOn: $useMovingAverageForWeight)
+            }
+        }
+    }
+
+    @ViewBuilder
+    var useMovingAverageSection: some View {
+        if model.component == .weight {
+            Section(footer: movingAverageFooter) {
+                HStack {
+                    Toggle("Use Moving Average", isOn: $useMovingAverageForWeight)
+                }
+            }
+        }
+    }
+    
+    var movingAverageWeights: some View {
+        
+        var header: some View {
+            HStack {
+                Text("Kilograms")
+                Spacer()
+            }
+        }
+        
+        var footer: some View {
+            Text("Your weight is an average of these values.")
+        }
+        
+        return Group {
+            if model.component == .weight, useMovingAverageForWeight {
+                Section(header: header, footer: footer) {
+                    ForEach(0...6, id: \.self) { i in
+                        HStack {
+                            Text(Date.now.moveDayBy(-i).adaptiveMaintenanceDateString)
+                            Spacer()
+                            Text("96")
+                                .foregroundStyle(model.type == .healthKit ? Color(.secondaryLabel) : Color(.label))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    var movingAverageFooter: some View {
+        Text("Use a 7-day moving average of your weight data when available.\n\nThis makes the calculation less affected by cyclical fluctuations in your weight due to factors like fluid loss.")
     }
     
     var toolbarContent: some ToolbarContent {
@@ -62,17 +121,22 @@ struct AdaptiveDataForm: View {
         HStack {
             Text(model.component.name)
             Spacer()
-            MenuPicker($model.type)
+            MenuPicker(AdaptiveDataType.options(for: model.component), $model.type)
         }
     }
     
+    @ViewBuilder
     var manualValue: some View {
-        ManualHealthField(
-            unitBinding: .constant(BodyMassUnit.kg),
-            valueBinding: $model.value,
-            firstComponentBinding: .constant(0),
-            secondComponentBinding: .constant(0)
-        )
+        if model.component == .weight, useMovingAverageForWeight {
+            healthValue
+        } else {
+            ManualHealthField(
+                unitBinding: .constant(BodyMassUnit.kg),
+                valueBinding: $model.value,
+                firstComponentBinding: .constant(0),
+                secondComponentBinding: .constant(0)
+            )
+        }
     }
     
     var healthValue: some View {
@@ -86,7 +150,10 @@ struct AdaptiveDataForm: View {
 }
 
 #Preview {
-    NavigationStack {
-        AdaptiveDataForm(MockDataPoints[1], .dietaryEnergy, Date.now)
-    }
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                AdaptiveDataForm(MockDataPoints[1], .weight, Date.now)
+            }
+        }
 }
