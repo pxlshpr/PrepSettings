@@ -1,29 +1,54 @@
 import SwiftUI
 import PrepShared
 
-struct AdaptiveDataForm: View {
-    
-    @State var model: Model
-    
+//TODO: Next
+/// [ ] Consider having movingAverageInterval as a property in sample itself, so user could essentially have it set for one weight and not set for the other for whatever reason?
+/// [ ] Add a field for numberOfAveragedValues, and have a stepper that lets user choose the interval, ranging from 2 days to 3 weeks, defaulting it 1 week
+extension WeightSampleForm {
     @Observable class Model {
         
         let date: Date
-        let sample: MaintenanceSample
+        var sample: MaintenanceSample
         var type: AdaptiveDataType
-        var component: AdaptiveDataComponent
         var value: Double
 
-        init(_ sample: MaintenanceSample, _ component: AdaptiveDataComponent, _ date: Date) {
+        init(sample: MaintenanceSample, date: Date) {
             self.sample = sample
             self.type = sample.type
-            self.component = component
             self.value = sample.value
             self.date = date
         }
     }
+}
+
+extension WeightSampleForm.Model {
+    var usingMovingAverageBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { self.isUsingMovingAverage },
+            set: { newValue in
+                withAnimation {
+                    switch newValue {
+                    case false:
+                        self.sample.averagedValues = nil
+                    case true:
+                        self.sample.averagedValues = [:]
+                    }
+                }
+            }
+        )
+    }
     
-    init(_ sample: MaintenanceSample, _ component: AdaptiveDataComponent, _ date: Date) {
-        _model = State(initialValue: Model(sample, component, date))
+    var isUsingMovingAverage: Bool {
+        sample.averagedValues != nil
+    }
+}
+
+struct WeightSampleForm: View {
+    
+    @State var model: Model
+    
+    init(sample: MaintenanceSample, date: Date) {
+        _model = State(initialValue: Model(sample: sample, date: date))
     }
     
     var body: some View {
@@ -41,24 +66,16 @@ struct AdaptiveDataForm: View {
         .toolbar { toolbarContent }
     }
     
-    @State var useMovingAverageForWeight: Bool = true
-
-    @ViewBuilder
     var movingAverageRow: some View {
-        if model.component == .weight {
-            HStack {
-                Toggle("Moving Average", isOn: $useMovingAverageForWeight)
-            }
+        HStack {
+            Toggle("Moving Average", isOn: model.usingMovingAverageBinding)
         }
     }
 
-    @ViewBuilder
     var useMovingAverageSection: some View {
-        if model.component == .weight {
-            Section(footer: movingAverageFooter) {
-                HStack {
-                    Toggle("Use Moving Average", isOn: $useMovingAverageForWeight)
-                }
+        Section(footer: movingAverageFooter) {
+            HStack {
+                Toggle("Use Moving Average", isOn: model.usingMovingAverageBinding)
             }
         }
     }
@@ -70,7 +87,7 @@ struct AdaptiveDataForm: View {
         }
         
         return Group {
-            if model.component == .weight, useMovingAverageForWeight {
+            if model.isUsingMovingAverage {
                 Section(footer: footer) {
                     ForEach(0...6, id: \.self) { i in
                         HStack {
@@ -114,15 +131,15 @@ struct AdaptiveDataForm: View {
     
     var typeRow: some View {
         HStack {
-            Text(model.component.name)
+            Text(AdaptiveDataComponent.weight.name)
             Spacer()
-            MenuPicker(AdaptiveDataType.options(for: model.component), $model.type)
+            MenuPicker(AdaptiveDataType.options(for: .weight), $model.type)
         }
     }
     
     @ViewBuilder
     var manualValue: some View {
-        if model.component == .weight, useMovingAverageForWeight {
+        if model.isUsingMovingAverage {
             healthValue
         } else {
             ManualHealthField(
@@ -148,7 +165,7 @@ struct AdaptiveDataForm: View {
     Text("")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                AdaptiveDataForm(MockMaintenanceSamples[1], .weight, Date.now)
+                WeightSampleForm(sample: MockMaintenanceSamples[1], date: Date.now)
             }
         }
 }

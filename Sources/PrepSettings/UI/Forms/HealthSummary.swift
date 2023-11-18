@@ -51,6 +51,7 @@ public struct HealthSummary: View {
     
     public var body: some View {
         Form {
+            dateSection
             syncAllSection
             content(for: .maintenanceEnergy)
             content(for: .age)
@@ -63,6 +64,28 @@ public struct HealthSummary: View {
         .navigationTitle("Health Details")
         .navigationBarTitleDisplayMode(.large)
         .toolbar { toolbarContent }
+    }
+    
+    var dateSection: some View {
+        
+        var date: Date { model.health.date }
+        
+        var footer: some View {
+            Text("You are viewing the health details of a past date. Changes will not affect your current health details and will only affect the plan you had set on that day.")
+        }
+        
+        return Group {
+            if !date.isToday {
+                Section(footer: footer) {
+                    HStack {
+                        Text("Date")
+                        Spacer()
+                        Text(date.adaptiveMaintenanceDateString)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
     }
     
     var toolbarContent: some ToolbarContent {
@@ -194,7 +217,7 @@ public struct HealthSummary: View {
     
     var dailyValuesSection: some View {
         var footer: some View {
-            Text("Used to pick daily values for micronutrients.")
+            Text("Used as a criteria when choosing daily values for micronutrients.")
         }
         return Section(footer: footer) {
             if model.sexValue == .female {
@@ -250,6 +273,18 @@ struct HealthKitErrorCell: View {
     }
 }
 
+func fetchHealthFromDocuments() async throws -> Health {
+    let url = getDocumentsDirectory().appendingPathComponent("health.json")
+    do {
+        let data = try Data(contentsOf: url)
+        var health = try JSONDecoder().decode(Health.self, from: data)
+//        health.date = Date.now.moveDayBy(-15)
+        health.date = Date(fromDateString: "2023_02_26")!
+        return health
+    } catch {
+        return .init()
+    }
+}
 
 #Preview {
     NavigationStack {

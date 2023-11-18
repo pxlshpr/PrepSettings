@@ -30,9 +30,7 @@ struct MaintenanceEnergyRow: View {
             }
             viewDataRow
             errorRow
-//            viewDataButton
         }
-//        .sheet(isPresented: $showingAdaptiveDetails) { adaptiveDetails }
     }
     
     @ViewBuilder
@@ -46,7 +44,6 @@ struct MaintenanceEnergyRow: View {
         HStack(alignment: verticalAlignment) {
             removeButton
             Text(type.name)
-//            Text(type.name + " Energy")
                 .fontWeight(.semibold)
             Spacer()
             calculatedTag
@@ -55,45 +52,44 @@ struct MaintenanceEnergyRow: View {
     
     var bottomRow: some View {
         HStack {
-//            calculatedTag
-//            viewDataButton
             Spacer()
             detail
                 .multilineTextAlignment(.trailing)
         }
     }
     
+    @ViewBuilder
     var viewDataRow: some View {
-        NavigationLink {
-            AdaptiveDataList()
-        } label: {
-            Text("Show Data")
+        if model.maintenanceEnergyIsAdaptive {
+            NavigationLink {
+                AdaptiveDataList(model)
+            } label: {
+                Text("Show Adaptive Calculation")
+            }
         }
     }
 
 
-    var showingAdaptive: Bool {
-        model.maintenanceEnergyIsCalculated
-        && model.maintenanceEnergyCalculatedValue != nil
-        && model.maintenanceEnergyCalculationError == nil
+    var showAdaptive: Bool {
+        model.hasAdaptiveMaintenanceEnergyValue
     }
     
     var calculatedTag: some View {
         
         var string: String {
-            showingAdaptive ? "Adaptive" : "Estimated"
+            showAdaptive ? "Adaptive" : "Estimated"
         }
         
         var foregroundColor: Color {
-            Color(showingAdaptive ? .white : .secondaryLabel)
+            Color(showAdaptive ? .white : .secondaryLabel)
         }
         
         var backgroundColor: Color {
-            showingAdaptive ? Color.accentColor : Color(colorScheme == .dark ? .systemGray4 : .systemGray5)
+            showAdaptive ? Color.accentColor : Color(colorScheme == .dark ? .systemGray4 : .systemGray5)
         }
         
         var fontWeight: Font.Weight {
-            showingAdaptive ? .semibold : .regular
+            showAdaptive ? .semibold : .regular
         }
         
         return TagView(
@@ -158,8 +154,8 @@ struct MaintenanceEnergyRow: View {
         }
         
         var value: Double {
-            if model.maintenanceEnergyIsCalculated,
-                let value = model.maintenanceEnergyCalculatedValue,
+            if model.maintenanceEnergyIsAdaptive,
+                let value = model.maintenanceEnergyAdaptiveValue,
                 model.health.maintenanceEnergy?.error == nil
             {
                 value
@@ -197,7 +193,7 @@ struct MaintenanceEnergyRow: View {
     }
 }
 
-public enum MaintenanceCalculationError: Int, Codable {
+public enum AdaptiveMaintenanceError: Int, Codable {
     case noWeightData = 1
     case noNutritionData
     case noWeightOrNutritionData
@@ -231,9 +227,9 @@ public enum MaintenanceCalculationError: Int, Codable {
 /// [ ] Always give the user
 struct AdaptiveCalculationErrorCell: View {
     
-    let error: MaintenanceCalculationError
+    let error: AdaptiveMaintenanceError
     
-    init(_ error: MaintenanceCalculationError) {
+    init(_ error: AdaptiveMaintenanceError) {
         self.error = error
     }
     

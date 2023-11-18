@@ -1,11 +1,16 @@
 import Foundation
 
-public struct AdaptiveWeightData: Hashable, Codable {
-    public let current: AdaptiveDataPoint?
-    public let previous: AdaptiveDataPoint?
+public struct WeightChange: Hashable, Codable {
+    public let current: MaintenanceSample?
+    public let previous: MaintenanceSample?
+    
+    public init(current: MaintenanceSample? = nil, previous: MaintenanceSample? = nil) {
+        self.current = current
+        self.previous = previous
+    }
 }
 
-extension AdaptiveWeightData: CustomStringConvertible {
+extension WeightChange: CustomStringConvertible {
     public var description: String {
         var string = ""
         if let point = current {
@@ -24,7 +29,7 @@ extension AdaptiveWeightData: CustomStringConvertible {
         return string
     }
 }
-public extension AdaptiveWeightData {
+public extension WeightChange {
     var delta: Double? {
         guard let current, let previous else { return nil }
         return current.value - previous.value

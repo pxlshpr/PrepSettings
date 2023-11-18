@@ -18,11 +18,17 @@ struct DemoApp: App {
     func testAdaptiveHealthKitFetch() {
         guard !isPreview else { return }
         Task {
-            guard let data = try await HealthStore.adaptiveWeightData(for: Date(fromDateString: "2023_02_26")!) else {
-                print("No data")
-                return
-            }
-            print(data)
+            let date = Date(fromDateString: "2023_02_26")!
+            let maintenance = try await HealthStore.adaptiveMaintenanceEnergy(
+                energyUnit: .kcal,
+                bodyMassUnit: .kg,
+                on: date,
+                interval: .init(1, .week),
+                weightMovingAverageDays: 7
+            )
+            print(maintenance)
+//            let data = try await HealthStore.adaptiveWeightData(on: date)!
+//            print(data)
         }
     }
 }

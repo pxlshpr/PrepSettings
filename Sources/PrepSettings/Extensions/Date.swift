@@ -102,3 +102,15 @@ public extension Date {
         )
     }
 }
+
+public extension Date {
+    var adaptiveMaintenanceDateString: String {
+        let formatter = DateFormatter()
+        if self.year == Date().year {
+            formatter.dateFormat = "d MMM"
+        } else {
+            formatter.dateFormat = "d MMM yyyy"
+        }
+        return formatter.string(from: self)
+    }
+}

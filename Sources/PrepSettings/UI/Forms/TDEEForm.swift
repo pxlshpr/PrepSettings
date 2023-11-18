@@ -159,7 +159,7 @@ public struct TDEEFormSections: View {
     var estimateSection: some View {
         @ViewBuilder
         var footer: some View {
-            if model.maintenanceEnergyIsCalculated {
+            if model.maintenanceEnergyIsAdaptive {
                 Text("Used when there isn't sufficient weight or nutrition data to make a calculation.")
             }
         }
@@ -202,7 +202,7 @@ public struct TDEEFormSections: View {
                 Text("Use Adaptive Calculation")
                     .layoutPriority(1)
                 Spacer()
-                Toggle("", isOn: $model.maintenanceEnergyIsCalculated)
+                Toggle("", isOn: $model.maintenanceEnergyIsAdaptive)
             }
         }
         
@@ -212,7 +212,7 @@ public struct TDEEFormSections: View {
         }
 
         var adaptiveFooter: some View {
-            Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and food intake over the prior week. [Learn More.](https://example.com)")
+            Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
         }
 
         return Group {

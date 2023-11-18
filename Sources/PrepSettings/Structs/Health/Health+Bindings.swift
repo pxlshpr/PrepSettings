@@ -5,17 +5,17 @@ import PrepShared
 public extension Health {
     
     //MARK: Energy Burn
-    var maintenanceEnergyIsCalculated: Bool {
-        get { maintenanceEnergy?.isCalculated ?? false }
+    var maintenanceEnergyIsAdaptive: Bool {
+        get { maintenanceEnergy?.isAdaptive ?? false }
         set {
             guard maintenanceEnergy != nil else {
-                maintenanceEnergy = .init(isCalculated: newValue)
+                maintenanceEnergy = .init(isAdaptive: newValue)
                 return
             }
-            maintenanceEnergy?.isCalculated = newValue
+            maintenanceEnergy?.isAdaptive = newValue
             /// If we've turned it off, clear the previous value
             if !newValue {
-                maintenanceEnergy?.calculatedValue = nil
+                maintenanceEnergy?.adaptiveValue = nil
             }
         }
     }
@@ -236,27 +236,27 @@ public extension Health {
 
 public extension Health {
     
-    var maintenanceEnergyCalculatedValue: Double? {
-        get { maintenanceEnergy?.calculatedValue }
+    var maintenanceEnergyAdaptiveValue: Double? {
+        get { maintenanceEnergy?.adaptiveValue }
         set {
             guard maintenanceEnergy != nil else {
                 maintenanceEnergy = MaintenanceEnergy(
-                    isCalculated: true,
-                    calculatedValue: newValue
+                    isAdaptive: true,
+                    adaptiveValue: newValue
                 )
                 return
             }
-            maintenanceEnergy?.calculatedValue = newValue
+            maintenanceEnergy?.adaptiveValue = newValue
         }
     }
     
-    var maintenanceEnergyCalculationError: MaintenanceCalculationError? {
+    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
         get { maintenanceEnergy?.error }
         set {
             guard maintenanceEnergy != nil else {
                 maintenanceEnergy = MaintenanceEnergy(
-                    isCalculated: true,
-                    calculatedValue: nil,
+                    isAdaptive: true,
+                    adaptiveValue: nil,
                     error: newValue
                 )
                 return

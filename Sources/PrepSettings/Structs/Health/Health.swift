@@ -65,7 +65,8 @@ public struct Health: Hashable, Codable {
 public extension Health {
     /// Checks that everything except `date` and `updatedAt` match
     func matches(_ other: Health) -> Bool {
-        energyUnit == other.energyUnit
+        date == other.date
+        && energyUnit == other.energyUnit
         && heightUnit == other.heightUnit
         && bodyMassUnit == other.bodyMassUnit
         && maintenanceEnergy == other.maintenanceEnergy
@@ -174,21 +175,28 @@ public extension Health {
 public extension Health {
     
     struct MaintenanceEnergy: Hashable, Codable {
-        public var isCalculated: Bool
-        public var calculatedValue: Double?
-        public var error: MaintenanceCalculationError?
+        public var isAdaptive: Bool
+        public var adaptiveValue: Double?
+        public var error: AdaptiveMaintenanceError?
         
-        public var weightData: AdaptiveWeightData?
-        public var dietaryEnergyData: AdaptiveDietaryEnergyData?
+        public var interval: HealthInterval
+        public var weightChange: WeightChange
+        public var dietaryEnergy: DietaryEnergy?
 
         public init(
-            isCalculated: Bool = true,
-            calculatedValue: Double? = nil,
-            error: MaintenanceCalculationError? = nil
+            isAdaptive: Bool = true,
+            adaptiveValue: Double? = nil,
+            error: AdaptiveMaintenanceError? = nil,
+            interval: HealthInterval = .init(1, .week),
+            weightChange: WeightChange = .init(),
+            dietaryEnergy: DietaryEnergy? = nil
         ) {
-            self.isCalculated = isCalculated
-            self.calculatedValue = calculatedValue
+            self.isAdaptive = isAdaptive
+            self.adaptiveValue = adaptiveValue
             self.error = error
+            self.interval = interval
+            self.weightChange = weightChange
+            self.dietaryEnergy = dietaryEnergy
         }
     }
     

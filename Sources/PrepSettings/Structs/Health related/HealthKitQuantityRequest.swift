@@ -26,19 +26,18 @@ extension Array where Element == Double {
     }
 }
 extension Array where Element == Quantity {
-    var valuesGroupedByDate: [[Double]] {
+    var valuesGroupedByDate: [Date: [Quantity]] {
         let withDates = self.filter { $0.date != nil }
         return Dictionary(grouping: withDates) { $0.date!.startOfDay }
-            .map { $0.value.map { $0.value } }
     }
 }
 
 extension HealthKitQuantityRequest {
     
-    func averageValue(
+    func daySample(
         for date: Date,
         asMovingAverageWithNumberOfPriorDays days: Int = 0
-    ) async throws -> Double? {
+    ) async throws -> DaySample? {
         
         //TODO: Write this properly
         /// [ ] Get all quantities from start of earliest day to end of last day (provided date)
@@ -53,39 +52,64 @@ extension HealthKitQuantityRequest {
         
         let quantities = try await quantities(matching: predicate)
         let groupedByDate = quantities.valuesGroupedByDate
-        var dailyAverages: [Double] = []
-        for dailyValues in groupedByDate {
-            guard let dailyAverage = dailyValues.averageValue else { continue }
-            dailyAverages.append(dailyAverage)
+
+        var movingAverageValues: [Int: Double] = [:]
+        for (quantitiesDate, quantities) in groupedByDate {
+            let numberOfDays = date.numberOfDaysFrom(quantitiesDate)
+            guard numberOfDays >= 0 else { continue }
+            
+            let dailyAverage = quantities.map { $0.value }.averageValue
+            guard let dailyAverage else { continue }
+            
+            movingAverageValues[numberOfDays] = dailyAverage
         }
-        return dailyAverages.averageValue
+        
+        guard let average = Array(movingAverageValues.values).averageValue else { return nil }
+        
+        return DaySample(
+            value: average,
+            movingAverageValues: movingAverageValues.isEmpty ? nil : movingAverageValues
+        )
     }
     
     func averageValue(on date: Date) async throws -> Double? {
-        try await averageValue(for: date)
+        try await daySample(for: date)?.value
     }
 }
 
 extension HealthKitQuantityRequest {
     
-    func adaptiveWeightData() async throws -> AdaptiveWeightData? {
+    func weightChange(
+        interval: HealthInterval,
+        asMovingAverageOfNumberOfDays days: Int? = nil
+    ) async throws -> WeightChange {
         
-        func weight(for date: Date) async throws -> Double? {
-            try await averageValue(
+        let numberOfPriorDays = if let days, days > 0 { days - 1 } else { 0 }
+        
+        func weightDaySample(for date: Date) async throws -> DaySample? {
+            try await daySample(
                 for: date,
-                asMovingAverageWithNumberOfPriorDays: 6
+                asMovingAverageWithNumberOfPriorDays: numberOfPriorDays
             )
         }
         
-        let current: AdaptiveDataPoint? = if let weight = try await weight(for: date) {
-            AdaptiveDataPoint(.healthKit, weight)
+        let current: MaintenanceSample? = if let daySample = try await weightDaySample(for: date) {
+            MaintenanceSample(
+                type: .healthKit,
+                averagedValues: daySample.movingAverageValues,
+                value: daySample.value
+            )
         } else { nil }
         
-        let previous: AdaptiveDataPoint? = if let weight = try await weight(for: date.moveDayBy(-7)) {
-            AdaptiveDataPoint(.healthKit, weight)
+        let previous: MaintenanceSample? = if let daySample = try await weightDaySample(for: interval.startDate(with: date)) {
+            MaintenanceSample(
+                type: .healthKit,
+                averagedValues: daySample.movingAverageValues,
+                value: daySample.value
+            )
         } else { nil }
         
-        return AdaptiveWeightData(current: current, previous: previous)
+        return WeightChange(current: current, previous: previous)
     }
 }
 

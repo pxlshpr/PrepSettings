@@ -17,17 +17,6 @@ public extension SettingsStore {
 
 //MARK: - Private
 
-func fetchHealthFromDocuments() async throws -> Health {
-    let url = getDocumentsDirectory().appendingPathComponent("health.json")
-    do {
-        let data = try Data(contentsOf: url)
-        let health = try JSONDecoder().decode(Health.self, from: data)
-        return health
-    } catch {
-        return .init()
-    }
-}
-
 func saveHealthInDocuments(_ health: Health, isCurrent: Bool) async throws {
     let url = getDocumentsDirectory().appendingPathComponent("health.json")
     let json = try JSONEncoder().encode(health)

@@ -29,13 +29,13 @@ public extension HealthModel {
     }
     
     //MARK: Energy Burn
-    var maintenanceEnergyIsCalculated: Bool {
-        get { health.maintenanceEnergyIsCalculated }
+    var maintenanceEnergyIsAdaptive: Bool {
+        get { health.maintenanceEnergyIsAdaptive }
         set {
             Task {
                 await MainActor.run {
                     withAnimation {
-                        health.maintenanceEnergyIsCalculated = newValue
+                        health.maintenanceEnergyIsAdaptive = newValue
                     }
                 }
                 if newValue {
@@ -43,7 +43,7 @@ public extension HealthModel {
                 } else {
                     await MainActor.run {
                         withAnimation {
-                            health.maintenanceEnergyCalculationError = nil
+                            health.maintenanceEnergyAdaptiveError = nil
                         }
                     }
                 }
@@ -274,14 +274,14 @@ public extension HealthModel {
 
     //MARK: Values
     
-    var maintenanceEnergyCalculatedValue: Double? {
-        get { health.maintenanceEnergyCalculatedValue }
-        set { health.maintenanceEnergyCalculatedValue = newValue }
+    var maintenanceEnergyAdaptiveValue: Double? {
+        get { health.maintenanceEnergyAdaptiveValue }
+        set { health.maintenanceEnergyAdaptiveValue = newValue }
     }
 
-    var maintenanceEnergyCalculationError: MaintenanceCalculationError? {
-        get { health.maintenanceEnergyCalculationError }
-        set { health.maintenanceEnergyCalculationError = newValue }
+    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
+        get { health.maintenanceEnergyAdaptiveError }
+        set { health.maintenanceEnergyAdaptiveError = newValue }
     }
 
     var isSmoker: Bool {

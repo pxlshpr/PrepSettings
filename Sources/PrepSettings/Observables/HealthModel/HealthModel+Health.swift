@@ -47,6 +47,11 @@ public extension HealthModel {
 }
 
 public extension HealthModel {
+    var hasAdaptiveMaintenanceEnergyValue: Bool {
+        maintenanceEnergyIsAdaptive
+        && maintenanceEnergyAdaptiveValue != nil
+        && maintenanceEnergyAdaptiveError == nil
+    }
 }
 
 public extension HealthModel {
@@ -99,9 +104,9 @@ public extension HealthModel {
         
         case .maintenanceEnergy:
             if [1, 2].randomElement() == 1 {
-                .maintenanceEnergy(0, .noWeightData)
+                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 0, error: .noWeightData))
             } else {
-                .maintenanceEnergy(2693, nil)
+                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 2693, error: nil))
             }
 
         default: nil
@@ -126,11 +131,20 @@ public extension HealthModel {
             try await HealthStore.dateOfBirthComponents()
         )
         case .maintenanceEnergy:
-            if [1, 2].randomElement() == 1 {
-                return .maintenanceEnergy(0, .noWeightData)
-            } else {
-                return .maintenanceEnergy(2693, nil)
-            }
+            let maintenance = try await HealthStore.adaptiveMaintenanceEnergy(
+                energyUnit: health.energyUnit,
+                bodyMassUnit: health.bodyMassUnit,
+                on: health.date,
+                interval: .init(1, .week),
+                weightMovingAverageDays: 7
+            )
+            guard let maintenance else { return nil }
+            return .maintenanceEnergy(maintenance)
+//            if [1, 2].randomElement() == 1 {
+//                return .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 0, error: .noWeightData))
+//            } else {
+//                return .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 2693, error: nil))
+//            }
 
         case .restingEnergy:
             guard let interval = health.restingEnergy?.interval else {
@@ -198,8 +212,9 @@ public extension Health {
         case .age:              ageHealthKitDateComponents = value?.dateComponents
 
         case .maintenanceEnergy:
-            maintenanceEnergyCalculatedValue = value?.double
-            maintenanceEnergyCalculationError = value?.maintenanceCalculationError
+            maintenanceEnergy = value?.maintenanceEnergy
+//            maintenanceEnergyAdaptiveValue = value?.double
+//            maintenanceEnergyAdaptiveError = value?.adaptiveMaintenanceError
 
         default:                break
         }

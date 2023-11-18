@@ -35,3 +35,46 @@ extension AdaptiveDataType: GenericSource {
         }
     }
 }
+
+public extension AdaptiveDataType {
+    var systemImage: String {
+        switch self {
+//        case .averaged:     "chart.line.flattrend.xyaxis"
+        case .averaged:     "equal"
+        case .healthKit:    "heart.fill"
+        case .userEntered:  "pencil"
+        }
+    }
+    
+    var name: String {
+        switch self {
+        case .averaged:     "Average value"
+        case .healthKit:    "Health app"
+        case .userEntered:  "Entered manually"
+        }
+    }
+    
+    var foregroundColor: Color {
+        switch self {
+        case .averaged:     .white
+        case .healthKit:    .pink
+        case .userEntered:  .white
+        }
+    }
+
+    var backgroundColor: Color {
+        switch self {
+        case .averaged:     .gray
+        case .healthKit:    .white
+        case .userEntered:  .accentColor
+        }
+    }
+    
+    var strokeColor: Color {
+        switch self {
+        case .averaged:     .clear
+        case .healthKit:    .gray
+        case .userEntered:  .clear
+        }
+    }
+}
