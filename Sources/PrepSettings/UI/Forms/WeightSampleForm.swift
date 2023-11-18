@@ -2,8 +2,8 @@ import SwiftUI
 import PrepShared
 
 //TODO: Next
-/// [ ] Consider having movingAverageInterval as a property in sample itself, so user could essentially have it set for one weight and not set for the other for whatever reason?
-/// [ ] Add a field for numberOfAveragedValues, and have a stepper that lets user choose the interval, ranging from 2 days to 3 weeks, defaulting it 1 week
+/// [x] Consider having movingAverageInterval as a property in sample itself, so user could essentially have it set for one weight and not set for the other for whatever reason?
+/// [x] Add a field for numberOfAveragedValues, and have a stepper that lets user choose the interval, ranging from 2 days to 3 weeks, defaulting it 1 week
 extension WeightSampleForm {
     @Observable class Model {
         
@@ -15,13 +15,18 @@ extension WeightSampleForm {
         init(sample: MaintenanceSample, date: Date) {
             self.sample = sample
             self.type = sample.type
-            self.value = sample.value
+            self.value = sample.value ?? 0
             self.date = date
         }
     }
 }
 
 extension WeightSampleForm.Model {
+    
+    var movingAverageNumberOfDays: Int {
+        sample.movingAverageInterval?.numberOfDays ?? DefaultNumberOfDaysForMovingAverage
+    }
+    
     var usingMovingAverageBinding: Binding<Bool> {
         Binding<Bool>(
             get: { self.isUsingMovingAverage },
@@ -38,8 +43,50 @@ extension WeightSampleForm.Model {
         )
     }
     
+    var movingAverageIntervalPeriodBinding: Binding<HealthPeriod> {
+        Binding<HealthPeriod>(
+            get: { self.movingAverageIntervalPeriod },
+            set: { newValue in
+                withAnimation {
+                    var value = self.movingAverageIntervalValue
+                    switch newValue {
+                    case .day:
+                        value = max(2, value)
+                    default:
+                        break
+                    }
+                    self.sample.movingAverageInterval = .init(value, newValue)
+                }
+            }
+        )
+    }
+    
+    var movingAverageIntervalPeriod: HealthPeriod {
+        sample.movingAverageInterval?.period ?? .week
+    }
+    
+    var movingAverageIntervalValueBinding: Binding<Int> {
+        Binding<Int>(
+            get: { self.movingAverageIntervalValue },
+            set: { newValue in
+//                guard let interval = self.sample.movingAverageInterval else { return }
+                withAnimation {
+                    self.sample.movingAverageInterval = .init(newValue, self.movingAverageIntervalPeriod)
+                }
+            }
+        )
+    }
+
+    var movingAverageIntervalValue: Int {
+        sample.movingAverageInterval?.value ?? 1
+    }
+    
     var isUsingMovingAverage: Bool {
         sample.averagedValues != nil
+    }
+    
+    func movingAverageValue(at index: Int) -> Double? {
+        sample.averagedValues?[index]
     }
 }
 
@@ -55,7 +102,7 @@ struct WeightSampleForm: View {
         Form {
             Section {
                 typeRow
-                movingAverageRow
+                movingAverageRows
                 valueRow
             }
 //            useMovingAverageSection
@@ -66,9 +113,24 @@ struct WeightSampleForm: View {
         .toolbar { toolbarContent }
     }
     
-    var movingAverageRow: some View {
-        HStack {
-            Toggle("Moving Average", isOn: model.usingMovingAverageBinding)
+    var movingAverageRows: some View {
+        Group {
+            HStack {
+                Toggle("Moving Average", isOn: model.usingMovingAverageBinding)
+            }
+            if model.isUsingMovingAverage {
+                HStack {
+                    Spacer()
+                    Text("of the past")
+                    Stepper("", value: model.movingAverageIntervalValueBinding, in: model.movingAverageIntervalPeriod.range)
+                        .fixedSize()
+                    Text("\(model.movingAverageIntervalValue)")
+                        .font(.system(.body, design: .monospaced, weight: .bold))
+                        .contentTransition(.numericText(value: Double(model.movingAverageIntervalValue)))
+                        .foregroundStyle(.secondary)
+                    MenuPicker<HealthPeriod>([.day, .week], model.movingAverageIntervalPeriodBinding)
+                }
+            }
         }
     }
 
@@ -86,18 +148,34 @@ struct WeightSampleForm: View {
             Text("The average of these values is being used.")
         }
         
+        func cell(_ daysAgo: Int) -> some View {
+            HStack {
+                Text(model.date.moveDayBy(-daysAgo).adaptiveMaintenanceDateString)
+                Spacer()
+                if let value = model.movingAverageValue(at: daysAgo) {
+                    Text(value.cleanAmount)
+                        .foregroundStyle(model.type == .healthKit ? Color(.secondaryLabel) : Color(.label))
+//                    Text("kg")
+//                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Not set")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        
+        var header: some View {
+            HStack {
+                Spacer()
+                Text("Kilograms")
+            }
+        }
+        
         return Group {
             if model.isUsingMovingAverage {
-                Section(footer: footer) {
-                    ForEach(0...6, id: \.self) { i in
-                        HStack {
-                            Text(Date.now.moveDayBy(-i).adaptiveMaintenanceDateString)
-                            Spacer()
-                            Text("96")
-                                .foregroundStyle(model.type == .healthKit ? Color(.secondaryLabel) : Color(.label))
-                            Text("kg")
-                                .foregroundStyle(.secondary)
-                        }
+                Section(header: header, footer: footer) {
+                    ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) { daysAgo in
+                        cell(daysAgo)
                     }
                 }
             }

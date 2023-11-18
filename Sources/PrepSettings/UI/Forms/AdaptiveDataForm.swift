@@ -17,7 +17,7 @@ struct AdaptiveDataForm: View {
             self.sample = sample
             self.type = sample.type
             self.component = component
-            self.value = sample.value
+            self.value = sample.value ?? 0
             self.date = date
         }
     }

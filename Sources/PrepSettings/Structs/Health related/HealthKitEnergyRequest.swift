@@ -35,17 +35,12 @@ extension HealthKitEnergyRequest {
 }
 
 extension HealthKitEnergyRequest {
-    /// [ ] write function for daily totals over an interval
-    /// [ ] then use that to create AdaptiveDietaryEnergyData
-}
-
-extension HealthKitEnergyRequest {
-    func dailyAverage() async throws -> Double {
-        
+    
+    func dailyStatistics(from startDate: Date, to endDate: Date) async throws -> HKStatisticsCollection {
         try await requestPersmissions()
 
-        /// Always get samples up to the start of tomorrow, so that we get all of today's results too in case we need it
-        let endDate = Date().startOfDay.moveDayBy(1)
+        /// Always get samples up to the start of the next day, so that we get all of `date`'s results too
+        let endDate = endDate.startOfDay.moveDayBy(1)
         
         let datePredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate)
 
@@ -62,11 +57,16 @@ extension HealthKitEnergyRequest {
             anchorDate: endDate,
             intervalComponents: everyDay
         )
-        let collection = try await asyncQuery.result(for: HealthStore.store)
+        return try await asyncQuery.result(for: HealthStore.store)
+    }
+    
+    func dailyAverage() async throws -> Double {
+        
+        let statisticsCollection = try await dailyStatistics(from: startDate, to: date)
         
         var sumQuantities: [Date: HKQuantity] = [:]
         for day in dateRange.days {
-            guard let statistics = collection.statistics(for: day) else {
+            guard let statistics = statisticsCollection.statistics(for: day) else {
                 throw HealthStoreError.couldNotGetStatistics
             }
             guard let sumQuantity = statistics.sumQuantity() else {
@@ -86,5 +86,28 @@ extension HealthKitEnergyRequest {
         
         /// Average by the number of `sumQuantities`, to filter out days that may not have been logged (by not wearing the Apple Watch, for instance)—which would otherwise skew the results to be lower.
         return sum / Double(sumQuantities.count)
+    }
+}
+
+extension HealthKitEnergyRequest {
+    
+    func dietaryEnergy() async throws -> DietaryEnergy {
+        
+        let statisticsCollection = try await dailyStatistics(from: startDate, to: date)
+
+        var samples: [Int: MaintenanceSample] = [:]
+        for daysAgo in 0...interval.numberOfDays-1 {
+            let date = date.moveDayBy(-daysAgo)
+            guard let statistics = statisticsCollection.statistics(for: date),
+                  let sumQuantity = statistics.sumQuantity()
+            else { continue }
+            let value = sumQuantity.doubleValue(for: unit)
+            samples[daysAgo] = .init(type: .healthKit, value: value)
+        }
+        
+        return DietaryEnergy(
+            numberOfDays: interval.numberOfDays,
+            samples: samples
+        )
     }
 }

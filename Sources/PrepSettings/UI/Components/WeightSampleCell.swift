@@ -3,18 +3,18 @@ import PrepShared
 
 struct WeightSampleCell: View {
     
-    let sample: MaintenanceSample?
+    let sample: MaintenanceSample
     let date: Date
     
-    init(_ sample: MaintenanceSample?, _ date: Date) {
+    init(_ sample: MaintenanceSample, _ date: Date) {
         self.sample = sample
         self.date = date
     }
     
     @ViewBuilder
     var value: some View {
-        if let sample {
-            Text("\(sample.value.cleanAmount)")
+        if let value = sample.value {
+            Text("\(value.cleanAmount)")
         } else {
             Text("Not set")
                 .foregroundStyle(.secondary)
@@ -54,7 +54,7 @@ struct WeightSampleCell: View {
     }
     
     var type: AdaptiveDataType {
-        sample?.type ?? .userEntered
+        sample.type
     }
 }
 

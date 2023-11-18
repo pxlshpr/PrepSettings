@@ -14,7 +14,7 @@ struct AdaptiveDataCell: View {
     var body: some View {
         HStack {
             image
-            Text("\(sample.value.cleanAmount)")
+            Text("\(sample.value?.cleanAmount ?? "Not set")")
             averageLabel
             Spacer()
             Text(date.adaptiveMaintenanceDateString)

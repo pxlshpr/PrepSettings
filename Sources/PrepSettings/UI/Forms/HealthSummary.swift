@@ -279,7 +279,8 @@ func fetchHealthFromDocuments() async throws -> Health {
         let data = try Data(contentsOf: url)
         var health = try JSONDecoder().decode(Health.self, from: data)
 //        health.date = Date.now.moveDayBy(-15)
-        health.date = Date(fromDateString: "2023_02_26")!
+//        health.date = Date(fromDateString: "2023_02_26")!
+        health.date = Date(fromDateString: "2021_08_28")!
         return health
     } catch {
         return .init()

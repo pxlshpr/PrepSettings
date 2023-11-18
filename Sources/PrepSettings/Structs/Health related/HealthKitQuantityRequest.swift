@@ -93,21 +93,21 @@ extension HealthKitQuantityRequest {
             )
         }
         
-        let current: MaintenanceSample? = if let daySample = try await weightDaySample(for: date) {
+        let current: MaintenanceSample = if let daySample = try await weightDaySample(for: date) {
             MaintenanceSample(
                 type: .healthKit,
                 averagedValues: daySample.movingAverageValues,
                 value: daySample.value
             )
-        } else { nil }
+        } else { MaintenanceSample(type: .userEntered) }
         
-        let previous: MaintenanceSample? = if let daySample = try await weightDaySample(for: interval.startDate(with: date)) {
+        let previous: MaintenanceSample = if let daySample = try await weightDaySample(for: interval.startDate(with: date)) {
             MaintenanceSample(
                 type: .healthKit,
                 averagedValues: daySample.movingAverageValues,
                 value: daySample.value
             )
-        } else { nil }
+        } else { MaintenanceSample(type: .userEntered) }
         
         return WeightChange(current: current, previous: previous)
     }

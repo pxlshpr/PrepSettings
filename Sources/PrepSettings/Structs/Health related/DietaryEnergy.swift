@@ -4,10 +4,11 @@ public struct DietaryEnergy: Hashable, Codable {
     static let DefaultNumberOfPoints = 7
     
     public let numberOfDays: Int
-    public var samples: [Int: MaintenanceSample] = [:]
+    public var samples: [Int: MaintenanceSample]
     
-    init(numberOfDays: Int = DefaultNumberOfPoints) {
+    init(numberOfDays: Int = DefaultNumberOfPoints, samples: [Int: MaintenanceSample] = [:]) {
         self.numberOfDays = numberOfDays
+        self.samples = samples
     }
 }
 
@@ -42,7 +43,9 @@ public extension DietaryEnergy {
 public extension DietaryEnergy {
     
     var average: Double? {
-        let values = samples.values.map { $0.value }
+        let values = samples
+            .values
+            .compactMap { $0.value }
         guard !values.isEmpty else { return nil }
         let sum = values.reduce(0) { $0 + $1 }
         return Double(sum) / Double(values.count)

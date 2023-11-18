@@ -2,6 +2,7 @@ import HealthKit
 import PrepShared
 
 let DefaultNumberOfDaysForAdaptiveMaintenance = 7
+let DefaultNumberOfDaysForMovingAverage = 7
 
 extension HealthStore {
     
@@ -19,16 +20,23 @@ extension HealthStore {
             asMovingAverageOfNumberOfDays: weightMovingAverageDays
         )
         
+        let dietaryEnergy = try await adaptiveDietaryEnergyData(
+            interval: interval,
+            date: date,
+            unit: energyUnit
+        )
+        
         return Health.MaintenanceEnergy(
             isAdaptive: true,
             adaptiveValue: nil,
             error: nil,
             interval: interval,
             weightChange: weightChange,
-            dietaryEnergy: nil
+            dietaryEnergy: dietaryEnergy
         )
     }
     
+    //TODO: Modify asMovingAverageOfNumberOfDays with HealthInterval
     public static func adaptiveWeightData(
         in unit: BodyMassUnit = .kg,
         on date: Date = Date.now,
@@ -43,12 +51,12 @@ extension HealthStore {
     }
     
     public static func adaptiveDietaryEnergyData(
-        for interval: HealthInterval = .init(0, .day),
-        on date: Date = Date.now,
-        in unit: EnergyUnit = .kcal
-    ) async throws -> Double {
+        interval: HealthInterval = .init(0, .day),
+        date: Date = Date.now,
+        unit: EnergyUnit = .kcal
+    ) async throws -> DietaryEnergy {
         try await HealthKitEnergyRequest(.dietary, unit, interval, date)
-            .dailyAverage()
+            .dietaryEnergy()
     }
 }
 

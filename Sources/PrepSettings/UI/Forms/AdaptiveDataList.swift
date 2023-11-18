@@ -124,14 +124,24 @@ struct AdaptiveDataList: View {
                 HStack {
                     Text("Weight Change")
                     Spacer()
-                    Text("- 0.69 kg")
-                        .foregroundStyle(.secondary)
+                    if let delta = maintenance.weightChange.delta {
+                        Text("\(delta.cleanAmount) kg")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Not set")
+                            .foregroundStyle(.tertiary)
+                    }
                 }
                 HStack {
                     Text("Equivalent Energy")
                     Spacer()
-                    Text("- 5,291 kcal")
-                        .foregroundStyle(.secondary)
+                    if let kcal = maintenance.weightChange.deltaEquivalentEnergyInKcal {
+                        Text("\(kcal.formattedEnergy) kcal")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Not set")
+                            .foregroundStyle(.tertiary)
+                    }
                 }
             }
         }
@@ -238,10 +248,9 @@ struct AdaptiveDataList: View {
         }
     }
 
-    func weightCell(sample: MaintenanceSample?, date: Date) -> some View {
+    func weightCell(sample: MaintenanceSample, date: Date) -> some View {
         NavigationLink {
-//            AdaptiveDataForm(sample, component, Datqe.now)
-            Text("Form")
+            WeightSampleForm(sample: sample, date: date)
         } label: {
             WeightSampleCell(sample, date)
         }

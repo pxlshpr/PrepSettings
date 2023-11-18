@@ -17,6 +17,18 @@ public struct HealthInterval: Hashable, Codable, Equatable {
 }
 
 public extension HealthInterval {
+    var numberOfDays: Int {
+        switch period {
+        case .day:      value
+        case .week:     value * 7
+            
+        /// [ ]  Use the date to precisely find out how many days ago was `value` months (get the current day `value` months back, and calculate the number of days)
+        case .month:    value * 30
+        }
+    }
+}
+
+public extension HealthInterval {
     
     func equalsWithoutTimestamp(_ other: HealthInterval) -> Bool {
         value == other.value && period == other.period
