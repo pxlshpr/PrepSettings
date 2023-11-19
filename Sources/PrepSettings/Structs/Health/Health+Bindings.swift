@@ -236,34 +236,34 @@ public extension Health {
 
 public extension Health {
     
-    var maintenanceEnergyAdaptiveValue: Double? {
-        get { maintenanceEnergy?.adaptiveValue }
-        set {
-            guard maintenanceEnergy != nil else {
-                maintenanceEnergy = MaintenanceEnergy(
-                    isAdaptive: true,
-                    adaptiveValue: newValue
-                )
-                return
-            }
-            maintenanceEnergy?.adaptiveValue = newValue
-        }
-    }
-    
-    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
-        get { maintenanceEnergy?.error }
-        set {
-            guard maintenanceEnergy != nil else {
-                maintenanceEnergy = MaintenanceEnergy(
-                    isAdaptive: true,
-                    adaptiveValue: nil,
-                    error: newValue
-                )
-                return
-            }
-            maintenanceEnergy?.error = newValue
-        }
-    }
+//    var maintenanceEnergyAdaptiveValue: Double? {
+//        get { maintenanceEnergy?.adaptiveValue }
+//        set {
+//            guard maintenanceEnergy != nil else {
+//                maintenanceEnergy = MaintenanceEnergy(
+//                    isAdaptive: true,
+//                    adaptiveValue: newValue
+//                )
+//                return
+//            }
+//            maintenanceEnergy?.adaptiveValue = newValue
+//        }
+//    }
+//    
+//    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
+//        get { maintenanceEnergy?.error }
+//        set {
+//            guard maintenanceEnergy != nil else {
+//                maintenanceEnergy = MaintenanceEnergy(
+//                    isAdaptive: true,
+//                    adaptiveValue: nil,
+//                    error: newValue
+//                )
+//                return
+//            }
+//            maintenanceEnergy?.error = newValue
+//        }
+//    }
     
     var activeEnergyValue: Double? {
         get { activeEnergy?.value }

@@ -172,6 +172,29 @@ public extension Health {
     }
 }
 
+extension Health.MaintenanceEnergy {
+    static func calculate(
+        weightChange: WeightChange,
+        dietaryEnergy: DietaryEnergy,
+        interval: HealthInterval
+    ) -> Result<Double, AdaptiveMaintenanceError> {
+        
+        guard let weightDeltaInKcal = weightChange.deltaEquivalentEnergyInKcal,
+              let dietaryEnergyTotal = dietaryEnergy.total //TODO: Handle kcal/kj
+        else {
+            return switch (weightChange.isEmpty, dietaryEnergy.isEmpty) {
+            case (true, false): .failure(.noWeightData)
+            case (false, true): .failure(.noNutritionData)
+            default:            .failure(.noWeightOrNutritionData)
+            }
+        }
+        
+        let value = (dietaryEnergyTotal - weightDeltaInKcal) / Double(interval.numberOfDays)
+        
+        return .success(value)
+    }
+}
+
 public extension Health {
     
     struct MaintenanceEnergy: Hashable, Codable {
@@ -181,22 +204,40 @@ public extension Health {
         
         public var interval: HealthInterval
         public var weightChange: WeightChange
-        public var dietaryEnergy: DietaryEnergy?
+        public var dietaryEnergy: DietaryEnergy
 
-        public init(
-            isAdaptive: Bool = true,
-            adaptiveValue: Double? = nil,
-            error: AdaptiveMaintenanceError? = nil,
-            interval: HealthInterval = .init(1, .week),
-            weightChange: WeightChange = .init(),
-            dietaryEnergy: DietaryEnergy? = nil
-        ) {
+        public init(isAdaptive: Bool = true) {
             self.isAdaptive = isAdaptive
-            self.adaptiveValue = adaptiveValue
-            self.error = error
+            self.adaptiveValue = nil
+            self.error = nil
+            self.interval = .init(1, .week)
+            self.weightChange = .init()
+            self.dietaryEnergy = .init()
+        }
+        
+        public init(
+            interval: HealthInterval,
+            weightChange: WeightChange,
+            dietaryEnergy: DietaryEnergy
+        ) {
+            self.isAdaptive = true
             self.interval = interval
             self.weightChange = weightChange
             self.dietaryEnergy = dietaryEnergy
+            
+            let result = Self.calculate(
+                weightChange: weightChange,
+                dietaryEnergy: dietaryEnergy,
+                interval: interval
+            )
+            switch result {
+            case .success(let value):
+                self.adaptiveValue = value
+                self.error = nil
+            case .failure(let error):
+                self.adaptiveValue = nil
+                self.error = error
+            }
         }
     }
     

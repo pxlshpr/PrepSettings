@@ -37,4 +37,8 @@ public extension WeightChange {
 //        delta : x kcal
         return (3500 * delta) / BodyMassUnit.lb.convert(1, to: .kg)
     }
+    
+    var isEmpty: Bool {
+        current.value == nil || previous.value == nil
+    }
 }

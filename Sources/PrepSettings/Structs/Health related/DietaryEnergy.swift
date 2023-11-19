@@ -1,13 +1,15 @@
 import Foundation
 
 public struct DietaryEnergy: Hashable, Codable {
-    static let DefaultNumberOfPoints = 7
+    public static let DefaultNumberOfSamples = 7
+    public var samples: [MaintenanceSample]
     
-    public let numberOfDays: Int
-    public var samples: [Int: MaintenanceSample]
-    
-    init(numberOfDays: Int = DefaultNumberOfPoints, samples: [Int: MaintenanceSample] = [:]) {
-        self.numberOfDays = numberOfDays
+    public init(
+        samples: [MaintenanceSample] = Array.init(
+            repeating: MaintenanceSample(type: .userEntered),
+            count: DefaultNumberOfSamples
+        )
+    ) {
         self.samples = samples
     }
 }
@@ -15,12 +17,8 @@ public struct DietaryEnergy: Hashable, Codable {
 extension DietaryEnergy: CustomStringConvertible {
     public var description: String {
         var string = ""
-        for day in 0..<numberOfDays {
-            if let point = samples[day] {
-                string += "[\(day)] → \(point.description)\n"
-            } else {
-                string += "[\(day)] → nil\n"
-            }
+        for i in 0..<samples.count {
+            string += "[\(i)] → \(samples[i].description)\n"
         }
         return string
     }
@@ -36,7 +34,7 @@ public extension DietaryEnergy {
     }
     
     func hasSample(at index: Int) -> Bool {
-        samples[index] != nil
+        samples[index].value != nil
     }
 }
 
@@ -44,7 +42,6 @@ public extension DietaryEnergy {
     
     var average: Double? {
         let values = samples
-            .values
             .compactMap { $0.value }
         guard !values.isEmpty else { return nil }
         let sum = values.reduce(0) { $0 + $1 }
@@ -53,13 +50,24 @@ public extension DietaryEnergy {
     
     mutating func fillEmptyValuesWithAverages() {
         guard let average else { return }
-        for i in 0..<numberOfDays {
+        for i in 0..<samples.count {
             /// Only fill with average if there is no value for it
-            guard samples[i] == nil else { continue }
+            guard samples[i].value == nil else { continue }
             samples[i] = .init(
                 type: .averaged,
                 value: average
             )
         }
+    }
+    
+    var isEmpty: Bool {
+        samples.contains(where: { $0.value == nil })
+    }
+    
+    var total: Double? {
+        guard !isEmpty else { return nil }
+        return samples
+            .compactMap { $0.value }
+            .reduce(0) { $0 + $1 }
     }
 }

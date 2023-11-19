@@ -43,7 +43,7 @@ public extension HealthModel {
                 } else {
                     await MainActor.run {
                         withAnimation {
-                            health.maintenanceEnergyAdaptiveError = nil
+                            health.maintenanceEnergy?.error = nil
                         }
                     }
                 }
@@ -274,15 +274,15 @@ public extension HealthModel {
 
     //MARK: Values
     
-    var maintenanceEnergyAdaptiveValue: Double? {
-        get { health.maintenanceEnergyAdaptiveValue }
-        set { health.maintenanceEnergyAdaptiveValue = newValue }
-    }
-
-    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
-        get { health.maintenanceEnergyAdaptiveError }
-        set { health.maintenanceEnergyAdaptiveError = newValue }
-    }
+//    var maintenanceEnergyAdaptiveValue: Double? {
+//        get { health.maintenanceEnergyAdaptiveValue }
+//        set { health.maintenanceEnergyAdaptiveValue = newValue }
+//    }
+//
+//    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
+//        get { health.maintenanceEnergyAdaptiveError }
+//        set { health.maintenanceEnergyAdaptiveError = newValue }
+//    }
 
     var isSmoker: Bool {
         get { health.isSmoker ?? false }

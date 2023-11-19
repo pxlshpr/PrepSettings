@@ -155,7 +155,7 @@ struct MaintenanceEnergyRow: View {
         
         var value: Double {
             if model.maintenanceEnergyIsAdaptive,
-                let value = model.maintenanceEnergyAdaptiveValue,
+               let value = model.health.maintenanceEnergy?.adaptiveValue,
                 model.health.maintenanceEnergy?.error == nil
             {
                 value
@@ -193,7 +193,7 @@ struct MaintenanceEnergyRow: View {
     }
 }
 
-public enum AdaptiveMaintenanceError: Int, Codable {
+public enum AdaptiveMaintenanceError: Int, Error, Codable {
     case noWeightData = 1
     case noNutritionData
     case noWeightOrNutritionData

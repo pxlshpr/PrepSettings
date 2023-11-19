@@ -1,31 +1,33 @@
 import SwiftUI
 import PrepShared
 
-struct WeightSampleCell: View {
+struct SampleCell: View {
     
     let sample: MaintenanceSample
     let date: Date
+    let component: AdaptiveDataComponent
     
-    init(_ sample: MaintenanceSample, _ date: Date) {
+    init(sample: MaintenanceSample, date: Date, component: AdaptiveDataComponent) {
         self.sample = sample
         self.date = date
+        self.component = component
     }
     
     @ViewBuilder
     var value: some View {
         if let value = sample.value {
-            Text("\(value.cleanAmount)")
+            Text("\(component == .dietaryEnergy ? value.formattedEnergy : value.rounded(toPlaces: 1).cleanAmount)")
         } else {
             Text("Not set")
                 .foregroundStyle(.secondary)
         }
     }
     
-    var body: some View {
+    var body: some View { 
         HStack {
             image
             value
-            averageLabel
+//            averageLabel
             Spacer()
             Text(date.adaptiveMaintenanceDateString)
                 .foregroundStyle(.secondary)

@@ -6,6 +6,28 @@ let DefaultNumberOfDaysForMovingAverage = 7
 
 extension HealthStore {
     
+//    public static func mockAdaptiveMaintenanceEnergy(
+//        weightMovingAverageDays: Int? = nil
+//    ) async throws -> Health.MaintenanceEnergy? {
+//        let weightChange = try await adaptiveWeightData(
+//            in: bodyMassUnit,
+//            on: date,
+//            interval: interval,
+//            asMovingAverageOfNumberOfDays: weightMovingAverageDays
+//        )
+//        
+//        let dietaryEnergy = try await adaptiveDietaryEnergyData(
+//            interval: interval,
+//            date: date,
+//            unit: energyUnit
+//        )
+//        
+//        return Health.MaintenanceEnergy(
+//            interval: interval,
+//            weightChange: weightChange,
+//            dietaryEnergy: dietaryEnergy
+//        )
+//    }
     public static func adaptiveMaintenanceEnergy(
         energyUnit: EnergyUnit = .kcal,
         bodyMassUnit: BodyMassUnit = .kg,
@@ -27,9 +49,6 @@ extension HealthStore {
         )
         
         return Health.MaintenanceEnergy(
-            isAdaptive: true,
-            adaptiveValue: nil,
-            error: nil,
             interval: interval,
             weightChange: weightChange,
             dietaryEnergy: dietaryEnergy

@@ -80,7 +80,7 @@ public extension HealthModel {
     var isSettingMaintenanceFromHealthKit: Bool {
         if health.maintenanceEnergyIsAdaptive, isSettingTypeFromHealthKit(.maintenanceEnergy) {
             return true
-        } else if !(health.maintenanceEnergyIsAdaptive && health.maintenanceEnergyAdaptiveValue != nil) {
+        } else if !(health.maintenanceEnergyIsAdaptive && health.maintenanceEnergy?.adaptiveValue != nil) {
             return isSettingTypeFromHealthKit(.restingEnergy) || isSettingTypeFromHealthKit(.activeEnergy)
         }
         return false

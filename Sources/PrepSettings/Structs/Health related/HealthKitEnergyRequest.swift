@@ -95,19 +95,22 @@ extension HealthKitEnergyRequest {
         
         let statisticsCollection = try await dailyStatistics(from: startDate, to: date)
 
-        var samples: [Int: MaintenanceSample] = [:]
-        for daysAgo in 0...interval.numberOfDays-1 {
-            let date = date.moveDayBy(-daysAgo)
+        var samples: [MaintenanceSample] = []
+        for i in 0...interval.numberOfDays-1 {
+            let date = date.moveDayBy(-i)
             guard let statistics = statisticsCollection.statistics(for: date),
                   let sumQuantity = statistics.sumQuantity()
-            else { continue }
+            else {
+                samples.append(.init(type: .healthKit))
+                continue
+            }
             let value = sumQuantity.doubleValue(for: unit)
-            samples[daysAgo] = .init(type: .healthKit, value: value)
+            samples.append(.init(type: .healthKit, value: value))
         }
         
-        return DietaryEnergy(
-            numberOfDays: interval.numberOfDays,
-            samples: samples
-        )
+        var dietaryEnergy = DietaryEnergy(samples: samples)
+        dietaryEnergy.fillEmptyValuesWithAverages()
+        
+        return dietaryEnergy
     }
 }

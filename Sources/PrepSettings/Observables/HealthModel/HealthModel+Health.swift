@@ -49,8 +49,10 @@ public extension HealthModel {
 public extension HealthModel {
     var hasAdaptiveMaintenanceEnergyValue: Bool {
         maintenanceEnergyIsAdaptive
-        && maintenanceEnergyAdaptiveValue != nil
-        && maintenanceEnergyAdaptiveError == nil
+        && health.maintenanceEnergy?.adaptiveValue != nil
+        && health.maintenanceEnergy?.error == nil
+//        && maintenanceEnergyAdaptiveValue != nil
+//        && maintenanceEnergyAdaptiveError == nil
     }
 }
 
@@ -103,11 +105,12 @@ public extension HealthModel {
         case .age:              .age(DefaultDateOfBirth.dateComponentsWithoutTime)
         
         case .maintenanceEnergy:
-            if [1, 2].randomElement() == 1 {
-                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 0, error: .noWeightData))
-            } else {
-                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 2693, error: nil))
-            }
+                .maintenanceEnergy(Health.MaintenanceEnergy(isAdaptive: true))
+//            if [1, 2].randomElement() == 1 {
+//                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 0, error: .noWeightData))
+//            } else {
+//                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 2693, error: nil))
+//            }
 
         default: nil
         }
@@ -140,11 +143,6 @@ public extension HealthModel {
             )
             guard let maintenance else { return nil }
             return .maintenanceEnergy(maintenance)
-//            if [1, 2].randomElement() == 1 {
-//                return .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 0, error: .noWeightData))
-//            } else {
-//                return .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 2693, error: nil))
-//            }
 
         case .restingEnergy:
             guard let interval = health.restingEnergy?.interval else {

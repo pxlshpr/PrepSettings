@@ -1,27 +1,10 @@
 import SwiftUI
 import PrepShared
 
-public enum AdaptiveDataSection: Int, Hashable, Codable, CaseIterable {
-    case summary = 1
-    case weight
-    case dietaryEnergy
-}
-
-public extension AdaptiveDataSection {
-    var name: String {
-        switch self {
-        case .summary:          "Summary"
-        case .weight:           "Weight"
-        case .dietaryEnergy:    "Dietary Energy"
-        }
-    }
-}
-
 struct AdaptiveDataList: View {
     
     @Bindable var model: HealthModel
     
-    @State var section: AdaptiveDataSection = .summary
     @State var useMovingAverageForWeight = true
     @State var showingWeightConversionInfo = false
 
@@ -51,6 +34,14 @@ struct AdaptiveDataList: View {
             dietaryEnergySection
             calculationSections
         }
+    }
+    
+    var maintenance: Health.MaintenanceEnergy {
+        model.health.maintenanceEnergy ?? .init()
+    }
+    
+    var date: Date {
+        model.health.date
     }
     
     var weightSection: some View {
@@ -95,14 +86,6 @@ struct AdaptiveDataList: View {
                 .textCase(.none)
         }
 
-        var maintenance: Health.MaintenanceEnergy {
-            model.health.maintenanceEnergy ?? .init()
-        }
-        
-        var date: Date {
-            model.health.date
-        }
-        
         var previousDate: Date {
             maintenance.interval.startDate(with: date)
         }
@@ -175,8 +158,11 @@ struct AdaptiveDataList: View {
             NavigationLink {
                 Form {
                     Section("Kilocalories") {
-                        ForEach(0...6, id: \.self) {
-                            cell(daysAgo: $0, component: .dietaryEnergy)
+                        ForEach(0..<maintenance.dietaryEnergy.samples.count, id: \.self) {
+                            dietaryEnergyCell(
+                                sample: maintenance.dietaryEnergy.samples[$0],
+                                date: date.moveDayBy(-$0)
+                            )
                         }
                     }
                     fillAllFromHealthAppSection
@@ -188,8 +174,13 @@ struct AdaptiveDataList: View {
             HStack {
                 Text("Total Dietary Energy")
                 Spacer()
-                Text("22,146 kcal")
-                    .foregroundStyle(.secondary)
+                if let total = maintenance.dietaryEnergy.total {
+                    Text("\(total.formattedEnergy) kcal")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Not enough data")
+                        .foregroundStyle(.tertiary)
+                }
             }
         }
     }
@@ -210,8 +201,13 @@ struct AdaptiveDataList: View {
             HStack {
                 Text("Maintenance Energy")
                 Spacer()
-                Text("3,920 kcal")
-                    .foregroundStyle(.secondary)
+                if let value = maintenance.adaptiveValue {
+                    Text("\(value.formattedEnergy) kcal")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Not enough data")
+                        .foregroundStyle(.tertiary)
+                }
             }
         }
     }
@@ -252,7 +248,23 @@ struct AdaptiveDataList: View {
         NavigationLink {
             WeightSampleForm(sample: sample, date: date)
         } label: {
-            WeightSampleCell(sample, date)
+            SampleCell(
+                sample: sample,
+                date: date,
+                component: .weight
+            )
+        }
+    }
+
+    func dietaryEnergyCell(sample: MaintenanceSample, date: Date) -> some View {
+        NavigationLink {
+            WeightSampleForm(sample: sample, date: date)
+        } label: {
+            SampleCell(
+                sample: sample,
+                date: date,
+                component: .dietaryEnergy
+            )
         }
     }
 
@@ -260,14 +272,6 @@ struct AdaptiveDataList: View {
     
     var toolbarContent: some ToolbarContent {
         Group {
-//            ToolbarItem(placement: .bottomBar) {
-//                Picker("", selection: $section) {
-//                    ForEach(AdaptiveDataSection.allCases, id: \.self) {
-//                        Text($0.name).tag($0)
-//                    }
-//                }
-//                .pickerStyle(.segmented)
-//            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(isEditing ? "Done" : "Edit") {
                     withAnimation {
