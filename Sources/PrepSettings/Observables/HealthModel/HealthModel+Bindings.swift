@@ -39,6 +39,7 @@ public extension HealthModel {
                     }
                 }
                 if newValue {
+                    //TODO: Rename this to refreshValue or something as we're techincally recalculating it here even if not healthKit based
                     try await setTypeFromHealthKit(.maintenanceEnergy)
                 } else {
                     await MainActor.run {

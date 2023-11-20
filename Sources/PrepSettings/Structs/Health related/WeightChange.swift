@@ -2,10 +2,13 @@ import Foundation
 import PrepShared
 
 public struct WeightChange: Hashable, Codable {
-    public let current: MaintenanceSample
-    public let previous: MaintenanceSample
+    public var current: MaintenanceSample
+    public var previous: MaintenanceSample
     
-    public init(current: MaintenanceSample = .init(type: .userEntered), previous: MaintenanceSample = .init(type: .userEntered)) {
+    public init(
+        current: MaintenanceSample = .init(type: .healthKit, movingAverageInterval: .init(1, .week)),
+        previous: MaintenanceSample = .init(type: .healthKit, movingAverageInterval: .init(1, .week))
+    ) {
         self.current = current
         self.previous = previous
     }

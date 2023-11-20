@@ -34,10 +34,9 @@ extension Array where Element == Quantity {
 
 extension HealthKitQuantityRequest {
     
-    func daySample(
-        for date: Date,
-        asMovingAverageWithNumberOfPriorDays days: Int = 0
-    ) async throws -> DaySample? {
+    func daySample(movingAverageInterval interval: HealthInterval? = nil) async throws -> DaySample? {
+        
+        let days = interval?.numberOfDays ?? 0
         
         //TODO: Write this properly
         /// [ ] Get all quantities from start of earliest day to end of last day (provided date)
@@ -72,46 +71,86 @@ extension HealthKitQuantityRequest {
         )
     }
     
-    func averageValue(on date: Date) async throws -> Double? {
-        try await daySample(for: date)?.value
+//    func averageValue(on date: Date) async throws -> Double? {
+//        try await daySample(for: date)?.value
+//    }
+}
+
+extension MaintenanceSample {
+    mutating func fill(using request: HealthKitQuantityRequest) async throws {
+        if let sample = try await request.daySample(movingAverageInterval: self.movingAverageInterval)
+        {
+            type = .healthKit
+            averagedValues = sample.movingAverageValues
+            value = sample.value
+//            self = MaintenanceSample(
+//                type: .healthKit,
+//                averagedValues: sample.movingAverageValues,
+//                value: sample.value
+//            )
+        } else {
+            averagedValues = nil
+            value = nil
+        }
     }
 }
 
-extension HealthKitQuantityRequest {
-    
-    func weightChange(
-        interval: HealthInterval,
-        asMovingAverageOfNumberOfDays days: Int? = nil
-    ) async throws -> WeightChange {
-        
-        let numberOfPriorDays = if let days, days > 0 { days - 1 } else { 0 }
-        
-        func weightDaySample(for date: Date) async throws -> DaySample? {
-            try await daySample(
-                for: date,
-                asMovingAverageWithNumberOfPriorDays: numberOfPriorDays
-            )
-        }
-        
-        let current: MaintenanceSample = if let daySample = try await weightDaySample(for: date) {
-            MaintenanceSample(
-                type: .healthKit,
-                averagedValues: daySample.movingAverageValues,
-                value: daySample.value
-            )
-        } else { MaintenanceSample(type: .userEntered) }
-        
-        let previous: MaintenanceSample = if let daySample = try await weightDaySample(for: interval.startDate(with: date)) {
-            MaintenanceSample(
-                type: .healthKit,
-                averagedValues: daySample.movingAverageValues,
-                value: daySample.value
-            )
-        } else { MaintenanceSample(type: .userEntered) }
-        
-        return WeightChange(current: current, previous: previous)
-    }
-}
+//extension HealthKitQuantityRequest {
+//
+//    func fillInWeightChange(
+//        _ weightChange: WeightChange,
+//        for interval: HealthInterval
+//    ) async throws -> WeightChange {
+//        
+//        var weightChange = weightChange
+//        
+//        if weightChange.current.type == .healthKit {
+//            if let sample = try await daySample(
+//                for: date,
+//                movingAverageInterval: weightChange.current.movingAverageInterval
+//            ) {
+//                weightChange.current = MaintenanceSample(
+//                    type: .healthKit,
+//                    averagedValues: sample.movingAverageValues,
+//                    value: sample.value
+//                )
+//            } else {
+//                weightChange.current.averagedValues = nil
+//                weightChange.current.value = nil
+//            }
+//        }
+//    }
+//    
+//    func weightChange(
+//        interval: HealthInterval,
+//        weightChange: WeightChange
+//    ) async throws -> WeightChange {
+//        
+//        func sample(date: Date, movingAverageDays: Int) async throws -> MaintenanceSample {
+//            if let sample = try await daySample(
+//                for: date,
+//                asMovingAverageWithNumberOfPriorDays: movingAverageDays
+//            ) {
+//                MaintenanceSample(
+//                    type: .healthKit,
+//                    averagedValues: sample.movingAverageValues,
+//                    value: sample.value
+//                )
+//            } else { MaintenanceSample(type: .userEntered) }
+//        }
+//        
+//        let current = try await sample(
+//            date: date,
+//            movingAverageDays: 2
+//        )
+//        let previous = try await sample(
+//            date: interval.startDate(with: date),
+//            movingAverageDays: 2
+//        )
+//        
+//        return WeightChange(current: current, previous: previous)
+//    }
+//}
 
 extension HealthKitQuantityRequest {
     func mostRecentOrEarliestAvailable() async throws -> Quantity? {

@@ -6,7 +6,7 @@ public struct DietaryEnergy: Hashable, Codable {
     
     public init(
         samples: [MaintenanceSample] = Array.init(
-            repeating: MaintenanceSample(type: .userEntered),
+            repeating: MaintenanceSample(type: .healthKit),
             count: DefaultNumberOfSamples
         )
     ) {

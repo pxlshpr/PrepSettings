@@ -134,14 +134,9 @@ public extension HealthModel {
             try await HealthStore.dateOfBirthComponents()
         )
         case .maintenanceEnergy:
-            let maintenance = try await HealthStore.adaptiveMaintenanceEnergy(
-                energyUnit: health.energyUnit,
-                bodyMassUnit: health.bodyMassUnit,
-                on: health.date,
-                interval: .init(1, .week),
-                weightMovingAverageDays: 7
-            )
-            guard let maintenance else { return nil }
+            guard let maintenance = try await health.calculate() else {
+                return nil
+            }
             return .maintenanceEnergy(maintenance)
 
         case .restingEnergy:
