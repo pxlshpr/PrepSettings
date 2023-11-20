@@ -1,11 +1,11 @@
 import Foundation
 
-public enum AdaptiveDataComponent: Int, Hashable, Codable, CaseIterable {
+public enum MaintenanceComponent: Int, Hashable, Codable, CaseIterable {
     case weight = 1
     case dietaryEnergy
 }
 
-public extension AdaptiveDataComponent {
+public extension MaintenanceComponent {
     var name: String {
         switch self {
         case .weight:           "Weight"

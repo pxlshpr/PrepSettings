@@ -5,9 +5,9 @@ struct SampleCell: View {
     
     let sample: MaintenanceSample
     let date: Date
-    let component: AdaptiveDataComponent
+    let component: MaintenanceComponent
     
-    init(sample: MaintenanceSample, date: Date, component: AdaptiveDataComponent) {
+    init(sample: MaintenanceSample, date: Date, component: MaintenanceComponent) {
         self.sample = sample
         self.date = date
         self.component = component
@@ -55,7 +55,7 @@ struct SampleCell: View {
             )
     }
     
-    var type: AdaptiveDataType {
+    var type: MaintenanceSampleType {
         sample.type
     }
 }

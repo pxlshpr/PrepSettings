@@ -99,7 +99,7 @@ struct EnergyBurnEstimateText: View {
     }
     
     var value: Double? {
-        model.health.estimatedEnergyBurn
+        model.health.estimatedMaintenance
     }
 
     @ViewBuilder
@@ -247,7 +247,7 @@ public struct TDEEFormSections: View {
                 Text(requiredString)
                     .foregroundStyle(Color(.tertiaryLabel))
             } else {
-                if let maintenanceEnergy = health.estimatedEnergyBurn {
+                if let maintenanceEnergy = health.estimatedMaintenance {
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(maintenanceEnergy.formattedEnergy)
                             .animation(.default, value: maintenanceEnergy)

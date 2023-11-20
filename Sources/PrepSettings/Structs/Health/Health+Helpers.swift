@@ -93,3 +93,20 @@ extension Health {
         }
     }
 }
+
+extension Health {
+    func bodyMassValue(for type: BodyMassType, in unit: BodyMassUnit? = nil) -> Double? {
+        let value: Double? = switch type {
+        case .weight:   weight?.quantity?.value
+        case .leanMass: leanBodyMass?.quantity?.value
+        }
+        
+        guard let value else { return nil}
+        
+        return if let unit {
+            bodyMassUnit.convert(value, to: unit)
+        } else {
+            value
+        }
+    }
+}

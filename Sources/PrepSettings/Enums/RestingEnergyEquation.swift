@@ -85,74 +85,19 @@ public extension RestingEnergyEquation {
 }
 
 public extension RestingEnergyEquation {
-    func calculate(lbmInKg: Double, energyUnit: EnergyUnit) -> Double? {
-        let kcal: Double? = switch self {
-        case .katchMcardle: 370 + (21.6 * lbmInKg)
-        case .cunningham:   500 + (22.0 * lbmInKg)
-        default:            nil
-        }
-        guard let kcal else { return nil }
-        let value = EnergyUnit.kcal.convert(kcal, to: energyUnit)
-        return max(value, 0)
-    }
-
-    func calculate(age: Int, weightInKg: Double, sexIsFemale: Bool, energyUnit: EnergyUnit) -> Double? {
-        let ageGroup = AgeGroup(age)
-        let kcal: Double
-        switch self {
-            
-        case .henryOxford:
-            let a = OxfordCoefficients.a(sexIsFemale: sexIsFemale, ageGroup: ageGroup)
-            let c = OxfordCoefficients.c(sexIsFemale: sexIsFemale, ageGroup: ageGroup)
-            kcal = (a * weightInKg) + c
-            
-        case .schofield:
-            let a = SchofieldCoefficients.a(sexIsFemale: sexIsFemale, ageGroup: ageGroup)
-            let c = SchofieldCoefficients.c(sexIsFemale: sexIsFemale, ageGroup: ageGroup)
-            kcal = (a * weightInKg) + c
-
-        default:
-            return nil
-        }
-        
-        let value = EnergyUnit.kcal.convert(kcal, to: energyUnit)
-        return max(value, 0)
-    }
-    
-    func calculate(age: Int, weightInKg: Double, heightInCm: Double, sexIsFemale: Bool, energyUnit: EnergyUnit) -> Double? {
-        let kcal: Double
-        switch self {
-
-        case .henryOxford:
-            return calculate(age: age, weightInKg: weightInKg, sexIsFemale: sexIsFemale, energyUnit: energyUnit)
-        case .schofield:
-            return calculate(age: age, weightInKg: weightInKg, sexIsFemale: sexIsFemale, energyUnit: energyUnit)
-
-        case .mifflinStJeor:
-            if sexIsFemale {
-                kcal = (9.99 * weightInKg) + (6.25 * heightInCm) - (4.92 * Double(age)) - 161
-            } else {
-                kcal = (9.99 * weightInKg) + (6.25 * heightInCm) - (4.92 * Double(age)) + 5
+    func usesHealthKit(in health: Health) -> Bool {
+        for param in self.params {
+            switch param {
+            case .sex:          if health.usesHealthKitForSex { return true }
+            case .age:          if health.usesHealthKitForAge { return true }
+            case .weight:       if health.usesHealthKitForWeight { return true }
+            case .leanBodyMass: if health.usesHealthKitForLeanBodyMass { return true }
+            case .height:       if health.usesHealthKitForHeight { return true }
+            default:
+                /// Remaining health types are not possible parameters
+                continue
             }
-            
-        case .rozaShizgal:
-            if sexIsFemale {
-                kcal = 447.593 + (9.247 * weightInKg) + (3.098 * heightInCm) - (4.33 * Double(age))
-            } else {
-                kcal = 88.362 + (13.397 * weightInKg) + (4.799 * heightInCm) - (5.677 * Double(age))
-            }
-
-        case .harrisBenedict:
-            if sexIsFemale {
-                kcal = 655.0955 + (9.5634 * weightInKg) + (1.8496 * heightInCm) - (4.6756 * Double(age))
-            } else {
-                kcal = 66.4730 + (13.7516 * weightInKg) + (5.0033 * heightInCm) - (6.7550 * Double(age))
-            }
-            
-        default:
-            return nil
         }
-        let value = EnergyUnit.kcal.convert(kcal, to: energyUnit)
-        return max(value, 0)
+        return false
     }
 }

@@ -62,19 +62,42 @@ extension HealthStore {
     }
 }
 
-//MARK: - Quantities
+extension HealthStore {
+    
+    /// Returns a dict where the key is the number of days from the start date (lowerBound) of dateRange, and the value is the daily total for the dietary energy on that day
+    static func dailyDietaryEnergyValues(
+        dateRange: ClosedRange<Date>,
+        energyUnit: EnergyUnit
+    ) async throws -> [Int: Double] {
+        
+        let statisticsCollection = try await HealthStore.dailyStatistics(
+            for: .dietaryEnergyConsumed,
+            from: dateRange.lowerBound,
+            to: dateRange.upperBound
+        )
 
-extension QuantityType {
-    var defaultUnit: HKUnit {
-        switch self {
-        case .weight:           .gramUnit(with: .kilo)
-        case .leanBodyMass:     .gramUnit(with: .kilo)
-        case .height:           .meterUnit(with: .centi)
-        case .restingEnergy:    .kilocalorie()
-        case .activeEnergy:     .kilocalorie()
+        var samplesDict: [Int: Double] = [:]
+        
+        let numberOfDays = dateRange.upperBound.numberOfDaysFrom(dateRange.lowerBound)
+        
+        for i in 0...numberOfDays {
+            let date = dateRange.lowerBound.moveDayBy(i)
+            guard let statistics = statisticsCollection.statistics(for: date),
+                  let sumQuantity = statistics.sumQuantity()
+            else {
+                continue
+            }
+            let value = sumQuantity.doubleValue(for: energyUnit.healthKitUnit)
+            samplesDict[i] = value
         }
+        
+        return samplesDict
     }
 }
+
+
+//MARK: - Quantities
+
 
 private extension HealthStore {
 
@@ -161,5 +184,37 @@ internal extension HealthStore {
         } catch {
             throw HealthStoreError.permissionsError(error)
         }
+    }
+}
+
+extension HealthStore {
+    
+    static func dailyStatistics(
+        for typeIdentifier: HKQuantityTypeIdentifier,
+        from startDate: Date,
+        to endDate: Date
+    ) async throws -> HKStatisticsCollection {
+        try await HealthStore.requestPermissions(quantityTypeIdentifiers: [typeIdentifier])
+//        try await requestPersmissions()
+        
+        /// Always get samples up to the start of the next day, so that we get all of `date`'s results too
+        let endDate = endDate.startOfDay.moveDayBy(1)
+        
+        let datePredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate)
+        
+        /// Create the query descriptor.
+        let type = HKSampleType.quantityType(forIdentifier: typeIdentifier)!
+        let samplesPredicate = HKSamplePredicate.quantitySample(type: type, predicate: datePredicate)
+        
+        /// We want the sum of each day
+        let everyDay = DateComponents(day: 1)
+        
+        let asyncQuery = HKStatisticsCollectionQueryDescriptor(
+            predicate: samplesPredicate,
+            options: .cumulativeSum,
+            anchorDate: endDate,
+            intervalComponents: everyDay
+        )
+        return try await asyncQuery.result(for: HealthStore.store)
     }
 }

@@ -43,7 +43,7 @@ struct AdaptiveDataCell: View {
             )
     }
     
-    var type: AdaptiveDataType {
+    var type: MaintenanceSampleType {
         sample.type
     }
 }

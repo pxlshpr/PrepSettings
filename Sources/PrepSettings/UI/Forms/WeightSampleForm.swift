@@ -9,7 +9,7 @@ extension WeightSampleForm {
         
         let date: Date
         var sample: MaintenanceSample
-        var type: AdaptiveDataType
+        var type: MaintenanceSampleType
         var value: Double
 
         init(sample: MaintenanceSample, date: Date) {
@@ -209,9 +209,9 @@ struct WeightSampleForm: View {
     
     var typeRow: some View {
         HStack {
-            Text(AdaptiveDataComponent.weight.name)
+            Text(MaintenanceComponent.weight.name)
             Spacer()
-            MenuPicker(AdaptiveDataType.options(for: .weight), $model.type)
+            MenuPicker(MaintenanceSampleType.options(for: .weight), $model.type)
         }
     }
     

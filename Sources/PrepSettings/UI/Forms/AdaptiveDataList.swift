@@ -233,7 +233,7 @@ struct AdaptiveDataList: View {
     /// [ ] Now complete the form, with bindings for picker and value
     /// [ ] Make sure the data is only saved when the user actually taps on "Save" (simply going back shouldn't save it\
     /// [ ] Add the field in HealthSummary for date (when not today) – but first try showing today as well
-    func cell(daysAgo: Int, component: AdaptiveDataComponent) -> some View {
+    func cell(daysAgo: Int, component: MaintenanceComponent) -> some View {
         var sample: MaintenanceSample {
             .init(type: .userEntered, value: 0)
         }

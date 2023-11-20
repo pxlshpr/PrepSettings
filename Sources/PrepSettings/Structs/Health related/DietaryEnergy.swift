@@ -71,3 +71,16 @@ public extension DietaryEnergy {
             .reduce(0) { $0 + $1 }
     }
 }
+
+extension DietaryEnergy {
+    func healthKitDatesRange(for date: Date) -> ClosedRange<Date>? {
+        guard let firstIndex = samples.firstIndex(where: { $0.type == .healthKit }),
+              let lastIndex = samples.lastIndex(where: { $0.type == .healthKit })
+        else { return nil }
+
+        /// Older date would be further down the list since indexes are number of days **prior** to the date provided
+        let older = date.moveDayBy(-lastIndex)
+        let newer = date.moveDayBy(-firstIndex)
+        return older...newer
+    }
+}

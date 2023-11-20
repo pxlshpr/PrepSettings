@@ -17,21 +17,6 @@ struct HealthKitQuantityRequest {
     }
 }
 
-extension Array where Element == Double {
-    var averageValue: Double? {
-        guard !isEmpty else { return nil }
-        let sum = self
-            .reduce(0, +)
-        return sum / Double(count)
-    }
-}
-extension Array where Element == Quantity {
-    var valuesGroupedByDate: [Date: [Quantity]] {
-        let withDates = self.filter { $0.date != nil }
-        return Dictionary(grouping: withDates) { $0.date!.startOfDay }
-    }
-}
-
 extension HealthKitQuantityRequest {
     
     func daySample(movingAverageInterval interval: HealthInterval? = nil) async throws -> DaySample? {
@@ -70,87 +55,7 @@ extension HealthKitQuantityRequest {
             movingAverageValues: movingAverageValues.isEmpty ? nil : movingAverageValues
         )
     }
-    
-//    func averageValue(on date: Date) async throws -> Double? {
-//        try await daySample(for: date)?.value
-//    }
 }
-
-extension MaintenanceSample {
-    mutating func fill(using request: HealthKitQuantityRequest) async throws {
-        if let sample = try await request.daySample(movingAverageInterval: self.movingAverageInterval)
-        {
-            type = .healthKit
-            averagedValues = sample.movingAverageValues
-            value = sample.value
-//            self = MaintenanceSample(
-//                type: .healthKit,
-//                averagedValues: sample.movingAverageValues,
-//                value: sample.value
-//            )
-        } else {
-            averagedValues = nil
-            value = nil
-        }
-    }
-}
-
-//extension HealthKitQuantityRequest {
-//
-//    func fillInWeightChange(
-//        _ weightChange: WeightChange,
-//        for interval: HealthInterval
-//    ) async throws -> WeightChange {
-//        
-//        var weightChange = weightChange
-//        
-//        if weightChange.current.type == .healthKit {
-//            if let sample = try await daySample(
-//                for: date,
-//                movingAverageInterval: weightChange.current.movingAverageInterval
-//            ) {
-//                weightChange.current = MaintenanceSample(
-//                    type: .healthKit,
-//                    averagedValues: sample.movingAverageValues,
-//                    value: sample.value
-//                )
-//            } else {
-//                weightChange.current.averagedValues = nil
-//                weightChange.current.value = nil
-//            }
-//        }
-//    }
-//    
-//    func weightChange(
-//        interval: HealthInterval,
-//        weightChange: WeightChange
-//    ) async throws -> WeightChange {
-//        
-//        func sample(date: Date, movingAverageDays: Int) async throws -> MaintenanceSample {
-//            if let sample = try await daySample(
-//                for: date,
-//                asMovingAverageWithNumberOfPriorDays: movingAverageDays
-//            ) {
-//                MaintenanceSample(
-//                    type: .healthKit,
-//                    averagedValues: sample.movingAverageValues,
-//                    value: sample.value
-//                )
-//            } else { MaintenanceSample(type: .userEntered) }
-//        }
-//        
-//        let current = try await sample(
-//            date: date,
-//            movingAverageDays: 2
-//        )
-//        let previous = try await sample(
-//            date: interval.startDate(with: date),
-//            movingAverageDays: 2
-//        )
-//        
-//        return WeightChange(current: current, previous: previous)
-//    }
-//}
 
 extension HealthKitQuantityRequest {
     func mostRecentOrEarliestAvailable() async throws -> Quantity? {
@@ -220,13 +125,5 @@ extension HealthKitQuantityRequest {
         )
         .first?
         .asQuantity(in: healthKitUnit)
-    }
-}
-
-extension HKQuantitySample {
-    func asQuantity(in healthKitUnit: HKUnit) -> Quantity {
-        let quantity = quantity.doubleValue(for: healthKitUnit)
-        let date = startDate
-        return Quantity(value: quantity, date: date)
     }
 }

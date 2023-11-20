@@ -20,3 +20,15 @@ public extension QuantityType {
         }
     }
 }
+
+extension QuantityType {
+    var defaultUnit: HKUnit {
+        switch self {
+        case .weight:           .gramUnit(with: .kilo)
+        case .leanBodyMass:     .gramUnit(with: .kilo)
+        case .height:           .meterUnit(with: .centi)
+        case .restingEnergy:    .kilocalorie()
+        case .activeEnergy:     .kilocalorie()
+        }
+    }
+}

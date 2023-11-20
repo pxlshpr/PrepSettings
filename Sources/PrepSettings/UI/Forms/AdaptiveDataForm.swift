@@ -9,11 +9,11 @@ struct AdaptiveDataForm: View {
         
         let date: Date
         let sample: MaintenanceSample
-        var type: AdaptiveDataType
-        var component: AdaptiveDataComponent
+        var type: MaintenanceSampleType
+        var component: MaintenanceComponent
         var value: Double
 
-        init(_ sample: MaintenanceSample, _ component: AdaptiveDataComponent, _ date: Date) {
+        init(_ sample: MaintenanceSample, _ component: MaintenanceComponent, _ date: Date) {
             self.sample = sample
             self.type = sample.type
             self.component = component
@@ -22,7 +22,7 @@ struct AdaptiveDataForm: View {
         }
     }
     
-    init(_ sample: MaintenanceSample, _ component: AdaptiveDataComponent, _ date: Date) {
+    init(_ sample: MaintenanceSample, _ component: MaintenanceComponent, _ date: Date) {
         _model = State(initialValue: Model(sample, component, date))
     }
     
@@ -116,7 +116,7 @@ struct AdaptiveDataForm: View {
         HStack {
             Text(model.component.name)
             Spacer()
-            MenuPicker(AdaptiveDataType.options(for: model.component), $model.type)
+            MenuPicker(MaintenanceSampleType.options(for: model.component), $model.type)
         }
     }
     

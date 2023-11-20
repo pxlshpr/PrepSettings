@@ -1,27 +1,27 @@
 import SwiftUI
 import PrepShared
 
-public enum AdaptiveDataType: Int, Hashable, Codable {
+public enum MaintenanceSampleType: Int, Hashable, Codable {
     case healthKit = 1
     case userEntered
     case averaged
 }
 
-public extension AdaptiveDataType {
-    static func options(for component: AdaptiveDataComponent) -> [AdaptiveDataType] {
+public extension MaintenanceSampleType {
+    static func options(for component: MaintenanceComponent) -> [MaintenanceSampleType] {
         switch component {
         case .weight:           [.healthKit, .userEntered]
         case .dietaryEnergy:    allCases
         }
     }
 }
-extension AdaptiveDataType: Pickable {
+extension MaintenanceSampleType: Pickable {
     public var pickedTitle: String { name }
     public var menuTitle: String { name }
-    public static var `default`: AdaptiveDataType { .userEntered }
+    public static var `default`: MaintenanceSampleType { .userEntered }
 }
 
-extension AdaptiveDataType: GenericSource {
+extension MaintenanceSampleType: GenericSource {
     public var isHealth: Bool {
         switch self {
         case .healthKit:    true
@@ -36,7 +36,7 @@ extension AdaptiveDataType: GenericSource {
     }
 }
 
-public extension AdaptiveDataType {
+public extension MaintenanceSampleType {
     var systemImage: String {
         switch self {
 //        case .averaged:     "chart.line.flattrend.xyaxis"
