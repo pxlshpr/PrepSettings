@@ -5,12 +5,13 @@ public enum MaintenanceSampleType: Int, Hashable, Codable {
     case healthKit = 1
     case userEntered
     case averaged
+    case backend
 }
 
 public extension MaintenanceSampleType {
     static func options(for component: MaintenanceComponent) -> [MaintenanceSampleType] {
         switch component {
-        case .weight:           [.healthKit, .userEntered]
+        case .weight:           [.healthKit, .userEntered, .backend]
         case .dietaryEnergy:    allCases
         }
     }
@@ -43,6 +44,7 @@ public extension MaintenanceSampleType {
         case .averaged:     "equal"
         case .healthKit:    "heart.fill"
         case .userEntered:  "pencil"
+        case .backend:      "text.book.closed"
         }
     }
     
@@ -51,6 +53,7 @@ public extension MaintenanceSampleType {
         case .averaged:     "Average value"
         case .healthKit:    "Health app"
         case .userEntered:  "Entered manually"
+        case .backend:      "Log"
         }
     }
     
@@ -59,6 +62,7 @@ public extension MaintenanceSampleType {
         case .averaged:     .white
         case .healthKit:    .pink
         case .userEntered:  .white
+        case .backend:      .white
         }
     }
 
@@ -66,7 +70,8 @@ public extension MaintenanceSampleType {
         switch self {
         case .averaged:     .gray
         case .healthKit:    .white
-        case .userEntered:  .accentColor
+        case .userEntered:  .gray
+        case .backend:      .accentColor
         }
     }
     
@@ -75,6 +80,7 @@ public extension MaintenanceSampleType {
         case .averaged:     .clear
         case .healthKit:    .gray
         case .userEntered:  .clear
+        case .backend:      .clear
         }
     }
 }

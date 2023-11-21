@@ -102,7 +102,7 @@ struct AdaptiveDataList: View {
                     }
                     .navigationTitle("Weight")
                 } label: {
-                    Text("Show All Data")
+                    Text("Show Data")
                 }
                 HStack {
                     Text("Weight Change")
@@ -169,7 +169,7 @@ struct AdaptiveDataList: View {
                 }
                 .navigationTitle("Dietary Energy")
             } label: {
-                Text("Show All Data")
+                Text("Show Data")
             }
             HStack {
                 Text("Total Dietary Energy")
@@ -246,7 +246,8 @@ struct AdaptiveDataList: View {
 
     func weightCell(sample: MaintenanceSample, date: Date) -> some View {
         NavigationLink {
-            WeightSampleForm(sample: sample, date: date)
+            EmptyView()
+//            WeightSampleForm(sample: sample, date: date)
         } label: {
             SampleCell(
                 sample: sample,
@@ -258,7 +259,8 @@ struct AdaptiveDataList: View {
 
     func dietaryEnergyCell(sample: MaintenanceSample, date: Date) -> some View {
         NavigationLink {
-            WeightSampleForm(sample: sample, date: date)
+            EmptyView()
+//            WeightSampleForm(sample: sample, date: date)
         } label: {
             SampleCell(
                 sample: sample,

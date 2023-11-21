@@ -29,7 +29,8 @@ public extension HealthModel {
     }
     
     func saveHealth() async throws {
-        try await saveHandler(health, isCurrent)
+        try await delegate.saveHealth(health, isCurrent: isCurrent)
+//        try await saveHandler(health, isCurrent)
     }
     
     /// This is supposed to handle single changes only (eg. when we change the weight source), and not multiple different changes

@@ -5,6 +5,9 @@ import CoreData
 
 import PrepShared
 
+public typealias FetchCurrentHealthHandler = (() async throws -> Health)
+public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
+
 @Observable public class HealthModel {
 
     public let isCurrent: Bool
@@ -13,8 +16,9 @@ import PrepShared
     internal let logger = Logger(subsystem: "HealthModel", category: "")
     internal var handleChangesTask: Task<Void, Error>? = nil
     
-    var fetchCurrentHealthHandler: (() async throws -> Health)? = nil
-    var saveHandler: ((Health, Bool) async throws -> ())
+//    let fetchCurrentHealthHandler: FetchCurrentHealthHandler?
+//    let saveHandler: SaveHealthHandler
+    let delegate: HealthModelDelegate
     
     public var health: Health {
         didSet {
@@ -27,11 +31,13 @@ import PrepShared
 
     /// Current Health
     public init(
-        fetchCurrentHealthHandler: (@escaping () async throws -> Health),
-        saveHandler: (@escaping (Health, Bool) async throws -> ())
+        delegate: HealthModelDelegate,
+        fetchCurrentHealthHandler: @escaping FetchCurrentHealthHandler
+//        saveHandler: @escaping SaveHealthHandler
     ) {
-        self.fetchCurrentHealthHandler = fetchCurrentHealthHandler
-        self.saveHandler = saveHandler
+//        self.fetchCurrentHealthHandler = fetchCurrentHealthHandler
+//        self.saveHandler = saveHandler
+        self.delegate = delegate
         self.health = Health()
         self.isCurrent = true
         loadCurrentHealth(fetchCurrentHealthHandler)
@@ -39,16 +45,18 @@ import PrepShared
     
     /// Past Health
     public init(
-        health: Health,
-        saveHandler: (@escaping (Health, Bool) async throws -> ())
+        delegate: HealthModelDelegate,
+        health: Health
+//        saveHandler: @escaping SaveHealthHandler
     ) {
-        self.fetchCurrentHealthHandler = nil
-        self.saveHandler = saveHandler
+//        self.fetchCurrentHealthHandler = nil
+//        self.saveHandler = saveHandler
+        self.delegate = delegate
         self.health = health
         self.isCurrent = false
     }
 
-    public func loadCurrentHealth(_ handler: @escaping (() async throws -> Health)) {
+    public func loadCurrentHealth(_ handler: @escaping FetchCurrentHealthHandler) {
         Task {
             let health = try await handler()
             await MainActor.run {

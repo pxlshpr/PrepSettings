@@ -108,6 +108,7 @@ struct AdaptiveDataForm: View {
             case .userEntered:  manualValue
             case .healthKit:    healthValue
             case .averaged:     healthValue
+            case .backend:      healthValue
             }
         }
     }

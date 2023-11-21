@@ -1,9 +1,32 @@
 import Foundation
 
 public let MockHealthModel = HealthModel(
-    fetchCurrentHealthHandler: fetchHealthFromDocuments,
-    saveHandler: saveHealthInDocuments
+    delegate: MockHealthDelegate(),
+    fetchCurrentHealthHandler: fetchHealthFromDocuments
+//    saveHandler: saveHealthInDocuments
 )
+
+struct MockHealthDelegate: HealthModelDelegate {
+    func saveHealth(_ health: Health, isCurrent: Bool) async throws {
+        try saveHealthInDocuments(health, isCurrent: isCurrent)
+    }
+    
+    func maintenanceData(for dateRange: ClosedRange<Date>) async throws -> [Date : (weightInKg: Double?, dietaryEnergyInKcal: Double?)] {
+        [:]
+    }
+    
+    func updateWeight(for date: Date, with weight: Double, source: HealthSource) async throws {
+        
+    }
+    
+    func planIsWeightDependent(on date: Date) async throws -> Bool {
+        false
+    }
+    
+    func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
+        nil
+    }
+}
 
 public extension SettingsStore {
     /// Saves and fetches from a `.json` file encoded/decoded in the documents directory
@@ -17,7 +40,7 @@ public extension SettingsStore {
 
 //MARK: - Private
 
-func saveHealthInDocuments(_ health: Health, isCurrent: Bool) async throws {
+func saveHealthInDocuments(_ health: Health, isCurrent: Bool) throws {
     let url = getDocumentsDirectory().appendingPathComponent("health.json")
     let json = try JSONEncoder().encode(health)
     try json.write(to: url)
