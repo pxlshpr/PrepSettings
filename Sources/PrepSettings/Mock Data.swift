@@ -1,12 +1,12 @@
 import Foundation
 
 public let MockHealthModel = HealthModel(
-    delegate: MockHealthDelegate(),
+    delegate: MockHealthModelDelegate(),
     fetchCurrentHealthHandler: fetchHealthFromDocuments
 //    saveHandler: saveHealthInDocuments
 )
 
-struct MockHealthDelegate: HealthModelDelegate {
+struct MockHealthModelDelegate: HealthModelDelegate {
     func saveHealth(_ health: Health, isCurrent: Bool) async throws {
         try saveHealthInDocuments(health, isCurrent: isCurrent)
     }
@@ -15,12 +15,12 @@ struct MockHealthDelegate: HealthModelDelegate {
         [:]
     }
     
-    func updateWeight(for date: Date, with weight: Double, source: HealthSource) async throws {
+    func updateWeight(for date: Date, with weight: Double?, source: HealthSource) async throws {
         
     }
     
     func planIsWeightDependent(on date: Date) async throws -> Bool {
-        false
+        true
     }
     
     func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
