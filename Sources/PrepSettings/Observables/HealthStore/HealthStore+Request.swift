@@ -10,24 +10,24 @@ extension HealthStore {
         in unit: BodyMassUnit = .kg,
         for date: Date = Date.now
     ) async throws -> Quantity? {
-        try await HealthKitQuantityRequest(.weight, unit.healthKitUnit, date)
-            .mostRecentOrEarliestAvailable()
+        try await HealthKitQuantityRequest(.weight, unit.healthKitUnit)
+            .mostRecentOrEarliestAvailable(to: date)
     }
 
     static func leanBodyMass(
         in unit: BodyMassUnit = .kg,
         for date: Date = Date.now
     ) async throws -> Quantity? {
-        try await HealthKitQuantityRequest(.leanBodyMass, unit.healthKitUnit, date)
-            .mostRecentOrEarliestAvailable()
+        try await HealthKitQuantityRequest(.leanBodyMass, unit.healthKitUnit)
+            .mostRecentOrEarliestAvailable(to: date)
     }
 
     static func height(
         in unit: HeightUnit = .cm,
         for date: Date = Date.now
     ) async throws -> Quantity? {
-        try await HealthKitQuantityRequest(.height, unit.healthKitUnit, date)
-            .mostRecentOrEarliestAvailable()
+        try await HealthKitQuantityRequest(.height, unit.healthKitUnit)
+            .mostRecentOrEarliestAvailable(to: date)
     }
 
     static func biologicalSex() async throws -> HKBiologicalSex? {

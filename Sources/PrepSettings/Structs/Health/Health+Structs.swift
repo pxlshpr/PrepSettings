@@ -17,7 +17,7 @@ public extension Health {
             self.isAdaptive = isAdaptive
             self.adaptiveValue = nil
             self.error = nil
-            self.interval = .init(1, .week)
+            self.interval = DefaultMaintenanceEnergyInterval
             self.weightChange = .init()
             self.dietaryEnergy = .init()
         }

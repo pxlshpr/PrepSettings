@@ -2,11 +2,11 @@ import Foundation
 
 public struct DietaryEnergy: Hashable, Codable {
     public static let DefaultNumberOfSamples = 7
-    public var samples: [MaintenanceSample]
+    public var samples: [MaintenanceDietaryEnergySample]
     
     public init(
-        samples: [MaintenanceSample] = Array.init(
-            repeating: MaintenanceSample(type: .healthKit),
+        samples: [MaintenanceDietaryEnergySample] = Array.init(
+            repeating: MaintenanceDietaryEnergySample(type: .healthKit),
             count: DefaultNumberOfSamples
         )
     ) {
@@ -14,22 +14,35 @@ public struct DietaryEnergy: Hashable, Codable {
     }
 }
 
-extension DietaryEnergy: CustomStringConvertible {
-    public var description: String {
-        var string = ""
-        for i in 0..<samples.count {
-            string += "[\(i)] → \(samples[i].description)\n"
+extension DietaryEnergy {
+    //TODO: We need type of dietary energy to be passed in too
+    //TODO: We need to show image in cells
+    mutating func setValues(
+        _ values: MaintenanceValues,
+        _ date: Date,
+        _ interval: HealthInterval
+    ) {
+        let numberOfDays = interval.numberOfDays
+        samples = Array.init(
+            repeating: MaintenanceDietaryEnergySample(type: .healthKit),
+            count: numberOfDays
+        )
+        for i in 0..<numberOfDays {
+            let date = date.moveDayBy(-i)
+            samples[i].value = values.dietaryEnergyInKcal(for: date)
+            if let type = values.dietaryEnergyType(for: date) {
+                samples[i].type = type
+            }
         }
-        return string
     }
 }
 
 public extension DietaryEnergy {
-    mutating func setSample(at index: Int, with sample: MaintenanceSample) {
+    mutating func setSample(at index: Int, with sample: MaintenanceDietaryEnergySample) {
         samples[index] = sample
     }
     
-    func sample(at index: Int) -> MaintenanceSample? {
+    func sample(at index: Int) -> MaintenanceDietaryEnergySample? {
         samples[index]
     }
     

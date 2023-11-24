@@ -244,29 +244,21 @@ struct AdaptiveDataList: View {
         }
     }
 
-    func weightCell(sample: MaintenanceSample, date: Date) -> some View {
+    func weightCell(sample: MaintenanceWeightSample, date: Date) -> some View {
         NavigationLink {
             EmptyView()
 //            WeightSampleForm(sample: sample, date: date)
         } label: {
-            SampleCell(
-                sample: sample,
-                date: date,
-                component: .weight
-            )
+            WeightSampleCell(sample: sample, date: date)
         }
     }
 
-    func dietaryEnergyCell(sample: MaintenanceSample, date: Date) -> some View {
+    func dietaryEnergyCell(sample: MaintenanceDietaryEnergySample, date: Date) -> some View {
         NavigationLink {
             EmptyView()
 //            WeightSampleForm(sample: sample, date: date)
         } label: {
-            SampleCell(
-                sample: sample,
-                date: date,
-                component: .dietaryEnergy
-            )
+            DietaryEnergySampleCell(sample: sample, date: date)
         }
     }
 

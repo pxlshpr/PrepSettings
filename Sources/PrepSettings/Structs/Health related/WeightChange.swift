@@ -2,29 +2,15 @@ import Foundation
 import PrepShared
 
 public struct WeightChange: Hashable, Codable {
-    public var current: MaintenanceSample
-    public var previous: MaintenanceSample
+    public var current: MaintenanceWeightSample
+    public var previous: MaintenanceWeightSample
     
-    public init(
-        current: MaintenanceSample = .init(type: .healthKit, movingAverageInterval: .init(1, .week)),
-        previous: MaintenanceSample = .init(type: .healthKit, movingAverageInterval: .init(1, .week))
-    ) {
-        self.current = current
-        self.previous = previous
-    }
+    public init() {
+        self.current = MaintenanceWeightSample()
+        self.previous = MaintenanceWeightSample()
+    }    
 }
 
-extension WeightChange: CustomStringConvertible {
-    public var description: String {
-        var string = ""
-        string += "[current] → \(current.description)\n"
-        string += "[previous] → \(previous.description)\n"
-        if let delta {
-            string += "Δ \(delta)"
-        }
-        return string
-    }
-}
 public extension WeightChange {
     var delta: Double? {
         guard 
@@ -43,5 +29,52 @@ public extension WeightChange {
     
     var isEmpty: Bool {
         current.value == nil || previous.value == nil
+    }
+}
+
+extension WeightChange {
+    mutating func setValues(
+        _ values: MaintenanceValues,
+        _ date: Date,
+        _ maintenanceInterval: HealthInterval
+    ) {
+        
+        let previousDate = maintenanceInterval.startDate(with: date)
+
+        func movingAverageWeightSample(on date: Date, interval: HealthInterval) -> MaintenanceWeightSample {
+            var movingAverageValues: [Int: Double] = [:]
+            for i in 0..<interval.numberOfDays {
+                let movedDate = date.moveDayBy(-i)
+                if let value = values.weightInKg(on: movedDate) {
+                    movingAverageValues[i] = value
+                }
+            }
+            let value = Array(movingAverageValues.values).averageValue
+            return MaintenanceWeightSample(
+                movingAverageInterval: interval,
+                movingAverageValues: movingAverageValues,
+                value: value
+            )
+        }
+        
+        func weightSample(on date: Date) -> MaintenanceWeightSample {
+            MaintenanceWeightSample(
+                movingAverageInterval: nil,
+                movingAverageValues: nil,
+                value: values.weightInKg(on: date)
+            )
+        }
+        
+        self.current = if let interval = current.movingAverageInterval {
+            movingAverageWeightSample(on: date, interval: interval)
+        } else {
+            weightSample(on: date)
+        }
+        
+        self.previous = if let interval = previous.movingAverageInterval {
+            movingAverageWeightSample(on: previousDate, interval: interval)
+        } else {
+            weightSample(on: previousDate)
+        }
     }
 }

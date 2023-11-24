@@ -189,6 +189,32 @@ internal extension HealthStore {
 
 extension HealthStore {
     
+    static func dailyDietaryEnergyTotalsInKcal(for dates: [Date]) async throws -> [Date: Double] {
+        
+        let sorted = dates.sorted()
+        guard let firstDate = sorted.first, let lastDate = sorted.last else { return [:] }
+        
+        let statisticsCollection = try await HealthStore.dailyStatistics(
+            for: .dietaryEnergyConsumed,
+            from: firstDate,
+            to: lastDate
+        )
+
+        var samplesDict: [Date: Double] = [:]
+        
+        for date in dates {
+            guard let statistics = statisticsCollection.statistics(for: date),
+                  let sumQuantity = statistics.sumQuantity()
+            else {
+                continue
+            }
+            let value = sumQuantity.doubleValue(for: EnergyUnit.kcal.healthKitUnit)
+            samplesDict[date] = value
+        }
+        
+        return samplesDict
+    }
+    
     static func dailyStatistics(
         for typeIdentifier: HKQuantityTypeIdentifier,
         from startDate: Date,

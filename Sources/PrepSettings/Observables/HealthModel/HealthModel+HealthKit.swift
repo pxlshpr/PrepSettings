@@ -123,10 +123,12 @@ public extension HealthModel {
             try await HealthStore.dateOfBirthComponents()
         )
         case .maintenanceEnergy:
-            guard let maintenance = try await health.calculate() else {
-                return nil
-            }
-            return .maintenanceEnergy(maintenance)
+            //TODO: Revisit this
+            return nil
+//            guard let maintenance = try await health.calculate() else {
+//                return nil
+//            }
+//            return .maintenanceEnergy(maintenance)
 
         case .restingEnergy:
             guard let interval = health.restingEnergy?.interval else {

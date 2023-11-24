@@ -388,9 +388,9 @@ struct WeightSampleForm: View {
             func didSaveWeight(_ weight: Double?) {
                 model.saveWeight(weight, at: index)
                 Task {
-                    try await healthModel.delegate.updateWeight(
+                    try await healthModel.delegate.updateBackendWeight(
                         for: date,
-                        with: weight,
+                        with: .init(value: weight),
                         source: .userEntered
                     )
                 }

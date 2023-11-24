@@ -3,31 +3,6 @@ import PrepShared
 
 public extension HealthModel {
     
-//    var restingEnergyUnit: EnergyUnit {
-//        get { health.energyUnit }
-//        set { setEnergyUnit(newValue, whileEditing: .restingEnergy) }
-//    }
-//
-//    var activeEnergyUnit: EnergyUnit {
-//        get { health.energyUnit }
-//        set { setEnergyUnit(newValue, whileEditing: .activeEnergy) }
-//    }
-//
-//    var healthWeightUnit: BodyMassUnit {
-//        get { health.bodyMassUnit }
-//        set { setBodyMassUnit(newValue, whileEditing: .weight) }
-//    }
-//    
-//    var healthHeightUnit: HeightUnit {
-//        get { health.heightUnit }
-//        set { setHeightUnit(newValue, whileEditing: .height) }
-//    }
-//    
-//    var healthLeanBodyMassUnit: BodyMassUnit {
-//        get { health.bodyMassUnit }
-//        set { setBodyMassUnit(newValue, whileEditing: .leanBodyMass) }
-//    }
-    
     //MARK: Energy Burn
     var maintenanceEnergyIsAdaptive: Bool {
         get { health.maintenanceEnergyIsAdaptive }
@@ -39,8 +14,7 @@ public extension HealthModel {
                     }
                 }
                 if newValue {
-                    //TODO: Rename this to refreshValue or something as we're techincally recalculating it here even if not healthKit based
-                    try await setTypeFromHealthKit(.maintenanceEnergy)
+                    try await calculateAdaptiveMaintenance()
                 } else {
                     await MainActor.run {
                         withAnimation {
