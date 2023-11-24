@@ -2,45 +2,6 @@ import SwiftUI
 import PrepShared
 import TipKit
 
-struct HealthBodyProfileTitle: View {
-    
-    @Bindable var model: HealthModel
-    
-    init(_ model: HealthModel) {
-        self.model = model
-    }
-    
-    @ViewBuilder
-    var body: some View {
-        if model.health.hasType(.maintenanceEnergy) {
-            content
-                .padding(.top)
-        } else {
-            content
-        }
-    }
-    
-    var content: some View {
-        Text("Body Profile")
-            .font(.title2)
-            .textCase(.none)
-            .foregroundStyle(Color(.label))
-            .fontWeight(.bold)
-    }
-}
-
-public extension Health {
-    var doesNotHaveAnyHealthKitBasedTypesSet: Bool {
-        restingEnergy == nil
-        && activeEnergy == nil
-        && age == nil
-        && sex == nil
-        && weight == nil
-        && height == nil
-        && leanBodyMass == nil
-    }
-}
-
 public struct HealthSummary: View {
     
     @Bindable var model: HealthModel
@@ -71,7 +32,7 @@ public struct HealthSummary: View {
         var date: Date { model.health.date }
         
         var footer: some View {
-            Text("You are viewing the health details of a past date. Changes will not affect your current health details and will only affect the plan you had set on that day.")
+            Text("You are viewing the health details of a past date. Changes will not affect your current health details and will only affect the goals you had set on this day.")
         }
         
         return Group {
@@ -232,58 +193,6 @@ public struct HealthSummary: View {
     func link(_ type: HealthType) -> some View {
         HealthLink(type: type)
             .environment(model)
-    }
-}
-
-struct HealthKitErrorCell: View {
-    let type: HealthType
-    var body: some View {
-        HStack(alignment: .top) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 50))
-                .foregroundStyle(Color.accentColor)
-            VStack(alignment: .leading) {
-                Text(heading)
-                    .fontWeight(.semibold)
-                Text(message)
-                    .font(.system(.callout))
-                    .foregroundStyle(.secondary)
-                TagView(string: location)
-                Text(secondaryMessage)
-                    .font(.system(.callout))
-                    .foregroundStyle(Color(.secondaryLabel))
-            }
-        }
-    }
-    
-    var heading: String {
-        "Data unavailable"
-    }
-    
-    var message: String {
-        "Check that you have allowed Prep to read your \(type.abbreviation) in:"
-    }
-    
-    var secondaryMessage: String {
-        "If allowed, then there may be no \(type.abbreviation) data."
-    }
-    
-    var location: String {
-        "Settings > Privacy & Security > Health > Prep"
-    }
-}
-
-func fetchHealthFromDocuments() async throws -> Health {
-    let url = getDocumentsDirectory().appendingPathComponent("health.json")
-    do {
-        let data = try Data(contentsOf: url)
-        var health = try JSONDecoder().decode(Health.self, from: data)
-//        health.date = Date.now.moveDayBy(-15)
-//        health.date = Date(fromDateString: "2023_02_26")!
-        health.date = Date(fromDateString: "2021_08_28")!
-        return health
-    } catch {
-        return .init()
     }
 }
 

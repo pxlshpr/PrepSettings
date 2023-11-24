@@ -52,20 +52,32 @@ struct HealthHeightSection: View {
     }
     
     var healthValue: some View {
-        CalculatedHealthView(
-            quantityBinding: $model.health.heightQuantity,
-            secondComponent: model.heightCentimetersComponent,
-            unitBinding: $model.healthHeightUnit,
+        CalculatedHeightView(
+            unit: $model.health.heightUnit,
+            quantityInCm: $model.health.heightQuantity,
             source: model.heightSource
+        )
+//        CalculatedHealthView(
+//            quantityBinding: $model.health.heightQuantity,
+//            secondComponent: model.heightCentimetersComponent,
+//            unitBinding: $model.health.heightUnit,
+//            source: model.heightSource
+//        )
+    }
+
+    var manualValue: some View {
+        ManualHeightField(
+            unit: $model.health.heightUnit,
+            valueInCm: $model.heightValue
         )
     }
     
-    var manualValue: some View {
-        ManualHealthField(
-            unitBinding: $model.healthHeightUnit,
-            valueBinding: $model.heightValue,
-            firstComponentBinding: $model.heightFeetComponent,
-            secondComponentBinding: $model.heightCentimetersComponent
-        )
-    }
+//    var manualValue: some View {
+//        ManualHealthField(
+//            unitBinding: $model.health.heightUnit,
+//            valueBinding: $model.heightValue,
+//            firstComponentBinding: $model.heightFeetComponent,
+//            secondComponentBinding: $model.heightCentimetersComponent
+//        )
+//    }
 }

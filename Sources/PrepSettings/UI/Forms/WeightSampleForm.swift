@@ -4,27 +4,42 @@ import PrepShared
 typealias DidSaveWeightHandler = (Double?) -> ()
 struct WeightMovingAverageComponentForm: View {
 
-    @Environment(HealthModel.self) var healthModel
     @Environment(\.dismiss) var dismiss
+    
     @State var model: Model
+    @Bindable var healthModel: HealthModel
     
     @State var requiresSaveConfirmation = false
     @State var showingSaveConfirmation = false
     
     let didSaveWeight: DidSaveWeightHandler
 
-    init(value: Double?, date: Date, didSaveWeight: @escaping DidSaveWeightHandler) {
+    init(
+        value: Double?,
+        date: Date,
+        healthModel: HealthModel,
+        didSaveWeight: @escaping DidSaveWeightHandler
+    ) {
         //TODO: Create a Model
         /// [x] Store the value, have a textValue too, store the initial value too
         /// [x] Store the date
         /// [x] Pass in the delegate (do this for WeightSampleForm.Model too
         /// [x] Use the delegate to show confirmation before saving
-        /// [ ] Have a didSave closure passed in to this and WeightSampleForm.Model too
-        /// [ ] When saved, set the value in the array of moving averages and recalculate the average
-        /// [ ] Now display the average value not letting user edit in WeightSampleForm
-        /// [ ] Handle the unit change by simply changing what the displayed value is, but still storing it using kilograms perhaps
+        /// [x] Have a didSave closure passed in to this and WeightSampleForm.Model too
+        /// [x] When saved, set the value in the array of moving averages and recalculate the average
+        /// [x] Now display the average value not letting user edit in WeightSampleForm
+        /// [x] Handle the unit change by simply changing what the displayed value is, but still storing it using kilograms perhaps
+        /// [ ] Revisit `setBodyMassUnit`, and consider removing it in favour of saving weight in kilograms and always converting to display to the Health.bodyMassUnit, consider renaming this to `displayBodyMassUnit`, and changing the Weight and LBM structs to clearly say `weightInKilograms` or something
+        /// [ ] Also do the same thing with energy and height, changing from `heightUnit` to `displayHeightUnit`, changing from `energyUnit` to `displayEnergyUnit`, and changing `height` to `heightInCentimeters`
+        /// [ ] Have it so that displayed value in forms reacts to change in healthModel.health.bodyMassUnit by converting itself
+        /// [ ] Make sure we're calling the `HealthModel.setBodyMassUnit(_:whileEditing:)` when the unit changes and also revisit it and make sure we're doing the thing where we only chan
         /// [ ] When not in kilograms, save entered value after converting to kilograms
-        _model = State(initialValue: Model(value: value, date: date))
+        _model = State(initialValue: Model(
+            value: value,
+            date: date,
+            healthModel: healthModel
+        ))
+        self.healthModel = healthModel
         self.didSaveWeight = didSaveWeight
     }
     
@@ -38,18 +53,28 @@ struct WeightMovingAverageComponentForm: View {
         .toolbar { toolbarContent }
         .task(loadRequiresSaveConfirmation)
         .confirmationDialog("", isPresented: $showingSaveConfirmation, actions: saveConfirmationActions, message: saveConfirmationMessage)
+        .onChange(of: healthModel.health.bodyMassUnit, model.bodyMassUnitChanged)
     }
     
     func saveConfirmationActions() -> some View {
-        Group {
-            Button("\(model.value == nil ? "Remove" : "Save") weight and \(model.value == nil ? "disable" : "modify") goals") {
+        let primaryAction = isRemoving ? "Remove" : "Save"
+        let secondaryAction = isRemoving ? "disable" : "modify"
+        return Group {
+            Button("\(primaryAction) weight and \(secondaryAction) goals") {
                 save()
             }
         }
     }
     
+    var isRemoving: Bool {
+        model.value == nil
+    }
+    
     func saveConfirmationMessage() -> some View {
-        Text("You have goals on this day that are based on your weight, which will be \(model.value == nil ? "disabled" : "modified").")
+        let result = isRemoving
+        ? "They will be disabled if you remove this."
+        : "They will also be modified if you save this change."
+        return Text("You have weight-based goals set on this day. \(result)")
     }
     
     @Sendable
@@ -91,15 +116,15 @@ struct WeightMovingAverageComponentForm: View {
                     Button("Set weight") {
                         withAnimation {
                             model.value = 0
-                            model.textValue = 0
+                            model.displayedValue = 0
                         }
                     }
                 } else {
                     ManualHealthField(
-                        unitBinding: .constant(BodyMassUnit.kg),
-                        valueBinding: $model.textValue,
-                        firstComponentBinding: .constant(0),
-                        secondComponentBinding: .constant(0)
+                        unitBinding: $healthModel.health.bodyMassUnit,
+                        valueBinding: $model.displayedValue,
+                        firstComponentBinding: $model.weightStonesComponent,
+                        secondComponentBinding: $model.weightPoundsComponent
                     )
                 }
             }
@@ -126,39 +151,85 @@ extension WeightMovingAverageComponentForm {
     @Observable class Model {
         
         let initialValue: Double?
-
+        let initialUnit: BodyMassUnit
+        let healthModel: HealthModel
+        
         var value: Double?
-        var textValue: Double {
+        var displayedValue: Double {
             didSet {
-                value = textValue
+                value = displayedValue
             }
         }
         var date: Date
         
-        init(value: Double?, date: Date) {
+        init(value: Double?, date: Date, healthModel: HealthModel) {
             self.initialValue = value
+            self.initialUnit = healthModel.health.bodyMassUnit
+            self.healthModel = healthModel
             self.value = value
-            self.textValue = value ?? 0
+            self.displayedValue = value ?? 0
             self.date = date
         }
     }
 }
 
 extension WeightMovingAverageComponentForm.Model {
+    
+    var isNotDirty: Bool {
+        value == initialValue
+        && initialUnit == healthModel.health.bodyMassUnit
+    }
+    
     var isSaveDisabled: Bool {
-        if value == initialValue { return true }
+        if isNotDirty { return true }
         guard let value else { return false }
         return value <= 0
+    }
+    
+    func bodyMassUnitChanged(old: BodyMassUnit, new: BodyMassUnit) {
+        guard let value else { return }
+        let converted = old.convert(value, to: new)
+        self.value = converted
+        displayedValue = converted
+    }
+    
+    var weightStonesComponent: Int {
+        get { Int(displayedValue.whole) }
+        set {
+            let value = Double(newValue) + (weightPoundsComponent / PoundsPerStone)
+            self.value = value
+            displayedValue = value
+        }
+    }
+    
+    var weightPoundsComponent: Double {
+        get { displayedValue.fraction * PoundsPerStone }
+        set {
+            let newValue = min(newValue, PoundsPerStone-1)
+            let value = Double(weightStonesComponent) + (newValue / PoundsPerStone)
+            self.value = value
+            displayedValue = value
+        }
     }
 }
 
 struct WeightSampleForm: View {
     
-    @Environment(HealthModel.self) var healthModel
     @State var model: Model
+    @Bindable var healthModel: HealthModel
     
-    init(sample: MaintenanceWeightSample, date: Date, isPrevious: Bool) {
+    let didSaveWeight: DidSaveWeightHandler
+
+    init(
+        sample: MaintenanceWeightSample,
+        date: Date,
+        isPrevious: Bool,
+        healthModel: HealthModel,
+        didSave: @escaping DidSaveWeightHandler
+    ) {
         _model = State(initialValue: Model(sample: sample, date: date, isPrevious: isPrevious))
+        self.didSaveWeight = didSave
+        self.healthModel = healthModel
     }
     
     var body: some View {
@@ -171,6 +242,7 @@ struct WeightSampleForm: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarContent }
+        .onChange(of: healthModel.health.bodyMassUnit, model.bodyMassUnitChanged)
     }
     
     var title: String {
@@ -196,38 +268,35 @@ struct WeightSampleForm: View {
         Section {
             HStack {
                 Text(model.date.adaptiveMaintenanceDateString)
-                    .foregroundStyle(.secondary)
+//                    .foregroundStyle(.secondary)
                 Spacer()
-                if model.value == nil {
+                if model.isUsingMovingAverage {
+                    if let value = model.value {
+                        CalculatedHealthView(
+                            quantityBinding: .constant(Quantity(value: value)),
+                            secondComponent: 0,
+                            unitBinding: $healthModel.health.bodyMassUnit,
+                            source: HealthSource.userEntered
+                        )
+                    } else {
+                        Text("Not enough values")
+                            .foregroundStyle(.tertiary)
+                    }
+                } else if model.value != nil {
+                    ManualHealthField(
+                        unitBinding: $healthModel.health.bodyMassUnit,
+                        valueBinding: $model.displayedValue,
+                        firstComponentBinding: $model.weightStonesComponent,
+                        secondComponentBinding: $model.weightPoundsComponent
+                    )
+                } else {
                     Button("Set weight") {
                         withAnimation {
                             model.value = 0
-                            model.textValue = 0
+                            model.displayedValue = 0
                         }
                     }
-                } else {
-                    if model.isUsingMovingAverage {
-                        Text("Average goes here")
-                    } else {
-                        ManualHealthField(
-                            unitBinding: .constant(BodyMassUnit.kg),
-                            valueBinding: $model.textValue,
-                            firstComponentBinding: .constant(0),
-                            secondComponentBinding: .constant(0)
-                        )
-                    }
                 }
-//                if model.isUsingMovingAverage {
-//                    Text("Average value")
-//                    CalculatedHealthView(
-//                        quantityBinding: .constant(Quantity(value: 96.0, date: Date.now)),
-//                        secondComponent: 0,
-//                        unitBinding: .constant(BodyMassUnit.kg),
-//                        source: model.type
-//                    )
-//                } else {
-//                    Text("Manual Health Field")
-//                }
             }
         }
     }
@@ -259,7 +328,7 @@ struct WeightSampleForm: View {
         }
         
         return Group {
-            if model.value != nil {
+            if !(model.value == nil && !model.isUsingMovingAverage) {
                 section
             }
         }
@@ -268,18 +337,22 @@ struct WeightSampleForm: View {
     var movingAverageValuesSection: some View {
         
         var footer: some View {
-            Text("The average of these values is being used.")
+//            Text("The average of these values is being used.")
+            EmptyView()
         }
         
         func cell(_ index: Int) -> some View {
             
+            @ViewBuilder
             var valueText: some View {
                 if let value = model.movingAverageValue(at: index) {
                     Text(value.cleanAmount)
+                        .font(.system(.body, design: .monospaced, weight: .bold))
+                        .animation(.default, value: value)
+                        .contentTransition(.numericText(value: value))
                         .foregroundStyle(Color(.secondaryLabel))
-//                        .foregroundStyle(model.type == .healthKit ? Color(.secondaryLabel) : Color(.label))
-//                    Text("kg")
-//                        .foregroundStyle(.secondary)
+                    Text(healthModel.health.bodyMassUnit.abbreviation)
+                        .foregroundStyle(.secondary)
                 } else {
                     Text("Not set")
                         .foregroundStyle(.tertiary)
@@ -292,21 +365,19 @@ struct WeightSampleForm: View {
             
             var dateText: some View {
                 Text(date.adaptiveMaintenanceDateString)
-                    .foregroundStyle(.secondary)
+//                    .foregroundStyle(.secondary)
             }
             
             var label: some View {
                 HStack {
-                    valueText
-                    Spacer()
                     dateText
+                    Spacer()
+                    valueText
                 }
             }
             
             func didSaveWeight(_ weight: Double?) {
-                withAnimation {
-                    model.sample.averagedValues?[index] = weight
-                }
+                model.saveWeight(weight, at: index)
                 Task {
                     try await healthModel.delegate.updateWeight(
                         for: date,
@@ -320,6 +391,7 @@ struct WeightSampleForm: View {
                 WeightMovingAverageComponentForm(
                     value: model.movingAverageValue(at: index),
                     date: date,
+                    healthModel: healthModel,
                     didSaveWeight: didSaveWeight
                 )
                 .environment(healthModel)
@@ -329,7 +401,7 @@ struct WeightSampleForm: View {
         }
         
         var header: some View {
-            Text("Kilograms")
+            Text("Averaged values")
         }
         
         return Group {
@@ -360,9 +432,12 @@ struct WeightSampleForm: View {
                 WeightSampleForm(
                     sample: .init(),
                     date: Date.now,
-                    isPrevious: true
+                    isPrevious: true,
+                    healthModel: MockHealthModel,
+                    didSave: { value in
+                        
+                    }
                 )
-                .environment(MockHealthModel)
             }
         }
 }
@@ -375,7 +450,11 @@ extension WeightSampleForm {
 
         let date: Date
         var value: Double?
-        var textValue: Double
+        var displayedValue: Double {
+            didSet {
+                value = displayedValue
+            }
+        }
         
         var isPrevious: Bool
 
@@ -383,7 +462,7 @@ extension WeightSampleForm {
             self.sampleBeingEdited = sample
             self.sample = sample
             self.value = sample.value
-            self.textValue = sample.value ?? 0
+            self.displayedValue = sample.value ?? 0
             self.date = date
             self.isPrevious = isPrevious
         }
@@ -391,6 +470,59 @@ extension WeightSampleForm {
 }
 
 extension WeightSampleForm.Model {
+    
+    func bodyMassUnitChanged(old: BodyMassUnit, new: BodyMassUnit) {
+        guard let value else { return }
+        let converted = old.convert(value, to: new)
+        self.value = converted
+        displayedValue = converted
+        
+        withAnimation {
+            if let movingAverageValues = sample.movingAverageValues {
+                for (i, value) in movingAverageValues {
+                    let converted = old.convert(value, to: new)
+                    sample.movingAverageValues?[i] = converted
+                }
+            }
+        }
+    }
+    
+    var weightStonesComponent: Int {
+        get { Int(displayedValue.whole) }
+        set {
+            let value = Double(newValue) + (weightPoundsComponent / PoundsPerStone)
+            self.value = value
+            displayedValue = value
+        }
+    }
+    
+    var weightPoundsComponent: Double {
+        get { displayedValue.fraction * PoundsPerStone }
+        set {
+            let newValue = min(newValue, PoundsPerStone-1)
+            let value = Double(weightStonesComponent) + (newValue / PoundsPerStone)
+            self.value = value
+            displayedValue = value
+        }
+    }
+}
+
+extension WeightSampleForm.Model {
+    
+    func saveWeight(_ weight: Double?, at index: Int) {
+        withAnimation {
+            sample.movingAverageValues?[index] = weight
+            calculateAverage()
+        }
+    }
+    
+    func calculateAverage() {
+        guard let values = sample.movingAverageValues, !values.isEmpty else {
+            value = nil
+            return
+        }
+        displayedValue = (values.reduce(0) { $0 + $1.value }) / Double(values.count)
+    }
     
     var movingAverageNumberOfDays: Int {
         sample.movingAverageInterval?.numberOfDays ?? DefaultNumberOfDaysForMovingAverage
@@ -403,9 +535,10 @@ extension WeightSampleForm.Model {
                 withAnimation {
                     switch newValue {
                     case false:
-                        self.sample.averagedValues = nil
+                        self.sample.movingAverageValues = nil
                     case true:
-                        self.sample.averagedValues = [:]
+                        self.sample.movingAverageValues = [:]
+                        self.calculateAverage()
                     }
                 }
             }
@@ -451,10 +584,10 @@ extension WeightSampleForm.Model {
     }
     
     var isUsingMovingAverage: Bool {
-        sample.averagedValues != nil
+        sample.movingAverageValues != nil
     }
     
     func movingAverageValue(at index: Int) -> Double? {
-        sample.averagedValues?[index]
+        sample.movingAverageValues?[index]
     }
 }

@@ -3,7 +3,7 @@ import Foundation
 public struct MaintenanceWeightSample: Hashable, Codable {
     var value: Double?
     var movingAverageInterval: HealthInterval?
-    var averagedValues: [Int: Double]?
+    var movingAverageValues: [Int: Double]?
 
     public init(
         movingAverageInterval: HealthInterval? = nil,
@@ -11,7 +11,7 @@ public struct MaintenanceWeightSample: Hashable, Codable {
         value: Double? = nil
     ) {
         self.movingAverageInterval = movingAverageInterval
-        self.averagedValues = averagedValues
+        self.movingAverageValues = averagedValues
         self.value = value
     }
 }
@@ -20,10 +20,10 @@ extension MaintenanceWeightSample {
     mutating func fill(using request: HealthKitQuantityRequest) async throws {
         if let sample = try await request.daySample(movingAverageInterval: self.movingAverageInterval)
         {
-            averagedValues = sample.movingAverageValues
+            movingAverageValues = sample.movingAverageValues
             value = sample.value
         } else {
-            averagedValues = nil
+            movingAverageValues = nil
             value = nil
         }
     }

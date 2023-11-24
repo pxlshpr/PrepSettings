@@ -3,30 +3,30 @@ import PrepShared
 
 public extension HealthModel {
     
-    var restingEnergyUnit: EnergyUnit {
-        get { health.energyUnit }
-        set { setEnergyUnit(newValue, whileEditing: .restingEnergy) }
-    }
-
-    var activeEnergyUnit: EnergyUnit {
-        get { health.energyUnit }
-        set { setEnergyUnit(newValue, whileEditing: .activeEnergy) }
-    }
-
-    var healthWeightUnit: BodyMassUnit {
-        get { health.bodyMassUnit }
-        set { setBodyMassUnit(newValue, whileEditing: .weight) }
-    }
-    
-    var healthHeightUnit: HeightUnit {
-        get { health.heightUnit }
-        set { setHeightUnit(newValue, whileEditing: .height) }
-    }
-    
-    var healthLeanBodyMassUnit: BodyMassUnit {
-        get { health.bodyMassUnit }
-        set { setBodyMassUnit(newValue, whileEditing: .leanBodyMass) }
-    }
+//    var restingEnergyUnit: EnergyUnit {
+//        get { health.energyUnit }
+//        set { setEnergyUnit(newValue, whileEditing: .restingEnergy) }
+//    }
+//
+//    var activeEnergyUnit: EnergyUnit {
+//        get { health.energyUnit }
+//        set { setEnergyUnit(newValue, whileEditing: .activeEnergy) }
+//    }
+//
+//    var healthWeightUnit: BodyMassUnit {
+//        get { health.bodyMassUnit }
+//        set { setBodyMassUnit(newValue, whileEditing: .weight) }
+//    }
+//    
+//    var healthHeightUnit: HeightUnit {
+//        get { health.heightUnit }
+//        set { setHeightUnit(newValue, whileEditing: .height) }
+//    }
+//    
+//    var healthLeanBodyMassUnit: BodyMassUnit {
+//        get { health.bodyMassUnit }
+//        set { setBodyMassUnit(newValue, whileEditing: .leanBodyMass) }
+//    }
     
     //MARK: Energy Burn
     var maintenanceEnergyIsAdaptive: Bool {
@@ -318,6 +318,12 @@ public extension HealthModel {
         set { health.pregnancyStatus = newValue }
     }
     
+    var fatPercentageValue: Double {
+        get { health.fatPercentage ?? 0 }
+        set { health.fatPercentage = newValue }
+    }
+
+    //MARK: Weight
     var weightValue: Double {
         get { health.weightQuantity?.value ?? 0 }
         set { health.weightQuantity = .init(value: newValue) }
@@ -340,14 +346,10 @@ public extension HealthModel {
         }
     }
     
+    //MARK: Lean Body Mass
     var leanBodyMassValue: Double {
         get { health.leanBodyMassQuantity?.value ?? 0 }
         set { health.leanBodyMassQuantity = .init(value: newValue) }
-    }
-
-    var fatPercentageValue: Double {
-        get { health.fatPercentage ?? 0 }
-        set { health.fatPercentage = newValue }
     }
 
     var leanBodyMassStonesComponent: Int {
@@ -366,6 +368,8 @@ public extension HealthModel {
             health.leanBodyMassQuantity = .init(value: value)
         }
     }
+    
+    //MARK: Height
     
     var heightValue: Double {
         get { health.heightQuantity?.value ?? 0 }

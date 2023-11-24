@@ -326,7 +326,7 @@ struct ActiveEnergySection: View {
         var calculatedValue: some View {
             CalculatedEnergyView(
                 valueBinding: $model.health.activeEnergyValue,
-                unitBinding: $model.activeEnergyUnit,
+                unitBinding: $model.health.energyUnit,
                 intervalBinding: $model.activeEnergyInterval,
                 date: model.health.date,
                 source: model.activeEnergySource
@@ -342,7 +342,7 @@ struct ActiveEnergySection: View {
             return HStack {
                 Spacer()
                 NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
-                MenuPicker<EnergyUnit>($model.activeEnergyUnit)
+                MenuPicker<EnergyUnit>($model.health.energyUnit)
             }
         }
         
@@ -457,7 +457,7 @@ struct RestingEnergySection: View {
         var calculatedValue: some View {
             CalculatedEnergyView(
                 valueBinding: $model.health.restingEnergyValue,
-                unitBinding: $model.restingEnergyUnit,
+                unitBinding: $model.health.energyUnit,
                 intervalBinding: $model.restingEnergyInterval,
                 date: model.health.date,
                 source: model.restingEnergySource
@@ -473,7 +473,7 @@ struct RestingEnergySection: View {
             return HStack {
                 Spacer()
                 NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
-                MenuPicker<EnergyUnit>($model.restingEnergyUnit)
+                MenuPicker<EnergyUnit>($model.health.energyUnit)
             }
         }
         

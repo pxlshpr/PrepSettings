@@ -5,19 +5,26 @@ import PrepShared
 public struct Health: Hashable, Codable {
     
     public var date: Date
+    
     public var energyUnit: EnergyUnit
     public var heightUnit: HeightUnit
     public var bodyMassUnit: BodyMassUnit
     
+    /// Stored in `kcal`
     public var maintenanceEnergy: MaintenanceEnergy?
     public var restingEnergy: RestingEnergy?
     public var activeEnergy: ActiveEnergy?
-    public var age: Age?
-    public var sex: BiologicalSex?
+    
+    /// Stored in `kg`
     public var weight: HealthQuantity?
-    public var height: HealthQuantity?
     public var leanBodyMass: LeanBodyMass?
     
+    /// Stored in `cm`
+    public var height: HealthQuantity?
+
+    public var age: Age?
+    public var sex: BiologicalSex?
+
     public var fatPercentage: Double?
 
     public var pregnancyStatus: PregnancyStatus?

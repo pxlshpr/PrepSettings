@@ -108,3 +108,14 @@ public extension Health {
         }
     }
 }
+public extension Health {
+    var doesNotHaveAnyHealthKitBasedTypesSet: Bool {
+        restingEnergy == nil
+        && activeEnergy == nil
+        && age == nil
+        && sex == nil
+        && weight == nil
+        && height == nil
+        && leanBodyMass == nil
+    }
+}

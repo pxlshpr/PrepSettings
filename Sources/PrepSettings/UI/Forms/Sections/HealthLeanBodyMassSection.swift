@@ -33,23 +33,26 @@ struct HealthLeanBodyMassSection: View {
             HealthKitErrorCell(type: .leanBodyMass)
         }
     }
-    
+
     var manualValue: some View {
-        ManualHealthField(
-            unitBinding: $model.healthLeanBodyMassUnit,
-            valueBinding: $model.leanBodyMassValue,
-            firstComponentBinding: $model.leanBodyMassStonesComponent,
-            secondComponentBinding: $model.leanBodyMassPoundsComponent
+        ManualBodyMassField(
+            unit: $model.health.bodyMassUnit,
+            valueInKg: $model.leanBodyMassValue
         )
     }
-
+    
     var calculatedValue: some View {
-        CalculatedHealthView(
-            quantityBinding: $model.health.leanBodyMassQuantity,
-            secondComponent: model.leanBodyMassPoundsComponent,
-            unitBinding: $model.healthLeanBodyMassUnit,
+        CalculatedBodyMassView(
+            unit: $model.health.bodyMassUnit,
+            quantityInKg: $model.health.leanBodyMassQuantity,
             source: model.leanBodyMassSource
         )
+//        CalculatedHealthView(
+//            quantityBinding: $model.health.leanBodyMassQuantity,
+//            secondComponent: model.leanBodyMassPoundsComponent,
+//            unitBinding: $model.health.bodyMassUnit,
+//            source: model.leanBodyMassSource
+//        )
     }
     
     var leanBodyMass: Health.LeanBodyMass? {

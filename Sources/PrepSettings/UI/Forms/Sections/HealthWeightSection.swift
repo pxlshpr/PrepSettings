@@ -50,22 +50,27 @@ struct HealthWeightSection: View {
             }
         }
     }
-    
+
     var healthValue: some View {
-        CalculatedHealthView(
-            quantityBinding: $model.health.weightQuantity,
-            secondComponent: model.weightPoundsComponent,
-            unitBinding: $model.healthWeightUnit,
+        CalculatedBodyMassView(
+            unit: $model.health.bodyMassUnit,
+            quantityInKg: $model.health.weightQuantity,
             source: model.weightSource
         )
     }
-
+     
     var manualValue: some View {
-        ManualHealthField(
-            unitBinding: $model.healthWeightUnit,
-            valueBinding: $model.weightValue,
-            firstComponentBinding: $model.weightStonesComponent,
-            secondComponentBinding: $model.weightPoundsComponent
+        ManualBodyMassField(
+            unit: $model.health.bodyMassUnit,
+            valueInKg: $model.weightValue
         )
+    }
+}
+
+#Preview {
+    NavigationStack {
+        Form {
+            HealthWeightSection(MockHealthModel)
+        }
     }
 }
