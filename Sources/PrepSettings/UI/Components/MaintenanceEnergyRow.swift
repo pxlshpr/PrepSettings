@@ -159,7 +159,7 @@ struct MaintenanceEnergyRow: View {
                 model.health.maintenanceEnergy?.error == nil
             {
                 value
-            } else if let value = model.health.estimatedMaintenance {
+            } else if let value = model.health.estimatedMaintenanceInDisplayedUnits {
                 value
             } else {
                 0

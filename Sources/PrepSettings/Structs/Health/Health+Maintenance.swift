@@ -100,10 +100,15 @@ extension Health.MaintenanceEnergy {
 
 public extension Health {
     /// Estimate of maintenance energy calculated by adding estimated active and resting energies
-    var estimatedMaintenance: Double? {
+    var estimatedMaintenanceInKcal: Double? {
         guard let activeEnergyValue, let restingEnergyValue else {
             return nil
         }
         return activeEnergyValue + restingEnergyValue
+    }
+    
+    var estimatedMaintenanceInDisplayedUnits: Double? {
+        guard let estimatedMaintenanceInKcal else { return nil }
+        return EnergyUnit.kcal.convert(estimatedMaintenanceInKcal, to: energyUnit)
     }
 }

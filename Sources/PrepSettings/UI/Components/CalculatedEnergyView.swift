@@ -1,26 +1,52 @@
 import SwiftUI
 import PrepShared
 
-struct CalculatedEnergyView<Unit: HealthUnit, S: GenericSource>: View {
+struct CalculatedEnergyView<S: GenericSource>: View {
     
-    let valueBinding: Binding<Double?>
+    let valueInKcalBinding: Binding<Double?>
+    let unitBinding: Binding<EnergyUnit>
+    
     let intervalBinding: Binding<HealthInterval?>
     let date: Date
-    let unitBinding: Binding<Unit>
     let source: S
 
     init(
         valueBinding: Binding<Double?>,
-        unitBinding: Binding<Unit>,
+        unitBinding: Binding<EnergyUnit>,
         intervalBinding: Binding<HealthInterval?>,
         date: Date,
         source: S
     ) {
-        self.valueBinding = valueBinding
+        self.valueInKcalBinding = valueBinding
         self.unitBinding = unitBinding
         self.intervalBinding = intervalBinding
         self.date = date
         self.source = source
+    }
+    
+    var valueInKcal: Double? {
+        valueInKcalBinding.wrappedValue
+    }
+    
+    var unit: EnergyUnit {
+        unitBinding.wrappedValue
+    }
+
+    var valueBinding: Binding<Double?> {
+        Binding<Double?>(
+            get: {
+                guard let valueInKcal else { return nil }
+                return EnergyUnit.kcal.convert(valueInKcal, to: unit)
+            },
+            set: { newValue in
+                guard let newValue else {
+                    valueInKcalBinding.wrappedValue = nil
+                    return
+                }
+                let valueInKcal = unit.convert(newValue, to: .kcal)
+                valueInKcalBinding.wrappedValue = valueInKcal
+            }
+        )
     }
     
     var body: some View {
@@ -32,7 +58,7 @@ struct CalculatedEnergyView<Unit: HealthUnit, S: GenericSource>: View {
                 HStack(spacing: 2) {
                     HealthKitValueView(valueBinding, source, showPrecision: false)
                     if value != nil {
-                        MenuPicker<Unit>(unitBinding)
+                        MenuPicker(unitBinding)
                     }
                 }
             }

@@ -51,7 +51,8 @@ struct HealthTopRow: View {
     var detailContent: some View {
         switch type {
         case .maintenanceEnergy:
-            maintenanceContent
+            EmptyView()
+//            maintenanceContent
         case .restingEnergy:
             MenuPicker($model.restingEnergySource)
         case .activeEnergy:
@@ -75,40 +76,40 @@ struct HealthTopRow: View {
         }
     }
     
-    var maintenanceContent: some View {
-        func emptyContent(_ message: String) -> some View {
-            Text(message)
-                .foregroundStyle(.tertiary)
-        }
-        
-        func valueContent(_ value: Double) -> some View {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text(value.formattedEnergy)
-                    .animation(.default, value: value)
-                    .contentTransition(.numericText(value: value))
-                    .font(.system(.body, design: .monospaced, weight: .bold))
-                    .foregroundStyle(.secondary)
-                Text(model.health.energyUnit.abbreviation)
-                    .foregroundStyle(.secondary)
-                    .font(.system(.body, design: .default, weight: .semibold))
-            }
-        }
-        
-        var loadingContent: some View {
-            ProgressView()
-                .fixedSize(horizontal: true, vertical: false)
-        }
-        
-        return Group {
-            if model.isSettingMaintenanceFromHealthKit {
-                loadingContent
-            } else if let message = model.health.tdeeRequiredString {
-                emptyContent(message)
-            } else if let value = model.health.estimatedMaintenance {
-                valueContent(value)
-            } else {
-                EmptyView()
-            }
-        }
-    }
+//    var maintenanceContent: some View {
+//        func emptyContent(_ message: String) -> some View {
+//            Text(message)
+//                .foregroundStyle(.tertiary)
+//        }
+//        
+//        func valueContent(_ value: Double) -> some View {
+//            HStack(alignment: .firstTextBaseline, spacing: 4) {
+//                Text(value.formattedEnergy)
+//                    .animation(.default, value: value)
+//                    .contentTransition(.numericText(value: value))
+//                    .font(.system(.body, design: .monospaced, weight: .bold))
+//                    .foregroundStyle(.secondary)
+//                Text(model.health.energyUnit.abbreviation)
+//                    .foregroundStyle(.secondary)
+//                    .font(.system(.body, design: .default, weight: .semibold))
+//            }
+//        }
+//        
+//        var loadingContent: some View {
+//            ProgressView()
+//                .fixedSize(horizontal: true, vertical: false)
+//        }
+//        
+//        return Group {
+//            if model.isSettingMaintenanceFromHealthKit {
+//                loadingContent
+//            } else if let message = model.health.tdeeRequiredString {
+//                emptyContent(message)
+//            } else if let value = model.health.estimatedMaintenance {
+//                valueContent(value)
+//            } else {
+//                EmptyView()
+//            }
+//        }
+//    }
 }

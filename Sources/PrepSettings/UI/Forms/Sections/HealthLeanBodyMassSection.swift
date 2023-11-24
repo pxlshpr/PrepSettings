@@ -47,12 +47,6 @@ struct HealthLeanBodyMassSection: View {
             quantityInKg: $model.health.leanBodyMassQuantity,
             source: model.leanBodyMassSource
         )
-//        CalculatedHealthView(
-//            quantityBinding: $model.health.leanBodyMassQuantity,
-//            secondComponent: model.leanBodyMassPoundsComponent,
-//            unitBinding: $model.health.bodyMassUnit,
-//            source: model.leanBodyMassSource
-//        )
     }
     
     var leanBodyMass: Health.LeanBodyMass? {

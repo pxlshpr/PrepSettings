@@ -105,13 +105,16 @@ public extension HealthModel {
     func healthKitValue(for type: HealthType) async throws -> HealthKitValue? {
         switch type {
         case .weight: return .weight(
-            try await HealthStore.weight(in: health.bodyMassUnit, for: health.date)
+            try await HealthStore.weight(in: .kg, for: health.date)
+//            try await HealthStore.weight(in: health.bodyMassUnit, for: health.date)
         )
         case .height: return .height(
-            try await HealthStore.height(in: health.heightUnit, for: health.date)
+            try await HealthStore.height(in: .cm, for: health.date)
+//            try await HealthStore.height(in: health.heightUnit, for: health.date)
         )
         case .leanBodyMass: return .leanBodyMass(
-            try await HealthStore.leanBodyMass(in: health.bodyMassUnit, for: health.date)
+            try await HealthStore.leanBodyMass(in: .kg, for: health.date)
+//            try await HealthStore.leanBodyMass(in: health.bodyMassUnit, for: health.date)
         )
         case .sex: return .sex(
             try await HealthStore.biologicalSex()
@@ -133,7 +136,8 @@ public extension HealthModel {
                 try await HealthStore.restingEnergy(
                     for: interval,
                     on: health.date,
-                    in: health.energyUnit
+                    in: .kcal
+//                    in: health.energyUnit
             )
         )
         case .activeEnergy:
@@ -145,7 +149,8 @@ public extension HealthModel {
                 try await HealthStore.activeEnergy(
                     for: interval,
                     on: health.date,
-                    in: health.energyUnit
+                    in: .kcal
+//                    in: health.energyUnit
             )
         )
 

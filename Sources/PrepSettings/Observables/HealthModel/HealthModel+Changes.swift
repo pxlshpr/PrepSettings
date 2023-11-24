@@ -106,7 +106,7 @@ extension Health {
         case .leanBodyMass:         leanBodyMass?.quantity == nil
         case .activeEnergy:         activeEnergy?.value == nil
         case .restingEnergy:        restingEnergy?.value == nil
-        case .maintenanceEnergy:    estimatedMaintenance == nil
+        case .maintenanceEnergy:    estimatedMaintenanceInKcal == nil
         case .pregnancyStatus:      pregnancyStatus == nil
         case .isSmoker:             isSmoker == nil
         case .fatPercentage:        fatPercentage == nil

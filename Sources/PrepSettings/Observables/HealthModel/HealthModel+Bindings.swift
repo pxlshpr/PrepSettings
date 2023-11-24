@@ -323,74 +323,19 @@ public extension HealthModel {
         set { health.fatPercentage = newValue }
     }
 
-    //MARK: Weight
     var weightValue: Double {
         get { health.weightQuantity?.value ?? 0 }
         set { health.weightQuantity = .init(value: newValue) }
     }
     
-    var weightStonesComponent: Int {
-        get { Int(weightValue.whole) }
-        set {
-            let value = Double(newValue) + (weightPoundsComponent / PoundsPerStone)
-            health.weightQuantity = .init(value: value)
-        }
-    }
-    
-    var weightPoundsComponent: Double {
-        get { weightValue.fraction * PoundsPerStone }
-        set {
-            let newValue = min(newValue, PoundsPerStone-1)
-            let value = Double(weightStonesComponent) + (newValue / PoundsPerStone)
-            health.weightQuantity = .init(value: value)
-        }
-    }
-    
-    //MARK: Lean Body Mass
     var leanBodyMassValue: Double {
         get { health.leanBodyMassQuantity?.value ?? 0 }
         set { health.leanBodyMassQuantity = .init(value: newValue) }
     }
-
-    var leanBodyMassStonesComponent: Int {
-        get { Int(leanBodyMassValue.whole) }
-        set {
-            let value = Double(newValue) + (leanBodyMassPoundsComponent / PoundsPerStone)
-            health.leanBodyMassQuantity = .init(value: value)
-        }
-    }
-    
-    var leanBodyMassPoundsComponent: Double {
-        get { leanBodyMassValue.fraction * PoundsPerStone }
-        set {
-            let newValue = min(newValue, PoundsPerStone-1)
-            let value = Double(leanBodyMassStonesComponent) + (newValue / PoundsPerStone)
-            health.leanBodyMassQuantity = .init(value: value)
-        }
-    }
-    
-    //MARK: Height
     
     var heightValue: Double {
         get { health.heightQuantity?.value ?? 0 }
         set { health.heightQuantity = .init(value: newValue) }
-    }
-    
-    var heightFeetComponent: Int {
-        get { Int(heightValue.whole) }
-        set {
-            let value = Double(newValue) + (heightCentimetersComponent / InchesPerFoot)
-            health.heightQuantity = .init(value: value)
-        }
-    }
-    
-    var heightCentimetersComponent: Double {
-        get { heightValue.fraction * InchesPerFoot }
-        set {
-            let newValue = min(newValue, InchesPerFoot-1)
-            let value = Double(heightFeetComponent) + (newValue / InchesPerFoot)
-            health.heightQuantity = .init(value: value)
-        }
     }
 }
 

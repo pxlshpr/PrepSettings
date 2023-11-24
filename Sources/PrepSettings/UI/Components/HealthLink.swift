@@ -17,7 +17,7 @@ public struct HealthLink: View {
         NavigationLink {
             Group {
                 switch type {
-                case .maintenanceEnergy:    TDEEForm(model)
+                case .maintenanceEnergy:    MaintenanceForm(model)
                 default:                    HealthForm(model, [type])
                 }
             }

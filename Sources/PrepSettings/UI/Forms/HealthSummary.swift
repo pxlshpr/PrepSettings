@@ -141,7 +141,7 @@ public struct HealthSummary: View {
                 HealthTopRow(type: .isSmoker, model: model)
             case .maintenanceEnergy:
                 Group {
-                    TDEEFormSections(model)
+                    MaintenanceFormSections(model)
 //                    Divider()
 //                    Color.clear
 //                        .listRowBackground(EmptyView())
