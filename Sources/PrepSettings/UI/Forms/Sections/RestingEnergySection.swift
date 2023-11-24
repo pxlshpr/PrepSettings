@@ -4,7 +4,8 @@ import PrepShared
 struct RestingEnergySection: View {
     
     @Bindable var model: HealthModel
-    
+    @Bindable var settingsStore: SettingsStore
+
     var body: some View {
         Section(footer: footer) {
             HealthTopRow(type: .restingEnergy, model: model)
@@ -59,11 +60,13 @@ struct RestingEnergySection: View {
             
             return NavigationLink {
                 HealthForm(model)
+                    .environment(settingsStore)
             } label: {
                 HStack(alignment: .firstTextBaseline) {
                     Text(title)
                     Spacer()
-                    model.health.restingEnergyHealthLinkText
+                    HealthTexts(model.health, settingsStore).restingEnergyHealthLinkText
+//                    model.health.restingEnergyHealthLinkText
                 }
             }
         }
@@ -87,7 +90,8 @@ struct RestingEnergySection: View {
         var calculatedValue: some View {
             CalculatedEnergyView(
                 valueBinding: $model.health.restingEnergyValue,
-                unitBinding: $model.health.energyUnit,
+//                unitBinding: $model.health.energyUnit,
+                unitBinding: $settingsStore.energyUnit,
                 intervalBinding: $model.restingEnergyInterval,
                 date: model.health.date,
                 source: model.restingEnergySource
@@ -103,7 +107,8 @@ struct RestingEnergySection: View {
             return HStack {
                 Spacer()
                 NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
-                MenuPicker<EnergyUnit>($model.health.energyUnit)
+//                MenuPicker<EnergyUnit>($model.health.energyUnit)
+                MenuPicker<EnergyUnit>($settingsStore.energyUnit)
             }
         }
         

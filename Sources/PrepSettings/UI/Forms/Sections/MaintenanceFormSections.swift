@@ -2,6 +2,9 @@ import SwiftUI
 import PrepShared
 
 public struct MaintenanceFormSections: View {
+    
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+
     @Bindable var model: HealthModel
 
     public init(_ model: HealthModel) {
@@ -30,11 +33,12 @@ public struct MaintenanceFormSections: View {
         return Section(footer: footer) {
             NavigationLink {
                 MaintenanceEstimateForm(model)
+                    .environment(settingsStore)
             } label: {
                 HStack {
                     Text("Estimated")
                     Spacer()
-                    MaintenanceEstimateText(model)
+                    MaintenanceEstimateText(model, settingsStore)
                 }
             }
         }
@@ -53,7 +57,7 @@ public struct MaintenanceFormSections: View {
                     .contentTransition(.numericText(value: value))
                     .font(.system(.body, design: .monospaced, weight: .bold))
                     .foregroundStyle(.secondary)
-                Text(health.energyUnit.abbreviation)
+                Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(.secondary)
                     .font(.system(.body, design: .default, weight: .semibold))
             }
@@ -81,6 +85,7 @@ public struct MaintenanceFormSections: View {
         return Group {
             Section(footer: footer) {
                 MaintenanceEnergyRow(model)
+                    .environment(settingsStore)
             }
             Section(footer: adaptiveFooter) {
                 adaptiveRow

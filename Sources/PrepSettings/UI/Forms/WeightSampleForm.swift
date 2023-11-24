@@ -8,7 +8,8 @@ struct WeightMovingAverageComponentForm: View {
     
     @State var model: Model
     @Bindable var healthModel: HealthModel
-    
+    @Bindable var settingsStore: SettingsStore
+
     @State var requiresSaveConfirmation = false
     @State var showingSaveConfirmation = false
     
@@ -18,6 +19,7 @@ struct WeightMovingAverageComponentForm: View {
         value: Double?,
         date: Date,
         healthModel: HealthModel,
+        settingsStore: SettingsStore,
         didSaveWeight: @escaping DidSaveWeightHandler
     ) {
         //TODO: Create a Model
@@ -37,9 +39,11 @@ struct WeightMovingAverageComponentForm: View {
         _model = State(initialValue: Model(
             value: value,
             date: date,
-            healthModel: healthModel
+            healthModel: healthModel,
+            settingsStore: settingsStore
         ))
         self.healthModel = healthModel
+        self.settingsStore = settingsStore
         self.didSaveWeight = didSaveWeight
     }
     
@@ -53,7 +57,7 @@ struct WeightMovingAverageComponentForm: View {
         .toolbar { toolbarContent }
         .task(loadRequiresSaveConfirmation)
         .confirmationDialog("", isPresented: $showingSaveConfirmation, actions: saveConfirmationActions, message: saveConfirmationMessage)
-        .onChange(of: healthModel.health.bodyMassUnit, model.bodyMassUnitChanged)
+        .onChange(of: settingsStore.bodyMassUnit, model.bodyMassUnitChanged)
     }
     
     func saveConfirmationActions() -> some View {
@@ -121,7 +125,7 @@ struct WeightMovingAverageComponentForm: View {
                     }
                 } else {
                     ManualHealthField(
-                        unitBinding: $healthModel.health.bodyMassUnit,
+                        unitBinding: $settingsStore.bodyMassUnit,
                         valueBinding: $model.displayedValue,
                         firstComponentBinding: $model.weightStonesComponent,
                         secondComponentBinding: $model.weightPoundsComponent
@@ -153,7 +157,8 @@ extension WeightMovingAverageComponentForm {
         let initialValue: Double?
         let initialUnit: BodyMassUnit
         let healthModel: HealthModel
-        
+        let settingsStore: SettingsStore
+
         var value: Double?
         var displayedValue: Double {
             didSet {
@@ -162,10 +167,11 @@ extension WeightMovingAverageComponentForm {
         }
         var date: Date
         
-        init(value: Double?, date: Date, healthModel: HealthModel) {
+        init(value: Double?, date: Date, healthModel: HealthModel, settingsStore: SettingsStore) {
             self.initialValue = value
-            self.initialUnit = healthModel.health.bodyMassUnit
+            self.initialUnit = settingsStore.bodyMassUnit
             self.healthModel = healthModel
+            self.settingsStore = settingsStore
             self.value = value
             self.displayedValue = value ?? 0
             self.date = date
@@ -177,7 +183,7 @@ extension WeightMovingAverageComponentForm.Model {
     
     var isNotDirty: Bool {
         value == initialValue
-        && initialUnit == healthModel.health.bodyMassUnit
+        && initialUnit == settingsStore.bodyMassUnit
     }
     
     var isSaveDisabled: Bool {
@@ -217,7 +223,8 @@ struct WeightSampleForm: View {
     
     @State var model: Model
     @Bindable var healthModel: HealthModel
-    
+    @Bindable var settingsStore: SettingsStore
+
     let didSaveWeight: DidSaveWeightHandler
 
     init(
@@ -225,11 +232,13 @@ struct WeightSampleForm: View {
         date: Date,
         isPrevious: Bool,
         healthModel: HealthModel,
+        settingsStore: SettingsStore,
         didSave: @escaping DidSaveWeightHandler
     ) {
         _model = State(initialValue: Model(sample: sample, date: date, isPrevious: isPrevious))
         self.didSaveWeight = didSave
         self.healthModel = healthModel
+        self.settingsStore = settingsStore
     }
     
     var body: some View {
@@ -242,7 +251,7 @@ struct WeightSampleForm: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarContent }
-        .onChange(of: healthModel.health.bodyMassUnit, model.bodyMassUnitChanged)
+        .onChange(of: settingsStore.bodyMassUnit, model.bodyMassUnitChanged)
     }
     
     var title: String {
@@ -275,7 +284,7 @@ struct WeightSampleForm: View {
                         CalculatedHealthView(
                             quantityBinding: .constant(Quantity(value: value)),
                             secondComponent: 0,
-                            unitBinding: $healthModel.health.bodyMassUnit,
+                            unitBinding: $settingsStore.bodyMassUnit,
                             source: HealthSource.userEntered
                         )
                     } else {
@@ -284,7 +293,7 @@ struct WeightSampleForm: View {
                     }
                 } else if model.value != nil {
                     ManualHealthField(
-                        unitBinding: $healthModel.health.bodyMassUnit,
+                        unitBinding: $settingsStore.bodyMassUnit,
                         valueBinding: $model.displayedValue,
                         firstComponentBinding: $model.weightStonesComponent,
                         secondComponentBinding: $model.weightPoundsComponent
@@ -351,7 +360,7 @@ struct WeightSampleForm: View {
                         .animation(.default, value: value)
                         .contentTransition(.numericText(value: value))
                         .foregroundStyle(Color(.secondaryLabel))
-                    Text(healthModel.health.bodyMassUnit.abbreviation)
+                    Text(settingsStore.bodyMassUnit.abbreviation)
                         .foregroundStyle(.secondary)
                 } else {
                     Text("Not set")
@@ -392,6 +401,7 @@ struct WeightSampleForm: View {
                     value: model.movingAverageValue(at: index),
                     date: date,
                     healthModel: healthModel,
+                    settingsStore: settingsStore,
                     didSaveWeight: didSaveWeight
                 )
                 .environment(healthModel)
@@ -434,6 +444,7 @@ struct WeightSampleForm: View {
                     date: Date.now,
                     isPrevious: true,
                     healthModel: MockHealthModel,
+                    settingsStore: SettingsStore.shared,
                     didSave: { value in
                         
                     }

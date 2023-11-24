@@ -3,10 +3,12 @@ import PrepShared
 
 struct HealthWeightSection: View {
     
+    @Bindable var settingsStore: SettingsStore
     @Bindable var model: HealthModel
     
-    init(_ model: HealthModel) {
+    init(_ model: HealthModel, _ settingsStore: SettingsStore) {
         self.model = model
+        self.settingsStore = settingsStore
     }
     
     var body: some View {
@@ -53,7 +55,7 @@ struct HealthWeightSection: View {
 
     var healthValue: some View {
         CalculatedBodyMassView(
-            unit: $model.health.bodyMassUnit,
+            unit: $settingsStore.bodyMassUnit,
             quantityInKg: $model.health.weightQuantity,
             source: model.weightSource
         )
@@ -61,7 +63,7 @@ struct HealthWeightSection: View {
      
     var manualValue: some View {
         ManualBodyMassField(
-            unit: $model.health.bodyMassUnit,
+            unit: $settingsStore.bodyMassUnit,
             valueInKg: $model.weightValue
         )
     }
@@ -70,7 +72,7 @@ struct HealthWeightSection: View {
 #Preview {
     NavigationStack {
         Form {
-            HealthWeightSection(MockHealthModel)
+            HealthWeightSection(MockHealthModel, SettingsStore.shared)
         }
     }
 }

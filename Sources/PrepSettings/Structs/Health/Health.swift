@@ -6,9 +6,9 @@ public struct Health: Hashable, Codable {
     
     public var date: Date
     
-    public var energyUnit: EnergyUnit
-    public var heightUnit: HeightUnit
-    public var bodyMassUnit: BodyMassUnit
+//    public var energyUnit: EnergyUnit
+//    public var heightUnit: HeightUnit
+//    public var bodyMassUnit: BodyMassUnit
     
     /// Stored in `kcal`
     public var maintenanceEnergy: MaintenanceEnergy?
@@ -34,9 +34,9 @@ public struct Health: Hashable, Codable {
     
     public init(
         date: Date = Date.now,
-        energyUnit: EnergyUnit = .default,
-        heightUnit: HeightUnit = .default,
-        bodyMassUnit: BodyMassUnit = .default,
+//        energyUnit: EnergyUnit = .default,
+//        heightUnit: HeightUnit = .default,
+//        bodyMassUnit: BodyMassUnit = .default,
         maintenanceEnergy: MaintenanceEnergy? = nil,
         restingEnergy: RestingEnergy? = nil,
         activeEnergy: ActiveEnergy? = nil,
@@ -51,9 +51,9 @@ public struct Health: Hashable, Codable {
         updatedAt: Date = Date.now
     ) {
         self.date = date
-        self.energyUnit = energyUnit
-        self.heightUnit = heightUnit
-        self.bodyMassUnit = bodyMassUnit
+//        self.energyUnit = energyUnit
+//        self.heightUnit = heightUnit
+//        self.bodyMassUnit = bodyMassUnit
         self.maintenanceEnergy = maintenanceEnergy
         self.restingEnergy = restingEnergy
         self.activeEnergy = activeEnergy
@@ -73,9 +73,9 @@ public extension Health {
     /// Checks that everything except `date` and `updatedAt` match
     func matches(_ other: Health) -> Bool {
         date == other.date
-        && energyUnit == other.energyUnit
-        && heightUnit == other.heightUnit
-        && bodyMassUnit == other.bodyMassUnit
+//        && energyUnit == other.energyUnit
+//        && heightUnit == other.heightUnit
+//        && bodyMassUnit == other.bodyMassUnit
         && maintenanceEnergy == other.maintenanceEnergy
         && restingEnergy == other.restingEnergy
         && activeEnergy == other.activeEnergy
@@ -95,19 +95,16 @@ public extension Health {
 }
 
 public extension Health {
-    var weightInKg: Double? {
-        guard let value = weight?.quantity?.value else { return nil }
-        return bodyMassUnit.convert(value, to: .kg)
+    var weightValue: Double? {
+        weight?.quantity?.value
     }
 
-    var lbmInKg: Double? {
-        guard let value = leanBodyMass?.quantity?.value else { return nil }
-        return bodyMassUnit.convert(value, to: .kg)
+    var leanBodyMassValue: Double? {
+        leanBodyMass?.quantity?.value
     }
 
-    var heightInCm: Double? {
-        guard let value = height?.quantity?.value else { return nil }
-        return heightUnit.convert(value, to: .cm)
+    var heightValue: Double? {
+        height?.quantity?.value
     }
 }
 

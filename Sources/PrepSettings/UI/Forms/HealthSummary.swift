@@ -4,6 +4,8 @@ import TipKit
 
 public struct HealthSummary: View {
     
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+
     @Bindable var model: HealthModel
     
     public init(model: HealthModel) {
@@ -128,13 +130,13 @@ public struct HealthSummary: View {
             case .age:
                 HealthAgeSection(model)
             case .weight:
-                HealthWeightSection(model)
+                HealthWeightSection(model, settingsStore)
             case .height:
-                HealthHeightSection(model)
+                HealthHeightSection(model, settingsStore)
             case .sex:
                 HealthSexSection(model)
             case .leanBodyMass:
-                HealthLeanBodyMassSection(model)
+                HealthLeanBodyMassSection(model, settingsStore)
             case .pregnancyStatus:
                 HealthTopRow(type: .pregnancyStatus, model: model)
             case .isSmoker:
@@ -142,15 +144,17 @@ public struct HealthSummary: View {
             case .maintenanceEnergy:
                 Group {
                     MaintenanceFormSections(model)
+                        .environment(settingsStore)
 //                    Divider()
 //                    Color.clear
 //                        .listRowBackground(EmptyView())
 //                        .listSectionSpacing(0)
                 }
             default:
-                Section {
-                    link(type)
-                }
+                EmptyView()
+//                Section {
+//                    link(type)
+//                }
             }
         }
         
@@ -190,14 +194,16 @@ public struct HealthSummary: View {
         }
     }
     
-    func link(_ type: HealthType) -> some View {
-        HealthLink(type: type)
-            .environment(model)
-    }
+//    func link(_ type: HealthType) -> some View {
+//        HealthLink(type: type)
+//            .environment(model)
+//            .environment(settingsStore)
+//    }
 }
 
 #Preview {
     NavigationStack {
         HealthSummary(model: MockHealthModel)
+            .environment(SettingsStore.shared)
     }
 }

@@ -2,6 +2,9 @@ import SwiftUI
 import PrepShared
 
 public struct MaintenanceEstimateForm: View {
+    
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+    
     @Bindable var model: HealthModel
     
     public init(_ model: HealthModel) {
@@ -14,11 +17,17 @@ public struct MaintenanceEstimateForm: View {
 //                .listSectionSpacing(0)
             symbol("=")
 //                .listSectionSpacing(0)
-            RestingEnergySection(model: model)
+            RestingEnergySection(
+                model: model,
+                settingsStore: settingsStore
+            )
 //                .listSectionSpacing(0)
             symbol("+")
 //                .listSectionSpacing(0)
-            ActiveEnergySection(model: model)
+            ActiveEnergySection(
+                model: model,
+                settingsStore: settingsStore
+            )
 //                .listSectionSpacing(0)
         }
 //        .navigationTitle("Estimated Energy Expenditure")
@@ -39,7 +48,7 @@ public struct MaintenanceEstimateForm: View {
             HStack {
                 Text("Estimated")
                 Spacer()
-                MaintenanceEstimateText(model)
+                MaintenanceEstimateText(model, settingsStore)
             }
         }
     }

@@ -2,14 +2,17 @@ import SwiftUI
 import PrepShared
 
 struct MaintenanceEstimateText: View {
+
     @Bindable var model: HealthModel
-    
-    init(_ model: HealthModel) {
+    @Bindable var settingsStore: SettingsStore
+
+    init(_ model: HealthModel, _ settingsStore: SettingsStore) {
         self.model = model
+        self.settingsStore = settingsStore
     }
     
     var value: Double? {
-        model.health.estimatedMaintenanceInDisplayedUnits
+        model.health.estimatedMaintenance(in: settingsStore.energyUnit)
     }
 
     @ViewBuilder
@@ -24,7 +27,7 @@ struct MaintenanceEstimateText: View {
                     .contentTransition(.numericText(value: value))
                     .font(.system(.body, design: .monospaced, weight: .bold))
                     .foregroundStyle(.secondary)
-                Text(model.health.energyUnit.abbreviation)
+                Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(.secondary)
                     .font(.system(.body, design: .default, weight: .semibold))
             }

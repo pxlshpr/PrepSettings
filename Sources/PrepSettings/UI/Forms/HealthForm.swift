@@ -3,6 +3,7 @@ import PrepShared
 
 public struct HealthForm: View {
     
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
     @Bindable var model: HealthModel
 
     let types: [HealthType]
@@ -37,11 +38,11 @@ public struct HealthForm: View {
         case .age:
             HealthAgeSection(model)
         case .weight:
-            HealthWeightSection(model)
+            HealthWeightSection(model, settingsStore)
         case .leanBodyMass:
-            HealthLeanBodyMassSection(model)
+            HealthLeanBodyMassSection(model, settingsStore)
         case .height:
-            HealthHeightSection(model)
+            HealthHeightSection(model, settingsStore)
         default:
             EmptyView()
         }

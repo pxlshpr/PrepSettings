@@ -38,11 +38,11 @@ extension Health {
         case .sex:
             sex = .init(source: .userEntered, value: .female)
         case .weight:
-            let initial = BodyMassUnit.kg.convert(DefaultWeightInKg, to: bodyMassUnit)
-            weight = .init(source: .userEntered, quantity: .init(value: initial))
+//            let initial = BodyMassUnit.kg.convert(DefaultWeightInKg, to: bodyMassUnit)
+            weight = .init(source: .userEntered, quantity: .init(value: DefaultWeightInKg))
         case .height:
-            let initial = HeightUnit.cm.convert(DefaultHeightInCm, to: heightUnit)
-            height = .init(source: .userEntered, quantity: .init(value: initial))
+//            let initial = HeightUnit.cm.convert(DefaultHeightInCm, to: heightUnit)
+            height = .init(source: .userEntered, quantity: .init(value: DefaultHeightInCm))
         case.leanBodyMass:
             leanBodyMassSource = .equation
         case .pregnancyStatus:
@@ -104,7 +104,7 @@ extension Health {
         guard let value else { return nil}
         
         return if let unit {
-            bodyMassUnit.convert(value, to: unit)
+            BodyMassUnit.kg.convert(value, to: unit)
         } else {
             value
         }

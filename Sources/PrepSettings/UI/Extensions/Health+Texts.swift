@@ -1,20 +1,45 @@
 import SwiftUI
 import PrepShared
 
-public extension Health {
-
+struct HealthTexts {
+    
+    let health: Health
+    let energyUnit: EnergyUnit
+    let heightUnit: HeightUnit
+    let bodyMassUnit: BodyMassUnit
+    
+    init(_ health: Health, _ settingsStore: SettingsStore) {
+        self.health = health
+        self.energyUnit = settingsStore.energyUnit
+        self.heightUnit = settingsStore.heightUnit
+        self.bodyMassUnit = settingsStore.bodyMassUnit
+    }
+    
+    var maintenanceEnergy: Health.MaintenanceEnergy? { health.maintenanceEnergy }
+    var restingEnergy: Health.RestingEnergy? { health.restingEnergy }
+    var activeEnergy: Health.ActiveEnergy? { health.activeEnergy }
+    var weight: HealthQuantity? { health.weight }
+    var leanBodyMass: Health.LeanBodyMass? { health.leanBodyMass }
+    var height: HealthQuantity? { health.height }
+    var age: Health.Age? { health.age }
+    var sex: Health.BiologicalSex? { health.sex }
+    var fatPercentage: Double? { health.fatPercentage }
+    var pregnancyStatus: PregnancyStatus? { health.pregnancyStatus }
+    var isSmoker: Bool? { health.isSmoker }
+    var updatedAt: Date { health.updatedAt }
+    
     var restingEnergyHealthLinkText: some View {
-        healthLinkText(for: restingEnergyEquation.params)
+        healthLinkText(for: health.restingEnergyEquation.params)
     }
 
     var leanBodyMassHealthLinkText: some View {
-        healthLinkText(for: leanBodyMassSource.params)
+        healthLinkText(for: health.leanBodyMassSource.params)
     }
 
     func healthLinkText(for types: [HealthType]) -> some View {
         @ViewBuilder
         func view(for type: HealthType) -> some View {
-            if haveValue(for: type) {
+            if health.haveValue(for: type) {
                 textView(for: type)
                     .foregroundStyle(.secondary)
             } else if types.count == 1 {
@@ -52,7 +77,7 @@ public extension Health {
     
     @ViewBuilder
     var sexText: some View {
-        if let sexValue, sexValue != .other {
+        if let sexValue = health.sexValue, sexValue != .other {
             Text(sexValue.name)
         }
     }
@@ -120,9 +145,9 @@ public extension Health {
     
     @ViewBuilder
     var maintenanceText: some View {
-        if let estimatedMaintenanceInDisplayedUnits {
+        if let value = health.estimatedMaintenance(in: energyUnit) {
             HStack(spacing: 3) {
-                Text(estimatedMaintenanceInDisplayedUnits.formattedEnergy)
+                Text(value.formattedEnergy)
                     .font(HealthFont)
                 Text(energyUnit.abbreviation)
             }
@@ -132,7 +157,7 @@ public extension Health {
 
     @ViewBuilder
     var weightText: some View {
-        if let value = weightQuantity?.value {
+        if let value = health.weightQuantity?.value {
             HealthTextView(
                 unit: bodyMassUnit,
                 value: value,
@@ -143,7 +168,7 @@ public extension Health {
     
     @ViewBuilder
     var leanBodyMassText: some View {
-        if let value = leanBodyMassQuantity?.value {
+        if let value = health.leanBodyMassQuantity?.value {
             HealthTextView(
                 unit: bodyMassUnit,
                 value: value,
@@ -154,7 +179,7 @@ public extension Health {
     
     @ViewBuilder
     var heightText: some View {
-        if let value = heightQuantity?.value {
+        if let value = health.heightQuantity?.value {
             HealthTextView(
                 unit: heightUnit,
                 value: value,

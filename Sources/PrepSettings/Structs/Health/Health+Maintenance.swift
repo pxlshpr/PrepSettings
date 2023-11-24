@@ -28,7 +28,8 @@ extension Health {
         var weightChange = weightChange
         
         func request(for date: Date) -> HealthKitQuantityRequest {
-            HealthKitQuantityRequest(.weight, bodyMassUnit.healthKitUnit, date)
+//            HealthKitQuantityRequest(.weight, bodyMassUnit.healthKitUnit, date)
+            HealthKitQuantityRequest(.weight, BodyMassUnit.kg.healthKitUnit, date)
         }
         
         switch weightChange.current.type {
@@ -58,7 +59,8 @@ extension Health {
             /// If we do, grab the values that coincide with these dates
             let values = try await HealthStore.dailyDietaryEnergyValues(
                 dateRange: dateRange,
-                energyUnit: energyUnit
+//                energyUnit: energyUnit
+                energyUnit: .kcal
             )
             for i in values.keys {
                 guard i < dietaryEnergy.samples.count else { continue }
@@ -107,8 +109,8 @@ public extension Health {
         return activeEnergyValue + restingEnergyValue
     }
     
-    var estimatedMaintenanceInDisplayedUnits: Double? {
+    func estimatedMaintenance(in unit: EnergyUnit) -> Double? {
         guard let estimatedMaintenanceInKcal else { return nil }
-        return EnergyUnit.kcal.convert(estimatedMaintenanceInKcal, to: energyUnit)
+        return EnergyUnit.kcal.convert(estimatedMaintenanceInKcal, to: unit)
     }
 }

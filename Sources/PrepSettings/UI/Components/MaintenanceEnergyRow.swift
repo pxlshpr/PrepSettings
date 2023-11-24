@@ -5,12 +5,13 @@ import PrepShared
 /// [x] Consider always having text placed and simply use opacity to hide it when showing the progresss view, error view, etc (we already have a copy of it so use that perhaps)
 /// [ ] Fix up the value row while testing having estimate's components missing (resting or active), because their texts might need alignment
 struct MaintenanceEnergyRow: View {
-    
+
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+
     @Environment(\.colorScheme) var colorScheme
-    
+
     let type = HealthType.maintenanceEnergy
     @Bindable var model: HealthModel
-    
 //    @State var showingAdaptiveDetails: Bool = false
 
     init(_ model: HealthModel) {
@@ -142,7 +143,8 @@ struct MaintenanceEnergyRow: View {
 //                    .font(.system(.body, design: .monospaced, weight: .bold))
                     .font(.system(.largeTitle, design: .monospaced, weight: .bold))
                     .foregroundStyle(foregroundColor)
-                Text(model.health.energyUnit.abbreviation)
+//                Text(model.health.energyUnit.abbreviation)
+                Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(foregroundColor)
                     .font(.system(.body, design: .default, weight: .semibold))
             }
@@ -159,7 +161,7 @@ struct MaintenanceEnergyRow: View {
                 model.health.maintenanceEnergy?.error == nil
             {
                 value
-            } else if let value = model.health.estimatedMaintenanceInDisplayedUnits {
+            } else if let value = model.health.estimatedMaintenance(in: settingsStore.energyUnit) {
                 value
             } else {
                 0
@@ -274,6 +276,7 @@ struct AdaptiveCalculationErrorCell: View {
 #Preview {
     NavigationStack {
         HealthSummary(model: MockHealthModel)
+            .environment(SettingsStore.shared)
     }
 }
 

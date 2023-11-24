@@ -6,6 +6,9 @@ import PrepShared
 /// [ ] If user taps this tag, pop up a small message elaborating (e.g. "You need to have at least [2 weight measurements/1 day with food logged] over the [past two weeks/two weeks prior] to calculate your expenditure."
 
 public struct MaintenanceForm: View {
+    
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+
     @Bindable var model: HealthModel
 
     public init(_ model: HealthModel) {
@@ -15,6 +18,7 @@ public struct MaintenanceForm: View {
     public var body: some View {
         Form {
             MaintenanceFormSections(model)
+                .environment(settingsStore)
         }
         .navigationTitle("Maintenance Energy")
         .scrollDismissesKeyboard(.interactively)

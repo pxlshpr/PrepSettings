@@ -3,10 +3,12 @@ import PrepShared
 
 struct HealthLeanBodyMassSection: View {
     
+    @Bindable var settingsStore: SettingsStore
     @Bindable var model: HealthModel
     
-    init(_ model: HealthModel) {
+    init(_ model: HealthModel, _ settingsStore: SettingsStore) {
         self.model = model
+        self.settingsStore = settingsStore
     }
     
     var body: some View {
@@ -36,14 +38,14 @@ struct HealthLeanBodyMassSection: View {
 
     var manualValue: some View {
         ManualBodyMassField(
-            unit: $model.health.bodyMassUnit,
+            unit: $settingsStore.bodyMassUnit,
             valueInKg: $model.leanBodyMassValue
         )
     }
     
     var calculatedValue: some View {
         CalculatedBodyMassView(
-            unit: $model.health.bodyMassUnit,
+            unit: $settingsStore.bodyMassUnit,
             quantityInKg: $model.health.leanBodyMassQuantity,
             source: model.leanBodyMassSource
         )
@@ -82,11 +84,12 @@ struct HealthLeanBodyMassSection: View {
         if let leanBodyMass, leanBodyMass.source.isCalculated {
             NavigationLink {
                 HealthForm(model, leanBodyMass.source.params)
+                    .environment(settingsStore)
             } label: {
                 HStack(alignment: .firstTextBaseline) {
                     Text(model.leanBodyMassHealthLinkTitle)
                     Spacer()
-                    model.health.leanBodyMassHealthLinkText
+                    HealthTexts(model.health, settingsStore).leanBodyMassHealthLinkText
                 }
             }
         }

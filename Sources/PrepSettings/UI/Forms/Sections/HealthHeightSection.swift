@@ -3,12 +3,14 @@ import PrepShared
 
 struct HealthHeightSection: View {
     
+    @Bindable var settingsStore: SettingsStore
     @Bindable var model: HealthModel
     
-    init(_ model: HealthModel) {
+    init(_ model: HealthModel, _ settingsStore: SettingsStore) {
         self.model = model
+        self.settingsStore = settingsStore
     }
-    
+
     var body: some View {
         Section(footer: footer) {
             HealthTopRow(type: .height, model: model)
@@ -53,7 +55,7 @@ struct HealthHeightSection: View {
     
     var healthValue: some View {
         CalculatedHeightView(
-            unit: $model.health.heightUnit,
+            unit: $settingsStore.heightUnit,
             quantityInCm: $model.health.heightQuantity,
             source: model.heightSource
         )
@@ -61,7 +63,7 @@ struct HealthHeightSection: View {
 
     var manualValue: some View {
         ManualHeightField(
-            unit: $model.health.heightUnit,
+            unit: $settingsStore.heightUnit,
             valueInCm: $model.heightValue
         )
     }

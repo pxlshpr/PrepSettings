@@ -11,13 +11,12 @@ import PrepSettings
 struct ContentView: View {
     
     @State var model: HealthModel = MockHealthModel
+    @State var settingsStore: SettingsStore = SettingsStore.shared
     
     var body: some View {
         NavigationStack {
-//            Text("Demo")
-//                .sheet(isPresented: .constant(true)) {
-                    HealthSummary(model: model)
-//                }
+            HealthSummary(model: model)
+                .environment(settingsStore)
         }
     }
 }
