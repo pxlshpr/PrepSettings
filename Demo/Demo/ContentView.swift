@@ -18,6 +18,9 @@ struct ContentView: View {
             HealthSummary(model: model)
                 .environment(settingsStore)
         }
+        .onAppear {
+            SettingsStore.configureAsMock()
+        }
     }
 }
 

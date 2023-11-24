@@ -129,17 +129,29 @@ struct HealthTexts {
         }
     }
     
-    @ViewBuilder
     var restingEnergyText: some View {
-        if let value = restingEnergy?.value {
-            energyText(value)
+        var valueInDisplayedUnit: Double? {
+            guard let value = restingEnergy?.value else { return nil }
+            return EnergyUnit.kcal.convert(value, to: energyUnit)
+        }
+
+        return Group {
+            if let valueInDisplayedUnit {
+                energyText(valueInDisplayedUnit)
+            }
         }
     }
 
-    @ViewBuilder
     var activeEnergyText: some View {
-        if let value = activeEnergy?.value {
-            energyText(value)
+        var valueInDisplayedUnit: Double? {
+            guard let value = activeEnergy?.value else { return nil }
+            return EnergyUnit.kcal.convert(value, to: energyUnit)
+        }
+
+        return Group {
+            if let valueInDisplayedUnit {
+                energyText(valueInDisplayedUnit)
+            }
         }
     }
     
@@ -155,36 +167,52 @@ struct HealthTexts {
         }
     }
 
-    @ViewBuilder
     var weightText: some View {
-        if let value = health.weightQuantity?.value {
-            HealthTextView(
-                unit: bodyMassUnit,
-                value: value,
-                secondComponent: value.fraction * PoundsPerStone
-            )
+        var valueInDisplayedUnit: Double? {
+            guard let value = health.weightQuantity?.value else { return nil }
+            return BodyMassUnit.kg.convert(value, to: bodyMassUnit)
+        }
+        return Group {
+            if let valueInDisplayedUnit {
+                HealthTextView(
+                    unit: bodyMassUnit,
+                    value: valueInDisplayedUnit,
+                    secondComponent: valueInDisplayedUnit.fraction * PoundsPerStone
+                )
+            }
         }
     }
     
-    @ViewBuilder
     var leanBodyMassText: some View {
-        if let value = health.leanBodyMassQuantity?.value {
-            HealthTextView(
-                unit: bodyMassUnit,
-                value: value,
-                secondComponent: value.fraction * PoundsPerStone
-            )
+        var valueInDisplayedUnit: Double? {
+            guard let value = health.leanBodyMassQuantity?.value else { return nil }
+            return BodyMassUnit.kg.convert(value, to: bodyMassUnit)
+        }
+
+        return Group {
+            if let valueInDisplayedUnit {
+                HealthTextView(
+                    unit: bodyMassUnit,
+                    value: valueInDisplayedUnit,
+                    secondComponent: valueInDisplayedUnit.fraction * PoundsPerStone
+                )
+            }
         }
     }
     
-    @ViewBuilder
     var heightText: some View {
-        if let value = health.heightQuantity?.value {
-            HealthTextView(
-                unit: heightUnit,
-                value: value,
-                secondComponent: value.fraction * InchesPerFoot
-            )
+        var valueInDisplayedUnit: Double? {
+            guard let value = health.heightQuantity?.value else { return nil }
+            return HeightUnit.cm.convert(value, to: heightUnit)
+        }
+        return Group {
+            if let valueInDisplayedUnit {
+                HealthTextView(
+                    unit: heightUnit,
+                    value: valueInDisplayedUnit,
+                    secondComponent: valueInDisplayedUnit.fraction * InchesPerFoot
+                )
+            }
         }
     }
 }
