@@ -1,23 +1,25 @@
 import SwiftUI
 import PrepShared
 
-struct AdaptiveDataList: View {
+struct MaintenanceCalculationView: View {
     
-    @Bindable var model: HealthModel
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+
+    @Bindable var healthModel: HealthModel
     
     @State var useMovingAverageForWeight = true
     @State var showingWeightConversionInfo = false
 
     init(_ model: HealthModel) {
-        self.model = model
+        self.healthModel = model
     }
     
     var body: some View {
         list
             .navigationTitle("Adaptive Calculation")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbarContent }
-            .navigationBarBackButtonHidden(isEditing)
+//            .toolbar { toolbarContent }
+//            .navigationBarBackButtonHidden(isEditing)
     }
     
     var list: some View {
@@ -29,19 +31,19 @@ struct AdaptiveDataList: View {
     @ViewBuilder
     var content: some View {
         daysSection
-        if !isEditing {
+//        if !isEditing {
             weightSection
             dietaryEnergySection
             calculationSections
-        }
+//        }
     }
     
     var maintenance: Health.MaintenanceEnergy {
-        model.health.maintenanceEnergy ?? .init()
+        healthModel.health.maintenanceEnergy ?? .init()
     }
     
     var date: Date {
-        model.health.date
+        healthModel.health.date
     }
     
     var weightSection: some View {
@@ -90,53 +92,52 @@ struct AdaptiveDataList: View {
             maintenance.interval.startDate(with: date)
         }
         
+        var samplesLink: some View {
+            NavigationLink {
+                MaintenanceWeightSamplesList()
+                    .environment(settingsStore)
+                    .environment(healthModel)
+            } label: {
+                Text("Show Data")
+            }
+        }
+        
         return Group {
             Section(header: header, footer: footer) {
-                NavigationLink {
-                    Form {
-                        Section("Kilograms") {
-                            weightCell(sample: maintenance.weightChange.current, date: date)
-                            weightCell(sample: maintenance.weightChange.previous, date: previousDate)
-                        }
-                        fillAllFromHealthAppSection
-                    }
-                    .navigationTitle("Weight")
-                } label: {
-                    Text("Show Data")
-                }
-                HStack {
-                    Text("Weight Change")
-                    Spacer()
-                    if let delta = maintenance.weightChange.delta {
-                        Text("\(delta.cleanAmount) kg")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Not set")
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-                HStack {
-                    Text("Equivalent Energy")
-                    Spacer()
-                    if let kcal = maintenance.weightChange.deltaEquivalentEnergyInKcal {
-                        Text("\(kcal.formattedEnergy) kcal")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Not set")
-                            .foregroundStyle(.tertiary)
-                    }
-                }
+                samplesLink
+                maintenance.weightChangeRow
+                maintenance.equivalentEnergyRow
             }
         }
     }
     
     var daysSection: some View {
-        Section(footer: Text("Days over which to calculate your maintenance energy.")) {
+        var footer: some View {
+//            EmptyView()
+            Text("Duration over which to calculate your maintenance energy.")
+        }
+        
+        var header: some View {
+            EmptyView()
+//            Text("Calculated over")
+        }
+        
+        return Section(header: header, footer: footer) {
             HStack {
-                Text("Number of days")
+                Text("Duration")
+//                Text("Number of days")
+//                Text("Calculated over")
                 Spacer()
-                Text("7")
-                    .foregroundStyle(isEditing ? Color.accentColor : Color.primary)
+//                Text("the past")
+                Stepper("", value: healthModel.intervalValueBinding, in: healthModel.intervalPeriod.range)
+                    .fixedSize()
+                Text("\(healthModel.intervalValue)")
+                    .font(.system(.body, design: .monospaced, weight: .bold))
+                    .contentTransition(.numericText(value: Double(healthModel.intervalValue)))
+                    .foregroundStyle(.secondary)
+                MenuPicker<HealthPeriod>([.day, .week], healthModel.intervalPeriodBinding)
+//                Text("7")
+//                    .foregroundStyle(isEditing ? Color.accentColor : Color.primary)
             }
         }
     }
@@ -244,15 +245,6 @@ struct AdaptiveDataList: View {
         }
     }
 
-    func weightCell(sample: MaintenanceWeightSample, date: Date) -> some View {
-        NavigationLink {
-            EmptyView()
-//            WeightSampleForm(sample: sample, date: date)
-        } label: {
-            WeightSampleCell(sample: sample, date: date)
-        }
-    }
-
     func dietaryEnergyCell(sample: MaintenanceDietaryEnergySample, date: Date) -> some View {
         NavigationLink {
             EmptyView()
@@ -262,28 +254,142 @@ struct AdaptiveDataList: View {
         }
     }
 
-    @State var isEditing = false
+//    @State var isEditing = false
+//    
+//    var toolbarContent: some ToolbarContent {
+//        Group {
+//            ToolbarItem(placement: .topBarTrailing) {
+//                Button(isEditing ? "Done" : "Edit") {
+//                    withAnimation {
+//                        isEditing.toggle()
+//                    }
+//                }
+//                .fontWeight(isEditing ? .semibold : .regular)
+//            }
+//            if isEditing {
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Button("Cancel") {
+//                        isEditing = false
+//                    }
+//                }
+//            }
+//        }
+//    }
+}
+
+
+struct DietaryEnergySampleCell: View {
     
-    var toolbarContent: some ToolbarContent {
-        Group {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(isEditing ? "Done" : "Edit") {
-                    withAnimation {
-                        isEditing.toggle()
-                    }
-                }
-                .fontWeight(isEditing ? .semibold : .regular)
-            }
-            if isEditing {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        isEditing = false
-                    }
-                }
-            }
+    let sample: MaintenanceDietaryEnergySample
+    let date: Date
+    
+    init(sample: MaintenanceDietaryEnergySample, date: Date) {
+        self.sample = sample
+        self.date = date
+    }
+    
+    @ViewBuilder
+    var value: some View {
+        if let value = sample.value {
+            Text(value.formattedEnergy)
+        } else {
+            Text("Not set")
+                .foregroundStyle(.secondary)
         }
     }
+    
+    var body: some View {
+        HStack {
+            Text(date.adaptiveMaintenanceDateString)
+            Spacer()
+            type
+            value
+                .foregroundStyle(.secondary)
+//            averageLabel
+        }
+    }
+    
+//    @ViewBuilder
+//    var averageLabel: some View {
+//        if type == .averaged {
+//            TagView(string: "Average")
+//        }
+//    }
+//
+    @ViewBuilder
+    var type: some View {
+        switch sample.type {
+        case .healthKit:
+            Text("HealthKit")
+                .foregroundStyle(.tertiary)
+        case .backend:
+            EmptyView()
+        case .averaged:
+            Text("Average")
+                .foregroundStyle(.tertiary)
+        }
+//        Image(systemName: type.systemImage)
+//            .foregroundStyle(type.foregroundColor)
+//            .frame(width: 25, height: 25)
+//            .background(
+//                RoundedRectangle(cornerRadius: 4)
+//                    .foregroundStyle(type.backgroundColor)
+//            )
+//            .overlay(
+//                RoundedRectangle(cornerRadius: 4)
+//                    .stroke(type.strokeColor, lineWidth: 0.3)
+//            )
+    }
+//
+//    var type: MaintenanceSampleType {
+//        sample.type
+//    }
 }
+
+
+struct WeightSampleCell: View {
+    
+    @Environment(SettingsStore.self) var settingsStore
+    
+    let sample: MaintenanceWeightSample
+    let date: Date
+    
+    init(sample: MaintenanceWeightSample, date: Date) {
+        self.sample = sample
+        self.date = date
+    }
+    
+    @ViewBuilder
+    var value: some View {
+        if let value = sample.value {
+            HStack {
+                Text("\(value.rounded(toPlaces: 1).cleanAmount) \(settingsStore.bodyMassUnit.abbreviation)")
+            }
+            .foregroundStyle(.secondary)
+        } else {
+            Text("Not set")
+                .foregroundStyle(.tertiary)
+        }
+    }
+    
+    var body: some View {
+        HStack {
+            Text(date.adaptiveMaintenanceDateString)
+//                .foregroundStyle(.secondary)
+            Spacer()
+            value
+//            averageLabel
+        }
+    }
+    
+//    @ViewBuilder
+//    var averageLabel: some View {
+//        if type == .averaged {
+//            TagView(string: "Average")
+//        }
+//    }
+}
+
 
 let MockMaintenanceSamples: [MaintenanceSample] = [
     .init(type: .healthKit, value: 96.0),
@@ -302,7 +408,11 @@ let MockMaintenanceSamples: [MaintenanceSample] = [
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
 //                NavigationLink {
-                AdaptiveDataList(MockHealthModel)
+                MaintenanceCalculationView(MockHealthModel)
+                    .environment(SettingsStore.shared)
+                    .onAppear {
+                        SettingsStore.configureAsMock()
+                    }
 //                } label: {
 //                    Text("Show Data")
 //                }

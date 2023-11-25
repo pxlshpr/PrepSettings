@@ -16,8 +16,31 @@ extension HealthModel {
         dietaryEnergy.fillEmptyValuesWithAverages()
         return dietaryEnergy
     }
-    
-    func calculateAdaptiveMaintenance() async throws {
+}
+
+extension HealthModel {
+    func setWeightSample(_ sample: MaintenanceWeightSample, isPrevious: Bool) {
+        var weightChange = health.maintenanceEnergy?.weightChange ?? .init()
+        if isPrevious {
+            weightChange.previous = sample
+        } else {
+            weightChange.current = sample
+        }
+        
+        let maintenance = Health.MaintenanceEnergy(
+            interval: health.maintenanceEnergy?.interval ?? DefaultMaintenanceEnergyInterval,
+            weightChange: weightChange,
+            dietaryEnergy: health.maintenanceEnergy?.dietaryEnergy ?? .init()
+        )
+
+        health.maintenanceEnergy = maintenance
+    }
+}
+
+extension HealthModel {
+
+    /// Used when turning on adaptive calculation initially. Fetches backend and HealthKit data and calculates using those
+    func turnOnAdaptiveMaintenance() async throws {
         
         /// Get the backend values for the date range spanning the st
         let dateRange = health.dateRangeForMaintenanceBackendValues
@@ -65,9 +88,6 @@ extension HealthModel {
         )
 
         health.maintenanceEnergy = maintenance
-
-        print("We here")
-        /// [ ] Test that this works by having dummy values supplied for the delegate functions
     }
 }
 

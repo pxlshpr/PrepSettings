@@ -7,6 +7,7 @@ public struct MaintenanceWeightSample: Hashable, Codable {
 
     public init(
         movingAverageInterval: HealthInterval? = DefaultWeightMovingAverageInterval,
+//        movingAverageInterval: HealthInterval? = nil,
         movingAverageValues: [Int: Double]? = nil,
         value: Double? = nil
     ) {

@@ -63,7 +63,8 @@ struct MaintenanceEnergyRow: View {
     var viewDataRow: some View {
         if model.maintenanceEnergyIsAdaptive {
             NavigationLink {
-                AdaptiveDataList(model)
+                MaintenanceCalculationView(model)
+                    .environment(settingsStore)
             } label: {
                 Text("Show Adaptive Calculation")
             }

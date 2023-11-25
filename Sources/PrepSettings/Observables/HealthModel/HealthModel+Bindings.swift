@@ -14,7 +14,7 @@ public extension HealthModel {
                     }
                 }
                 if newValue {
-                    try await calculateAdaptiveMaintenance()
+                    try await turnOnAdaptiveMaintenance()
                 } else {
                     await MainActor.run {
                         withAnimation {
