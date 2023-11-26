@@ -141,7 +141,6 @@ struct MaintenanceEnergyRow: View {
                 Text(value.formattedEnergy)
                     .animation(.default, value: value)
                     .contentTransition(.numericText(value: value))
-                    .font(NumberFont)
                     .font(.system(.largeTitle, design: .monospaced, weight: .bold))
                     .foregroundStyle(foregroundColor)
                 Text(settingsStore.energyUnit.abbreviation)
