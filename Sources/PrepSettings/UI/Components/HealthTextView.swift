@@ -14,7 +14,7 @@ struct HealthTextView<Unit: HealthUnit>: View {
             HStack {
                 HStack(spacing: 3) {
                     Text("\(Int(value.whole))")
-                        .font(HealthFont)
+                        .font(NumberFont)
                         .contentTransition(.numericText(value: value.whole))
                         .animation(.default, value: value)
                     Text(unit.abbreviation)
@@ -22,7 +22,7 @@ struct HealthTextView<Unit: HealthUnit>: View {
                 if secondComponent.healthString != "0" {
                     HStack(spacing: 3) {
                         Text(secondComponent.healthString)
-                            .font(HealthFont)
+                            .font(NumberFont)
                             .contentTransition(.numericText(value: secondComponent))
                             .animation(.default, value: secondComponent)
                         if let string = Unit.secondaryUnit {
@@ -34,7 +34,7 @@ struct HealthTextView<Unit: HealthUnit>: View {
         case false:
             HStack(spacing: 3) {
                 Text(value.healthString)
-                    .font(HealthFont)
+                    .font(NumberFont)
                     .contentTransition(.numericText(value: value))
                     .animation(.default, value: value)
                 Text(unit.abbreviation)

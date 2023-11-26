@@ -73,7 +73,7 @@ struct HealthAgeSection: View {
         return Group {
             if let age = model.health.age?.value {
                 Text("\(age)")
-                    .font(HealthFont)
+                    .font(NumberFont)
                     .foregroundStyle(.secondary)
             } else {
                 Text(placeholder)

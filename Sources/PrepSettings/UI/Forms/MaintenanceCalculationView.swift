@@ -105,8 +105,8 @@ struct MaintenanceCalculationView: View {
         return Group {
             Section(header: header, footer: footer) {
                 samplesLink
-                maintenance.weightChangeRow
-                maintenance.equivalentEnergyRow
+                maintenance.weightChangeRow(bodyMassUnit: settingsStore.bodyMassUnit)
+                maintenance.equivalentEnergyRow(energyUnit: settingsStore.energyUnit)
             }
         }
     }
@@ -131,11 +131,13 @@ struct MaintenanceCalculationView: View {
 //                Text("the past")
                 Stepper("", value: healthModel.intervalValueBinding, in: healthModel.intervalPeriod.range)
                     .fixedSize()
-                Text("\(healthModel.intervalValue)")
-                    .font(.system(.body, design: .monospaced, weight: .bold))
-                    .contentTransition(.numericText(value: Double(healthModel.intervalValue)))
-                    .foregroundStyle(.secondary)
-                MenuPicker<HealthPeriod>([.day, .week], healthModel.intervalPeriodBinding)
+                HStack(spacing: 4) {
+                    Text("\(healthModel.intervalValue)")
+                        .font(NumberFont)
+                        .contentTransition(.numericText(value: Double(healthModel.intervalValue)))
+                        .foregroundStyle(.secondary)
+                    MenuPicker<HealthPeriod>([.day, .week], healthModel.intervalPeriodBinding)
+                }
 //                Text("7")
 //                    .foregroundStyle(isEditing ? Color.accentColor : Color.primary)
             }
@@ -362,8 +364,11 @@ struct WeightSampleCell: View {
     @ViewBuilder
     var value: some View {
         if let value = sample.value {
-            HStack {
-                Text("\(value.rounded(toPlaces: 1).cleanAmount) \(settingsStore.bodyMassUnit.abbreviation)")
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("\(value.rounded(toPlaces: 1).cleanAmount)")
+                    .font(NumberFont)
+                    .contentTransition(.numericText(value: Double(value)))
+                Text(settingsStore.bodyMassUnit.abbreviation)
             }
             .foregroundStyle(.secondary)
         } else {

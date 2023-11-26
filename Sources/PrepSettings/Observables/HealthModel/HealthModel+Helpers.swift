@@ -37,6 +37,51 @@ extension HealthModel {
     }
 }
 
+extension MaintenanceValues {
+    
+    var sortedDates: [Date] {
+        values.keys.sorted()
+    }
+    
+    var datesWithoutWeights: [Date]? {
+        var dates: [Date] = []
+        for date in sortedDates {
+            guard values[date]?.weightInKg == nil else { continue }
+            dates.append(date)
+        }
+        return dates.isEmpty ? nil : dates
+    }
+    
+    var datesWithoutDietaryEnergy: [Date]? {
+        var dates: [Date] = []
+        for date in sortedDates {
+            guard values[date]?.dietaryEnergyInKcal == nil else { continue }
+            dates.append(date)
+        }
+        return dates.isEmpty ? nil : dates
+    }
+}
+
+public extension HealthModel {
+    var hasAdaptiveMaintenanceEnergyValue: Bool {
+        maintenanceEnergyIsAdaptive
+        && health.maintenanceEnergy?.adaptiveValue != nil
+        && health.maintenanceEnergy?.error == nil
+    }
+}
+
+extension HealthModel {
+    func remove(_ type: HealthType) {
+        health.remove(type)
+    }
+    
+    func add(_ type: HealthType) {
+        health.add(type)
+    }
+}
+
+import SwiftUI
+
 extension HealthModel {
 
     /// Used when turning on adaptive calculation initially. Fetches backend and HealthKit data and calculates using those
@@ -87,49 +132,10 @@ extension HealthModel {
             dietaryEnergy: dietaryEnergy(from: values)
         )
 
-        health.maintenanceEnergy = maintenance
-    }
-}
-
-extension MaintenanceValues {
-    
-    var sortedDates: [Date] {
-        values.keys.sorted()
-    }
-    
-    var datesWithoutWeights: [Date]? {
-        var dates: [Date] = []
-        for date in sortedDates {
-            guard values[date]?.weightInKg == nil else { continue }
-            dates.append(date)
+        await MainActor.run {
+            withAnimation {
+                health.maintenanceEnergy = maintenance
+            }
         }
-        return dates.isEmpty ? nil : dates
-    }
-    
-    var datesWithoutDietaryEnergy: [Date]? {
-        var dates: [Date] = []
-        for date in sortedDates {
-            guard values[date]?.dietaryEnergyInKcal == nil else { continue }
-            dates.append(date)
-        }
-        return dates.isEmpty ? nil : dates
-    }
-}
-
-public extension HealthModel {
-    var hasAdaptiveMaintenanceEnergyValue: Bool {
-        maintenanceEnergyIsAdaptive
-        && health.maintenanceEnergy?.adaptiveValue != nil
-        && health.maintenanceEnergy?.error == nil
-    }
-}
-
-extension HealthModel {
-    func remove(_ type: HealthType) {
-        health.remove(type)
-    }
-    
-    func add(_ type: HealthType) {
-        health.add(type)
     }
 }

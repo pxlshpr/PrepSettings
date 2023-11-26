@@ -12,7 +12,7 @@ public struct WeightChange: Hashable, Codable {
 }
 
 public extension WeightChange {
-    var delta: Double? {
+    var deltaInKg: Double? {
         guard 
             let currentValue = current.value,
             let previousValue = previous.value
@@ -20,11 +20,21 @@ public extension WeightChange {
         return currentValue - previousValue
     }
     
-    var deltaEquivalentEnergyInKcal: Double? {
-        guard let delta else { return nil }
+    func delta(in bodyMassUnit: BodyMassUnit) -> Double? {
+        guard let deltaInKg else { return nil }
+        return BodyMassUnit.kg.convert(deltaInKg, to: bodyMassUnit)
+    }
+    
+    var deltaEnergyEquivalentInKcal: Double? {
+        guard let deltaInKg else { return nil }
 //        454 g : 3500 kcal
 //        delta : x kcal
-        return (3500 * delta) / BodyMassUnit.lb.convert(1, to: .kg)
+        return (3500 * deltaInKg) / BodyMassUnit.lb.convert(1, to: .kg)
+    }
+    
+    func deltaEnergyEquivalent(in energyUnit: EnergyUnit) -> Double? {
+        guard let kcal = deltaEnergyEquivalentInKcal else { return nil }
+        return EnergyUnit.kcal.convert(kcal, to: energyUnit)
     }
     
     var isEmpty: Bool {

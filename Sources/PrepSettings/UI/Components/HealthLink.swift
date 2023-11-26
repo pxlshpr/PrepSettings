@@ -36,7 +36,7 @@
 ////                if let maintenance = health.maintenanceEnergy {
 ////                    HStack(spacing: 3) {
 ////                        Text(maintenance.formattedEnergy)
-////                            .font(HealthFont)
+////                            .font(NumberFont)
 ////                        Text(health.energyUnit.abbreviation)
 ////                    }
 ////                    .foregroundStyle(.secondary)

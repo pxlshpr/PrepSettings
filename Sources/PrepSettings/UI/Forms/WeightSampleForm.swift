@@ -155,7 +155,7 @@ struct WeightSampleForm: View {
                         Stepper("", value: model.movingAverageIntervalValueBinding, in: model.movingAverageIntervalPeriod.range)
                             .fixedSize()
                         Text("\(model.movingAverageIntervalValue)")
-                            .font(.system(.body, design: .monospaced, weight: .bold))
+                            .font(NumberFont)
                             .contentTransition(.numericText(value: Double(model.movingAverageIntervalValue)))
                             .foregroundStyle(.secondary)
                         MenuPicker<HealthPeriod>([.day, .week], model.movingAverageIntervalPeriodBinding)
@@ -183,13 +183,15 @@ struct WeightSampleForm: View {
             @ViewBuilder
             var valueText: some View {
                 if let value = model.movingAverageValue(at: index) {
-                    Text(value.cleanAmount)
-                        .font(.system(.body, design: .monospaced, weight: .bold))
-                        .animation(.default, value: value)
-                        .contentTransition(.numericText(value: value))
-                        .foregroundStyle(Color(.secondaryLabel))
-                    Text(settingsStore.bodyMassUnit.abbreviation)
-                        .foregroundStyle(.secondary)
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(value.cleanAmount)
+                            .font(NumberFont)
+                            .animation(.default, value: value)
+                            .contentTransition(.numericText(value: value))
+                            .foregroundStyle(Color(.secondaryLabel))
+                        Text(settingsStore.bodyMassUnit.abbreviation)
+                            .foregroundStyle(.secondary)
+                    }
                 } else {
                     Text("Not set")
                         .foregroundStyle(.tertiary)

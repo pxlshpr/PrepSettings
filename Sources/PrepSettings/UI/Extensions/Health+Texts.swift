@@ -101,7 +101,7 @@ struct HealthTexts {
         if let age = age?.value {
             HStack(spacing: 3) {
                 Text("\(age)")
-                    .font(HealthFont)
+                    .font(NumberFont)
                     .contentTransition(.numericText(value: Double(age)))
                 Text("years")
             }
@@ -113,7 +113,7 @@ struct HealthTexts {
         if let fatPercentage {
             HStack(spacing: 3) {
                 Text(fatPercentage.healthString)
-                    .font(HealthFont)
+                    .font(NumberFont)
                     .contentTransition(.numericText(value: fatPercentage))
                 Text("%")
             }
@@ -123,7 +123,7 @@ struct HealthTexts {
     func energyText(_ value: Double) -> some View {
         HStack(spacing: 3) {
             Text("\(value.formattedEnergy)")
-                .font(HealthFont)
+                .font(NumberFont)
                 .contentTransition(.numericText(value: value))
             Text("\(energyUnit.abbreviation)")
         }
@@ -160,7 +160,7 @@ struct HealthTexts {
         if let value = health.estimatedMaintenance(in: energyUnit) {
             HStack(spacing: 3) {
                 Text(value.formattedEnergy)
-                    .font(HealthFont)
+                    .font(NumberFont)
                 Text(energyUnit.abbreviation)
             }
             .foregroundStyle(.secondary)

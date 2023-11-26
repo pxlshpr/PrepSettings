@@ -30,7 +30,7 @@ struct HealthKitValueView<S: GenericSource>: View {
         }
         
         return Text("\(rounded.clean)")
-            .font(.system(.body, design: .monospaced, weight: .bold))
+            .font(NumberFont)
             .animation(.default, value: binding.wrappedValue)
             .contentTransition(.numericText(value: double))
             .foregroundStyle(.secondary)

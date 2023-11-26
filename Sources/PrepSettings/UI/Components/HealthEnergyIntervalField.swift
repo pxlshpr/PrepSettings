@@ -16,7 +16,7 @@ struct HealthEnergyIntervalField: View {
                 Stepper("", value: $value, in: period.range)
                     .fixedSize()
                 Text("\(value)")
-                    .font(.system(.body, design: .monospaced, weight: .bold))
+                    .font(NumberFont)
                     .contentTransition(.numericText(value: Double(value)))
                     .foregroundStyle(.secondary)
                 MenuPicker<HealthPeriod>($period)

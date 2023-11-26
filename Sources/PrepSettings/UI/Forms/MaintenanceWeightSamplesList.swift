@@ -17,8 +17,8 @@ struct MaintenanceWeightSamplesList: View {
                 weightCell(sample: maintenance.weightChange.previous, isPrevious: true)
             }
             Section {
-                maintenance.weightChangeRow
-                maintenance.equivalentEnergyRow
+                maintenance.weightChangeRow(bodyMassUnit: settingsStore.bodyMassUnit)
+                maintenance.equivalentEnergyRow(energyUnit: settingsStore.energyUnit)
             }
 //            fillAllFromHealthAppSection
         }

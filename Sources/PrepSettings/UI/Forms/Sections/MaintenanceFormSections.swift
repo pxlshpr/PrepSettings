@@ -55,7 +55,7 @@ public struct MaintenanceFormSections: View {
                 Text(value.formattedEnergy)
                     .animation(.default, value: value)
                     .contentTransition(.numericText(value: value))
-                    .font(.system(.body, design: .monospaced, weight: .bold))
+                    .font(NumberFont)
                     .foregroundStyle(.secondary)
                 Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(.secondary)
