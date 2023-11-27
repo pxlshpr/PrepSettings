@@ -102,7 +102,7 @@ public struct MaintenanceValues: Codable {
             let value = Value(
                 weightInKg: weight,
                 dietaryEnergyInKcal: energy,
-                dietaryEnergyType: .backend
+                dietaryEnergyType: .logged
             )
             values[date] = value
         }

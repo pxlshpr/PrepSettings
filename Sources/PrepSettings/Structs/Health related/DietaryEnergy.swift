@@ -67,7 +67,7 @@ public extension DietaryEnergy {
             /// Only fill with average if there is no value for it
             guard samples[i].value == nil else { continue }
             samples[i] = .init(
-                type: .averaged,
+                type: .average,
                 value: average
             )
         }

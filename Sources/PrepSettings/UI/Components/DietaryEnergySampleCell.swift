@@ -24,7 +24,7 @@ struct DietaryEnergySampleCell: View {
     
     @ViewBuilder
     var value: some View {
-        if sample.type != .averaged, let value = sample.value(in: settingsStore.energyUnit) {
+        if sample.type != .average, let value = sample.value(in: settingsStore.energyUnit) {
             HStack(spacing: 4) {
                 Text(value.formattedEnergy)
                     .font(NumberFont)

@@ -44,7 +44,16 @@ struct DietaryEnergySamplesList: View {
     
     func dietaryEnergyCell(sample: MaintenanceDietaryEnergySample, date: Date) -> some View {
         NavigationLink {
-            EmptyView()
+            DietaryEnergySampleForm(
+                sample: sample,
+                date: date,
+                healthModel: healthModel,
+                settingsStore: settingsStore,
+                didSave: { value in
+                    
+                }
+            )
+//            EmptyView()
 //            WeightSampleForm(sample: sample, date: date)
         } label: {
             DietaryEnergySampleCell(sample: sample, date: date)
