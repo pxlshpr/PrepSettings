@@ -1,4 +1,4 @@
-import Foundation
+import PrepShared
 
 public struct MaintenanceDietaryEnergySample: Hashable, Codable {
     var type: MaintenanceDietaryEnergySampleType
@@ -10,5 +10,12 @@ public struct MaintenanceDietaryEnergySample: Hashable, Codable {
     ) {
         self.type = type
         self.value = value
+    }
+}
+
+extension MaintenanceDietaryEnergySample {
+    func value(in unit: EnergyUnit) -> Double? {
+        guard let value else { return nil }
+        return EnergyUnit.kcal.convert(value, to: unit)
     }
 }

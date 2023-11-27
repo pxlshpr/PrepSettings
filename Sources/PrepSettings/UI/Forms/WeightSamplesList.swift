@@ -1,11 +1,10 @@
 import SwiftUI
 import PrepShared
 
-struct MaintenanceWeightSamplesList: View {
+struct WeightSamplesList: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
     @Environment(HealthModel.self) var healthModel: HealthModel
-
     @Environment(\.dismiss) var dismiss
     
     var body: some View {

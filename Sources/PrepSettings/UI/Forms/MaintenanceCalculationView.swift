@@ -94,7 +94,7 @@ struct MaintenanceCalculationView: View {
         
         var samplesLink: some View {
             NavigationLink {
-                MaintenanceWeightSamplesList()
+                WeightSamplesList()
                     .environment(settingsStore)
                     .environment(healthModel)
             } label: {
@@ -159,18 +159,9 @@ struct MaintenanceCalculationView: View {
         
         return Section(header: header, footer: footer) {
             NavigationLink {
-                Form {
-                    Section("Kilocalories") {
-                        ForEach(0..<maintenance.dietaryEnergy.samples.count, id: \.self) {
-                            dietaryEnergyCell(
-                                sample: maintenance.dietaryEnergy.samples[$0],
-                                date: date.moveDayBy(-$0)
-                            )
-                        }
-                    }
-                    fillAllFromHealthAppSection
-                }
-                .navigationTitle("Dietary Energy")
+                DietaryEnergySamplesList()
+                    .environment(settingsStore)
+                    .environment(healthModel)
             } label: {
                 Text("Show Data")
             }
@@ -247,15 +238,6 @@ struct MaintenanceCalculationView: View {
         }
     }
 
-    func dietaryEnergyCell(sample: MaintenanceDietaryEnergySample, date: Date) -> some View {
-        NavigationLink {
-            EmptyView()
-//            WeightSampleForm(sample: sample, date: date)
-        } label: {
-            DietaryEnergySampleCell(sample: sample, date: date)
-        }
-    }
-
 //    @State var isEditing = false
 //    
 //    var toolbarContent: some ToolbarContent {
@@ -278,123 +260,6 @@ struct MaintenanceCalculationView: View {
 //        }
 //    }
 }
-
-
-struct DietaryEnergySampleCell: View {
-    
-    let sample: MaintenanceDietaryEnergySample
-    let date: Date
-    
-    init(sample: MaintenanceDietaryEnergySample, date: Date) {
-        self.sample = sample
-        self.date = date
-    }
-    
-    @ViewBuilder
-    var value: some View {
-        if let value = sample.value {
-            Text(value.formattedEnergy)
-        } else {
-            Text("Not set")
-                .foregroundStyle(.secondary)
-        }
-    }
-    
-    var body: some View {
-        HStack {
-            Text(date.adaptiveMaintenanceDateString)
-            Spacer()
-            type
-            value
-                .foregroundStyle(.secondary)
-//            averageLabel
-        }
-    }
-    
-//    @ViewBuilder
-//    var averageLabel: some View {
-//        if type == .averaged {
-//            TagView(string: "Average")
-//        }
-//    }
-//
-    @ViewBuilder
-    var type: some View {
-        switch sample.type {
-        case .healthKit:
-            Text("HealthKit")
-                .foregroundStyle(.tertiary)
-        case .backend:
-            EmptyView()
-        case .averaged:
-            Text("Average")
-                .foregroundStyle(.tertiary)
-        }
-//        Image(systemName: type.systemImage)
-//            .foregroundStyle(type.foregroundColor)
-//            .frame(width: 25, height: 25)
-//            .background(
-//                RoundedRectangle(cornerRadius: 4)
-//                    .foregroundStyle(type.backgroundColor)
-//            )
-//            .overlay(
-//                RoundedRectangle(cornerRadius: 4)
-//                    .stroke(type.strokeColor, lineWidth: 0.3)
-//            )
-    }
-//
-//    var type: MaintenanceSampleType {
-//        sample.type
-//    }
-}
-
-
-struct WeightSampleCell: View {
-    
-    @Environment(SettingsStore.self) var settingsStore
-    
-    let sample: MaintenanceWeightSample
-    let date: Date
-    
-    init(sample: MaintenanceWeightSample, date: Date) {
-        self.sample = sample
-        self.date = date
-    }
-    
-    @ViewBuilder
-    var value: some View {
-        if let value = sample.value {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text("\(value.rounded(toPlaces: 1).cleanAmount)")
-                    .font(NumberFont)
-                    .contentTransition(.numericText(value: Double(value)))
-                Text(settingsStore.bodyMassUnit.abbreviation)
-            }
-            .foregroundStyle(.secondary)
-        } else {
-            Text("Not set")
-                .foregroundStyle(.tertiary)
-        }
-    }
-    
-    var body: some View {
-        HStack {
-            Text(date.adaptiveMaintenanceDateString)
-//                .foregroundStyle(.secondary)
-            Spacer()
-            value
-//            averageLabel
-        }
-    }
-    
-//    @ViewBuilder
-//    var averageLabel: some View {
-//        if type == .averaged {
-//            TagView(string: "Average")
-//        }
-//    }
-}
-
 
 let MockMaintenanceSamples: [MaintenanceSample] = [
     .init(type: .healthKit, value: 96.0),

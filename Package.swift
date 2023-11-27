@@ -24,6 +24,9 @@ let package = Package(
             name: "PrepSettings",
             dependencies: [
                 .product(name: "PrepShared", package: "PrepShared"),
+            ],
+            resources: [
+                .process("Resources")
             ]
         ),
         .testTarget(
