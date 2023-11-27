@@ -10,14 +10,15 @@ struct DietaryEnergySamplesList: View {
     var body: some View {
         Form {
             samplesSection
-            logMissingDaysAsEmptySection
+//            logMissingDaysAsEmptySection
         }
         .navigationTitle("Dietary Energy")
     }
     
     var samplesSection: some View {
         var footer: some View {
-            Text("You can choose to disregard days that were inaccurately or incompletely logged by setting them to use the average.")
+            EmptyView()
+//            Text("You can choose to disregard days that were inaccurately or incompletely logged by setting them to use the average.")
         }
         
         return Section(footer: footer) {
