@@ -87,11 +87,13 @@ public struct HealthSummary: View {
                         Text("Apple Health")
                             .foregroundStyle(.white)
                             .fontWeight(.semibold)
-                        Text("Automatically sync your data with Apple Health.")
+                        Text("Automatically sync your health details with Apple Health. Any goals based them will automatically update to changes.")
                             .font(.system(.callout))
-//                            .foregroundStyle(.secondary)
-                            .foregroundStyle(Color(.systemGray6))
+                            .foregroundStyle(.white)
+                            .opacity(0.8)
                         Divider()
+                            .overlay(Color.white)
+                            .opacity(0.6)
                         Button("Sync Health Details") {
                             Task(priority: .high) {
                                 try await model.setAllFromHealthKit()

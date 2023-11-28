@@ -66,13 +66,13 @@ struct DietaryEnergySampleForm: View {
             var string: String {
                 switch model.type {
                 case .logged:
-                    "You are using the dietary energy that was logged."
+                    "You are using the logged dietary energy."
                 case .healthKit:
-                    "You are using the dietary energy value that is in Apple Health for this day"
+                    "You are using the dietary energy data from Apple Health."
                 case .average:
-                    "You are using the average dietary energy consumed for the days in the period you are calculating the maintenance energy for."
+                    "You are using the average dietary energy consumed for the other days."
                 case .userEntered:
-                    "You are using a custom entered value for the dietary energy consumed on this day."
+                    "You are using a custom entered value."
                 case .notConsumed:
                     "You have marked this day as having consumed no dietary energy."
                 }
@@ -145,7 +145,7 @@ struct DietaryEnergySampleForm: View {
                 Text(type.name)
                     .foregroundStyle(Color(.label))
                 Spacer()
-                if let value = value(for: type) {
+                if type != .userEntered, let value = value(for: type) {
                     HStack(spacing: 2) {
                         Text(value.formattedEnergy)
                             .contentTransition(.numericText(value: value))

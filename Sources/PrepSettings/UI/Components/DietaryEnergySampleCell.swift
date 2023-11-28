@@ -17,7 +17,7 @@ struct DietaryEnergySampleCell: View {
         HStack {
             Text(date.adaptiveMaintenanceDateString)
             Spacer()
-            healthKitIcon
+//            healthKitIcon
             value
         }
     }
