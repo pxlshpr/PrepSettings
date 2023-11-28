@@ -26,7 +26,7 @@ public struct MaintenanceFormSections: View {
         @ViewBuilder
         var footer: some View {
             if model.maintenanceEnergyIsAdaptive {
-                Text("Used when there isn't sufficient weight or nutrition data to make a calculation.")
+                Text("This estimate is used when there isn't sufficient weight or nutrition data to make a calculation.")
             }
         }
         

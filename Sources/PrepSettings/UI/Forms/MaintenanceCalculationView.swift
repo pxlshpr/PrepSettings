@@ -114,7 +114,7 @@ struct MaintenanceCalculationView: View {
     var daysSection: some View {
         var footer: some View {
 //            EmptyView()
-            Text("Period over which to calculate your maintenance energy.")
+            Text("The period over which to compare your weight change against your consumed dietary energy.")
         }
         
         var header: some View {
@@ -125,10 +125,7 @@ struct MaintenanceCalculationView: View {
         return Section(header: header, footer: footer) {
             HStack {
                 Text("Period")
-//                Text("Number of days")
-//                Text("Calculated over")
                 Spacer()
-//                Text("the past")
                 Stepper("", value: healthModel.intervalValueBinding, in: healthModel.intervalPeriod.range)
                     .fixedSize()
                 HStack(spacing: 4) {
@@ -138,8 +135,6 @@ struct MaintenanceCalculationView: View {
                         .foregroundStyle(.secondary)
                     MenuPicker<HealthPeriod>([.day, .week], healthModel.intervalPeriodBinding)
                 }
-//                Text("7")
-//                    .foregroundStyle(isEditing ? Color.accentColor : Color.primary)
             }
         }
     }
