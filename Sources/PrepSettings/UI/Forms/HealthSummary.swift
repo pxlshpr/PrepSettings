@@ -75,29 +75,36 @@ public struct HealthSummary: View {
             Section {
                 HStack(alignment: .top) {
                     VStack {
-                        Image(systemName: "heart.text.square")
-                            .font(.system(size: 50))
-                            .foregroundStyle(Color.accentColor)
+                        Image(packageResource: "AppleHealthIcon", ofType: "png")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+//                        Image(systemName: "heart.text.square")
+//                            .font(.system(size: 50))
+//                            .foregroundStyle(Color.accentColor)
                         Spacer()
                     }
                     VStack(alignment: .leading) {
-                        Text("Health App")
+                        Text("Apple Health")
+                            .foregroundStyle(.white)
                             .fontWeight(.semibold)
-                        Text("Fill in data from the Health App and have them stay synced to any changes")
+                        Text("Automatically sync your data with Apple Health.")
                             .font(.system(.callout))
-                            .foregroundStyle(.secondary)
+//                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color(.systemGray6))
                         Divider()
-                        Button("Fill from Health App") {
+                        Button("Sync Health Details") {
                             Task(priority: .high) {
                                 try await model.setAllFromHealthKit()
                             }
                         }
-                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .fontWeight(.bold)
                         .padding(.top, 5)
                     }
                 }
                 .padding(.top)
             }
+            .listRowBackground(Color.accentColor)
         }
         
         return Group {

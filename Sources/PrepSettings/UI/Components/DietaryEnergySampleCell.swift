@@ -5,10 +5,10 @@ struct DietaryEnergySampleCell: View {
 
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
 
-    let sample: MaintenanceDietaryEnergySample
+    let sample: DietaryEnergySample
     let date: Date
     
-    init(sample: MaintenanceDietaryEnergySample, date: Date) {
+    init(sample: DietaryEnergySample, date: Date) {
         self.sample = sample
         self.date = date
     }

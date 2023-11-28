@@ -24,13 +24,13 @@ struct WeightSamplesList: View {
         .navigationTitle("Weight")
     }
     
-    func weightCell(sample: MaintenanceWeightSample, isPrevious: Bool) -> some View {
+    func weightCell(sample: WeightSample, isPrevious: Bool) -> some View {
         
         var date: Date {
             isPrevious ? previousDate : currentDate
         }
         
-        func didSaveWeight(_ sample: MaintenanceWeightSample) {
+        func didSaveWeight(_ sample: WeightSample) {
             healthModel.setWeightSample(sample, isPrevious: isPrevious)
 //            dismiss()
         }

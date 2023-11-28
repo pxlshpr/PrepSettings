@@ -4,8 +4,8 @@ import PrepShared
 extension WeightSampleForm {
     @Observable class Model {
 
-        let initialSample: MaintenanceWeightSample
-        var sample: MaintenanceWeightSample
+        let initialSample: WeightSample
+        var sample: WeightSample
 
         let date: Date
         var value: Double?
@@ -16,7 +16,7 @@ extension WeightSampleForm {
             }
         }
 
-        init(sample: MaintenanceWeightSample, date: Date) {
+        init(sample: WeightSample, date: Date) {
             self.initialSample = sample
             self.sample = sample
             self.value = sample.value

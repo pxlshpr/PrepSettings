@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-typealias DidSaveWeightSampleHandler = (MaintenanceWeightSample) -> ()
+typealias DidSaveWeightSampleHandler = (WeightSample) -> ()
 typealias DidSaveWeightHandler = (Double?) -> ()
 
 struct WeightSampleForm: View {
@@ -18,7 +18,7 @@ struct WeightSampleForm: View {
     let didSaveWeight: DidSaveWeightSampleHandler
 
     init(
-        sample: MaintenanceWeightSample,
+        sample: WeightSample,
         date: Date,
         healthModel: HealthModel,
         settingsStore: SettingsStore,

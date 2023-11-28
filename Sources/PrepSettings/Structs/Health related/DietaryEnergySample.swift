@@ -1,11 +1,11 @@
 import PrepShared
 
-public struct MaintenanceDietaryEnergySample: Hashable, Codable {
-    var type: MaintenanceDietaryEnergySampleType
+public struct DietaryEnergySample: Hashable, Codable {
+    var type: DietaryEnergySampleType
     var value: Double?
 
     public init(
-        type: MaintenanceDietaryEnergySampleType,
+        type: DietaryEnergySampleType,
         value: Double? = nil
     ) {
         self.type = type
@@ -13,7 +13,7 @@ public struct MaintenanceDietaryEnergySample: Hashable, Codable {
     }
 }
 
-extension MaintenanceDietaryEnergySample {
+extension DietaryEnergySample {
     func value(in unit: EnergyUnit) -> Double? {
         guard let value else { return nil }
         return EnergyUnit.kcal.convert(value, to: unit)

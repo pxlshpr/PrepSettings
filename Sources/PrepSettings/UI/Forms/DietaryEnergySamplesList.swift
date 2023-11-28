@@ -43,7 +43,7 @@ struct DietaryEnergySamplesList: View {
         }
     }
     
-    func dietaryEnergyCell(sample: MaintenanceDietaryEnergySample, date: Date) -> some View {
+    func dietaryEnergyCell(sample: DietaryEnergySample, date: Date) -> some View {
         NavigationLink {
             DietaryEnergySampleForm(
                 sample: sample,

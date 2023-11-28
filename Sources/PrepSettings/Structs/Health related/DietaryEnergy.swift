@@ -2,11 +2,11 @@ import Foundation
 
 public struct DietaryEnergy: Hashable, Codable {
     public static let DefaultNumberOfSamples = 7
-    public var samples: [MaintenanceDietaryEnergySample]
+    public var samples: [DietaryEnergySample]
     
     public init(
-        samples: [MaintenanceDietaryEnergySample] = Array.init(
-            repeating: MaintenanceDietaryEnergySample(type: .healthKit),
+        samples: [DietaryEnergySample] = Array.init(
+            repeating: DietaryEnergySample(type: .healthKit),
             count: DefaultNumberOfSamples
         )
     ) {
@@ -24,7 +24,7 @@ extension DietaryEnergy {
     ) {
         let numberOfDays = interval.numberOfDays
         samples = Array.init(
-            repeating: MaintenanceDietaryEnergySample(type: .healthKit),
+            repeating: DietaryEnergySample(type: .healthKit),
             count: numberOfDays
         )
         for i in 0..<numberOfDays {
@@ -38,11 +38,11 @@ extension DietaryEnergy {
 }
 
 public extension DietaryEnergy {
-    mutating func setSample(at index: Int, with sample: MaintenanceDietaryEnergySample) {
+    mutating func setSample(at index: Int, with sample: DietaryEnergySample) {
         samples[index] = sample
     }
     
-    func sample(at index: Int) -> MaintenanceDietaryEnergySample? {
+    func sample(at index: Int) -> DietaryEnergySample? {
         samples[index]
     }
     

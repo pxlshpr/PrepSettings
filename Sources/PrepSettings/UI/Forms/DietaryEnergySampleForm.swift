@@ -8,7 +8,7 @@ import PrepShared
  [ ] error row if there are no days entered, letting the user know that at least one day has to be provided (maybe have a way for them to manually enter a value that will be repeated for all days, that they think was their average—so they can start off with this)
  */
 
-typealias DidSaveDietaryEnergySampleHandler = (MaintenanceDietaryEnergySample) -> ()
+typealias DidSaveDietaryEnergySampleHandler = (DietaryEnergySample) -> ()
 
 struct DietaryEnergySampleForm: View {
     
@@ -19,13 +19,12 @@ struct DietaryEnergySampleForm: View {
     @Bindable var settingsStore: SettingsStore
 
     /// Value that is fetched and stored in the unit that the user has set in `SettingsStore`
-    @State var values: [MaintenanceDietaryEnergySampleType: Double] = [:]
     @State var showingSaveConfirmation = false
 
     let didSave: DidSaveDietaryEnergySampleHandler
 
     init(
-        sample: MaintenanceDietaryEnergySample,
+        sample: DietaryEnergySample,
         date: Date,
         healthModel: HealthModel,
         settingsStore: SettingsStore,
@@ -39,88 +38,130 @@ struct DietaryEnergySampleForm: View {
 
     var body: some View {
         Form {
+            valueSection
             chooseSection
-//            useHealthKitSection
-//            doNotIncludeSection
         }
         .navigationTitle("Dietary Energy")
-//        .navigationTitle(model.date.adaptiveMaintenanceDateString)
         .navigationBarTitleDisplayMode(.inline)
-        .task(loadValues)
+        .task(model.loadValues)
+    }
+    
+    func value(for type: DietaryEnergySampleType) -> Double? {
+        guard let valueInKcal = model.valueInKcal(for: type) else { return nil }
+        return EnergyUnit.kcal.convert(valueInKcal, to: settingsStore.energyUnit)
+    }
+    
+    var valueSection: some View {
+        
+        let unitBinding = Binding<EnergyUnit>(
+            get: { settingsStore.energyUnit },
+            set: { newValue in
+                withAnimation {
+                    settingsStore.energyUnit = newValue
+                }
+            }
+        )
+        
+        var footer: some View {
+            var string: String {
+                switch model.type {
+                case .logged:
+                    "You are using the dietary energy that was logged."
+                case .healthKit:
+                    "You are using the dietary energy value that is in Apple Health for this day"
+                case .average:
+                    "You are using the average dietary energy consumed for the days in the period you are calculating the maintenance energy for."
+                case .userEntered:
+                    "You are using a custom entered value for the dietary energy consumed on this day."
+                case .notConsumed:
+                    "You have marked this day as having consumed no dietary energy."
+                }
+            }
+            
+            return Text(string)
+        }
+        
+        @ViewBuilder
+        var detail: some View {
+            switch model.type {
+            case .userEntered:
+                ManualHealthField(
+                    unitBinding: unitBinding,
+                    valueBinding: .constant(0),
+                    firstComponentBinding: .constant(0),
+                    secondComponentBinding: .constant(0)
+                )
+            default:
+                if let value = value(for: model.type) {
+                    HStack(spacing: 2) {
+                        Text("\(value.formattedEnergy)")
+                            .foregroundStyle(.secondary)
+                            .contentTransition(.numericText(value: value))
+                        MenuPicker(unitBinding)
+                    }
+                }
+            }
+        }
+        return Section(footer: footer) {
+            HStack {
+                Text(model.date.adaptiveMaintenanceDateString)
+                Spacer()
+                detail
+            }
+        }
     }
     
     var footer: some View {
         Text("Choose a value you would like to use for this day.\n\nIf the logged value is inaccurate or incomplete, you can choose to use the average of the days in the period you are calculating your maintenance energy for.")
     }
     
-    @State var type: MaintenanceDietaryEnergySampleType = .average
-    
     var chooseSection: some View {
-//        Section(footer: footer) {
-            Picker(model.date.adaptiveMaintenanceDateString, selection: $model.type) {
-                ForEach(MaintenanceDietaryEnergySampleType.allCases, id: \.self) {
-//                    Text($0.name)
-                    cell(for: $0)
+        
+        let selection = Binding<DietaryEnergySampleType>(
+            get: { model.type },
+            set: { newValue in
+                withAnimation {
+                    model.type = newValue
                 }
             }
-            .pickerStyle(.inline)
-//            .pickerStyle(.menu)
-
-//            cell("Logged", value: 1526, isSelected: true)
-//            if let healthKitValue {
-//                cell("Apple Health", value: 1025, isSelected: false)
-//            }
-//            cell("Average", value: 1852, isSelected: false)
-//            cell("Not consumed", value: 0, isSelected: false)
-//        }
+        )
+        
+        return Picker("Source", selection: selection) {
+            ForEach(DietaryEnergySampleType.allCases, id: \.self) {
+                cell(type: $0)
+            }
+        }
+        .pickerStyle(.inline)
+    }
+    
+    func haveValue(for type: DietaryEnergySampleType) -> Bool {
+        value(for: type) != nil
     }
     
     @ViewBuilder
-    func cell(for type: MaintenanceDietaryEnergySampleType) -> some View {
-        if let value = values[type] {
-//            Text(type.name)
-            cell(type.name, value: value, isSelected: typeIsSelected(type))
-        }
-    }
-    
-    func typeIsSelected(_ type: MaintenanceDietaryEnergySampleType) -> Bool {
-        false
-    }
-    
-    func cell(_ label: String, value: Double, isSelected: Bool) -> some View {
-//        Button {
-            
-//        } label: {
+    func cell(type: DietaryEnergySampleType) -> some View {
+        if type == .userEntered || haveValue(for: type) {
             HStack {
-                Text(label)
+                Text(type.name)
                     .foregroundStyle(Color(.label))
                 Spacer()
-                Text("\(value.formattedEnergy) kcal")
+                if let value = value(for: type) {
+                    HStack(spacing: 2) {
+                        Text(value.formattedEnergy)
+                            .contentTransition(.numericText(value: value))
+                        Text(settingsStore.energyUnit.abbreviation)
+                    }
                     .foregroundStyle(Color(.secondaryLabel))
-//                Image(systemName: "checkmark")
-//                    .opacity(isSelected ? 1 : 0)
+                }
             }
-//        }
-    }
-    
-    @Sendable
-    func loadValues() async {
-        await MainActor.run {
-            self.values = [
-                .healthKit: 1024,
-                .logged: 1526,
-                .average: 1852,
-//                .notConsumed: 0
-            ]
         }
     }
-    
 }
 
 extension DietaryEnergySampleForm {
     @Observable class Model {
-        let initialSample: MaintenanceDietaryEnergySample
-        var sample: MaintenanceDietaryEnergySample
+        let initialSample: DietaryEnergySample
+        var sample: DietaryEnergySample
         
         let date: Date
         var value: Double?
@@ -131,9 +172,11 @@ extension DietaryEnergySampleForm {
             }
         }
         
-        var type: MaintenanceDietaryEnergySampleType
+        var fetchedValuesInKcal: [DietaryEnergySampleType: Double] = [:]
 
-        init(sample: MaintenanceDietaryEnergySample, date: Date) {
+        var type: DietaryEnergySampleType
+
+        init(sample: DietaryEnergySample, date: Date) {
             self.initialSample = sample
             self.sample = sample
             self.value = sample.value
@@ -146,7 +189,24 @@ extension DietaryEnergySampleForm {
 }
 
 extension DietaryEnergySampleForm.Model {
+    func valueInKcal(for type: DietaryEnergySampleType) -> Double? {
+        switch type {
+        case .userEntered:  value
+        default:            fetchedValuesInKcal[type]
+        }
+    }
     
+    @Sendable
+    func loadValues() async {
+        await MainActor.run {
+            fetchedValuesInKcal = [
+                .healthKit: 1024,
+                .logged: 1526,
+                .average: 1852,
+//                .notConsumed: 0
+            ]
+        }
+    }
 }
 
 #Preview {

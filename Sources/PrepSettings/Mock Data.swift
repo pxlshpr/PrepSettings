@@ -79,12 +79,12 @@ public struct MaintenanceValues: Codable {
     public struct Value: Codable {
         public var weightInKg: Double?
         public var dietaryEnergyInKcal: Double?
-        public var dietaryEnergyType: MaintenanceDietaryEnergySampleType
+        public var dietaryEnergyType: DietaryEnergySampleType
         
         public init(
             weightInKg: Double? = nil,
             dietaryEnergyInKcal: Double? = nil,
-            dietaryEnergyType: MaintenanceDietaryEnergySampleType
+            dietaryEnergyType: DietaryEnergySampleType
         ) {
             self.weightInKg = weightInKg
             self.dietaryEnergyInKcal = dietaryEnergyInKcal
@@ -115,7 +115,7 @@ public extension MaintenanceValues {
         values[date]?.weightInKg = value
     }
     
-    mutating func setDietaryEnergyInKcal(_ value: Double, for date: Date, type: MaintenanceDietaryEnergySampleType) {
+    mutating func setDietaryEnergyInKcal(_ value: Double, for date: Date, type: DietaryEnergySampleType) {
         values[date]?.dietaryEnergyInKcal = value
         values[date]?.dietaryEnergyType = type
     }
@@ -128,7 +128,7 @@ public extension MaintenanceValues {
         values[date]?.dietaryEnergyInKcal
     }
     
-    func dietaryEnergyType(for date: Date) -> MaintenanceDietaryEnergySampleType? {
+    func dietaryEnergyType(for date: Date) -> DietaryEnergySampleType? {
         values[date]?.dietaryEnergyType
     }
 }

@@ -2,12 +2,12 @@ import Foundation
 import PrepShared
 
 public struct WeightChange: Hashable, Codable {
-    public var current: MaintenanceWeightSample
-    public var previous: MaintenanceWeightSample
+    public var current: WeightSample
+    public var previous: WeightSample
     
     public init() {
-        self.current = MaintenanceWeightSample()
-        self.previous = MaintenanceWeightSample()
+        self.current = WeightSample()
+        self.previous = WeightSample()
     }    
 }
 
@@ -51,7 +51,7 @@ extension WeightChange {
         
         let previousDate = maintenanceInterval.startDate(with: date)
 
-        func movingAverageWeightSample(on date: Date, interval: HealthInterval) -> MaintenanceWeightSample {
+        func movingAverageWeightSample(on date: Date, interval: HealthInterval) -> WeightSample {
             var movingAverageValues: [Int: Double] = [:]
             for i in 0..<interval.numberOfDays {
                 let movedDate = date.moveDayBy(-i)
@@ -60,15 +60,15 @@ extension WeightChange {
                 }
             }
             let value = Array(movingAverageValues.values).averageValue
-            return MaintenanceWeightSample(
+            return WeightSample(
                 movingAverageInterval: interval,
                 movingAverageValues: movingAverageValues,
                 value: value
             )
         }
         
-        func weightSample(on date: Date) -> MaintenanceWeightSample {
-            MaintenanceWeightSample(
+        func weightSample(on date: Date) -> WeightSample {
+            WeightSample(
                 movingAverageInterval: nil,
                 movingAverageValues: nil,
                 value: values.weightInKg(on: date)

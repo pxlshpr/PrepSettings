@@ -5,10 +5,10 @@ struct WeightSampleCell: View {
     
     @Environment(SettingsStore.self) var settingsStore
     
-    let sample: MaintenanceWeightSample
+    let sample: WeightSample
     let date: Date
     
-    init(sample: MaintenanceWeightSample, date: Date) {
+    init(sample: WeightSample, date: Date) {
         self.sample = sample
         self.date = date
     }

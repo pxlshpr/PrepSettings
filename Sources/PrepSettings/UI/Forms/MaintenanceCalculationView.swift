@@ -114,7 +114,7 @@ struct MaintenanceCalculationView: View {
     var daysSection: some View {
         var footer: some View {
 //            EmptyView()
-            Text("Duration over which to calculate your maintenance energy.")
+            Text("Period over which to calculate your maintenance energy.")
         }
         
         var header: some View {
@@ -124,7 +124,7 @@ struct MaintenanceCalculationView: View {
         
         return Section(header: header, footer: footer) {
             HStack {
-                Text("Duration")
+                Text("Period")
 //                Text("Number of days")
 //                Text("Calculated over")
                 Spacer()

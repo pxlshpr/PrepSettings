@@ -19,7 +19,7 @@ extension HealthModel {
 }
 
 extension HealthModel {
-    func setWeightSample(_ sample: MaintenanceWeightSample, isPrevious: Bool) {
+    func setWeightSample(_ sample: WeightSample, isPrevious: Bool) {
         var weightChange = health.maintenanceEnergy?.weightChange ?? .init()
         if isPrevious {
             weightChange.previous = sample
