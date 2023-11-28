@@ -21,7 +21,7 @@ extension Health.MaintenanceEnergy {
     
     func weightChangeRow(bodyMassUnit: BodyMassUnit) -> some View {
         HStack {
-            Text("Weight Change")
+            Text("Change")
             Spacer()
             weightChangeValueText(bodyMassUnit: bodyMassUnit)
         }

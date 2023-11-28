@@ -27,7 +27,7 @@ struct WeightSamplesList: View {
             sourceSection
             weightsSections
         }
-        .navigationTitle("Weight")
+        .navigationTitle("Weight Change")
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -56,7 +56,7 @@ struct WeightSamplesList: View {
         @ViewBuilder
         var row: some View {
             HStack {
-                Text("Weight Change")
+                Text("21 - 28 August 2021")
                 Spacer()
                 switch type {
                 case .usingWeights:

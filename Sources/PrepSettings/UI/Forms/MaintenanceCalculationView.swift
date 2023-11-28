@@ -104,9 +104,9 @@ struct MaintenanceCalculationView: View {
         
         return Group {
             Section(header: header, footer: footer) {
-                samplesLink
                 maintenance.weightChangeRow(bodyMassUnit: settingsStore.bodyMassUnit)
                 maintenance.equivalentEnergyRow(energyUnit: settingsStore.energyUnit)
+                samplesLink
             }
         }
     }
@@ -152,7 +152,7 @@ struct MaintenanceCalculationView: View {
             Text("The energy you consumed over the 7 days leading up to this date.")
         }
         
-        return Section(header: header, footer: footer) {
+        var samplesLink: some View {
             NavigationLink {
                 DietaryEnergySamplesList()
                     .environment(settingsStore)
@@ -160,8 +160,11 @@ struct MaintenanceCalculationView: View {
             } label: {
                 Text("Show Data")
             }
+        }
+        
+        var totalRow: some View {
             HStack {
-                Text("Total Dietary Energy")
+                Text("Total Consumed")
                 Spacer()
                 if let total = maintenance.dietaryEnergy.total {
                     Text("\(total.formattedEnergy) kcal")
@@ -171,6 +174,11 @@ struct MaintenanceCalculationView: View {
                         .foregroundStyle(.tertiary)
                 }
             }
+        }
+        
+        return Section(header: header, footer: footer) {
+            totalRow
+            samplesLink
         }
     }
     
