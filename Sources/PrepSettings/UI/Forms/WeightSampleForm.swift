@@ -317,7 +317,8 @@ struct WeightSampleForm: View {
                 )
             }
         }
-//        .onAppear {
+        .onAppear {
+            SettingsStore.configureAsMock()
 //            resetMockMaintenanceValues()
-//        }
+        }
 }
