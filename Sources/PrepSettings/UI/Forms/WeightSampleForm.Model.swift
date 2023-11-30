@@ -195,7 +195,7 @@ extension WeightSampleForm.Model {
                         self.sample.movingAverageValues = nil
                     }
                 case true:
-                    self.setMovingAverageValuesFromBacked()
+                    self.setMovingAverageValuesFromBackend()
                 }
             }
         )
