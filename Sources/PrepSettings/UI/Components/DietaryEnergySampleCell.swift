@@ -25,7 +25,7 @@ struct DietaryEnergySampleCell: View {
     @ViewBuilder
     var value: some View {
         if sample.type != .average, let value = sample.value(in: settingsStore.energyUnit) {
-            HStack(spacing: 4) {
+            HStack(spacing: UnitSpacing) {
                 Text(value.formattedEnergy)
                     .font(NumberFont)
                     .contentTransition(.numericText(value: Double(value)))

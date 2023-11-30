@@ -9,7 +9,7 @@ struct ManualHealthField<Unit: HealthUnit>: View {
     let secondComponentBinding: Binding<Double>
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack {
             switch unitBinding.wrappedValue.hasTwoComponents {
             case true:
                 NumberTextField(placeholder: "Required", binding: firstComponentBinding)

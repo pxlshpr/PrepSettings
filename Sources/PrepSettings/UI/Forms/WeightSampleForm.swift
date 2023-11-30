@@ -209,7 +209,7 @@ struct WeightSampleForm: View {
             @ViewBuilder
             var valueText: some View {
                 if let value = movingAverageValue(at: index) {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
                         Text(value.healthString)
                             .font(NumberFont)
                             .animation(.default, value: value)

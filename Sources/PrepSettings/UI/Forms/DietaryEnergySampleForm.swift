@@ -93,12 +93,13 @@ struct DietaryEnergySampleForm: View {
                 )
             default:
                 if let value = value(for: model.type) {
-                    HStack(spacing: 2) {
+                    HStack(spacing: UnitSpacing) {
                         Text("\(value.formattedEnergy)")
-                            .foregroundStyle(.secondary)
                             .contentTransition(.numericText(value: value))
-                        MenuPicker(unitBinding)
+//                        MenuPicker(unitBinding)
+                        Text(unitBinding.wrappedValue.abbreviation)
                     }
+                    .foregroundStyle(.secondary)
                 }
             }
         }
@@ -146,7 +147,7 @@ struct DietaryEnergySampleForm: View {
                     .foregroundStyle(Color(.label))
                 Spacer()
                 if type != .userEntered, let value = value(for: type) {
-                    HStack(spacing: 2) {
+                    HStack(spacing: UnitSpacing) {
                         Text(value.formattedEnergy)
                             .contentTransition(.numericText(value: value))
                         Text(settingsStore.energyUnit.abbreviation)

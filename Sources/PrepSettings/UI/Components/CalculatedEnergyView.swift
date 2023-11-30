@@ -54,14 +54,12 @@ struct CalculatedEnergyView<S: GenericSource>: View {
             if let interval = intervalBinding.wrappedValue {
                 prefixText(interval: interval, date: date)
             }
-            HStack {
-                HStack(spacing: 4) {
-                    HealthKitValueView(valueBinding, source, showPrecision: false)
-                    if value != nil {
-//                        MenuPicker(unitBinding)
-                        Text(unitBinding.wrappedValue.abbreviation)
-                            .foregroundStyle(.secondary)
-                    }
+            HStack(spacing: UnitSpacing) {
+                HealthKitValueView(valueBinding, source, showPrecision: false)
+                if value != nil {
+//                    MenuPicker(unitBinding)
+                    Text(unitBinding.wrappedValue.abbreviation)
+                        .foregroundStyle(.secondary)
                 }
             }
         }

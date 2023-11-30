@@ -1,6 +1,7 @@
 import SwiftUI
 import PrepShared
 
+public let UnitSpacing: CGFloat? = nil
 struct MaintenanceEstimateText: View {
 
     @Bindable var model: HealthModel
@@ -21,7 +22,7 @@ struct MaintenanceEstimateText: View {
             Text(requiredString)
                 .foregroundStyle(Color(.tertiaryLabel))
         } else if let value {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
                 Text(value.formattedEnergy)
                     .animation(.default, value: value)
                     .contentTransition(.numericText(value: value))

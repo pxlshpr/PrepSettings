@@ -64,7 +64,7 @@ public struct MaintenanceFormSections: View {
         }
         
         func valueContent(_ value: Double) -> some View {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
                 Text(value.formattedEnergy)
                     .animation(.default, value: value)
                     .contentTransition(.numericText(value: value))

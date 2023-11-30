@@ -6,7 +6,7 @@ extension Health.MaintenanceEnergy {
     @ViewBuilder
     func weightChangeValueText(bodyMassUnit: BodyMassUnit) -> some View {
         if let delta = weightChange.delta(in: bodyMassUnit) {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
                 Text("\(delta.cleanAmount)")
                     .font(NumberFont)
                     .contentTransition(.numericText(value: Double(delta)))
@@ -32,7 +32,7 @@ extension Health.MaintenanceEnergy {
             Text("Equivalent Energy")
             Spacer()
             if let kcal = weightChange.deltaEnergyEquivalent(in: energyUnit) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
                     Text("\(kcal.formattedEnergy)")
                         .font(NumberFont)
                         .contentTransition(.numericText(value: Double(kcal)))

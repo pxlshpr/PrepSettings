@@ -128,7 +128,7 @@ struct MaintenanceCalculationView: View {
                 Spacer()
                 Stepper("", value: healthModel.intervalValueBinding, in: healthModel.intervalPeriod.range)
                     .fixedSize()
-                HStack(spacing: 4) {
+                HStack(spacing: UnitSpacing) {
                     Text("\(healthModel.intervalValue)")
                         .font(NumberFont)
                         .contentTransition(.numericText(value: Double(healthModel.intervalValue)))

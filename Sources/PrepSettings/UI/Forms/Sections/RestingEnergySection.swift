@@ -104,7 +104,7 @@ struct RestingEnergySection: View {
                 set: { model.health.restingEnergyValue = $0 }
             )
 
-            return HStack(spacing: 4) {
+            return HStack(spacing: UnitSpacing) {
                 Spacer()
                 NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
                 /// Previously used a picker, but we've since removed it in favour of having unit changes in one place
