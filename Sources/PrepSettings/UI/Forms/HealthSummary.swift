@@ -5,14 +5,28 @@ import TipKit
 public struct HealthSummary: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
-
     @Bindable var model: HealthModel
+    @State var hasAppeared = false
     
     public init(model: HealthModel) {
         self.model = model
     }
     
     public var body: some View {
+        Group {
+            if hasAppeared {
+                form
+            } else {
+                Color.clear
+            }
+        }
+        .navigationTitle("Health Details")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar { toolbarContent }
+        .onAppear(perform: appeared)
+    }
+    
+    var form: some View {
         Form {
             dateSection
             syncAllSection
@@ -24,9 +38,12 @@ public struct HealthSummary: View {
             content(for: .leanBodyMass)
             dailyValuesSection
         }
-        .navigationTitle("Health Details")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar { toolbarContent }
+    }
+    
+    func appeared() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            hasAppeared = true
+        }
     }
     
     var dateSection: some View {
@@ -150,19 +167,10 @@ public struct HealthSummary: View {
             case .isSmoker:
                 HealthTopRow(type: .isSmoker, model: model)
             case .maintenanceEnergy:
-                Group {
-                    MaintenanceFormSections(model)
-                        .environment(settingsStore)
-//                    Divider()
-//                    Color.clear
-//                        .listRowBackground(EmptyView())
-//                        .listSectionSpacing(0)
-                }
+                MaintenanceFormSections(model)
+                    .environment(settingsStore)
             default:
                 EmptyView()
-//                Section {
-//                    link(type)
-//                }
             }
         }
         
@@ -210,8 +218,11 @@ public struct HealthSummary: View {
 }
 
 #Preview {
-    NavigationStack {
-        HealthSummary(model: MockHealthModel)
-            .environment(SettingsStore.shared)
-    }
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                HealthSummary(model: MockHealthModel)
+                    .environment(SettingsStore.shared)
+            }
+        }
 }

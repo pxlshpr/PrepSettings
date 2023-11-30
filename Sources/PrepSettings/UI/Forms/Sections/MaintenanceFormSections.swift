@@ -3,6 +3,10 @@ import PrepShared
 
 public struct MaintenanceFormSections: View {
     
+    enum Route {
+        case maintenance
+    }
+    
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
 
     @Bindable var model: HealthModel
@@ -30,15 +34,24 @@ public struct MaintenanceFormSections: View {
             }
         }
         
+        var label: some View {
+            HStack {
+                Text("Estimated")
+                Spacer()
+                MaintenanceEstimateText(model, settingsStore)
+            }
+        }
+        
         return Section(footer: footer) {
-            NavigationLink {
-                MaintenanceEstimateForm(model)
-                    .environment(settingsStore)
-            } label: {
-                HStack {
-                    Text("Estimated")
-                    Spacer()
-                    MaintenanceEstimateText(model, settingsStore)
+            /// Using this instead of `NavigationLink(destination:label:)` as that results in the offset bug mentioned here https://www.reddit.com/r/SwiftUI/comments/17pqj3d/on_ios_17_how_to_work_around_list_offset_jumping/
+            NavigationLink(value: Route.maintenance) {
+                label
+            }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .maintenance:
+                    MaintenanceEstimateForm(model)
+                        .environment(settingsStore)
                 }
             }
         }

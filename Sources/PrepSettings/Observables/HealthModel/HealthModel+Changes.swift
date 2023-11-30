@@ -37,9 +37,9 @@ public extension HealthModel {
     func handleChanges(from old: Health) async throws {
         
         /// Get the first type that has changed from a non-HealthKit source to HealthKit
-        guard let type = health.typeToFetchFromHealthKit(from: old) else { return }
-
-        try await setTypeFromHealthKit(type)
+        if let type = health.typeToFetchFromHealthKit(from: old) {
+            try await setTypeFromHealthKit(type)
+        }
         
         await MainActor.run {
             health.recalculate()

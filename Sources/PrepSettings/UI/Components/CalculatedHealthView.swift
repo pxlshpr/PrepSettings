@@ -157,14 +157,18 @@ struct CalculatedHealthView<Unit: HealthUnit, S: GenericSource, Q: GenericQuanti
 
             }
             HStack {
-                HStack(spacing: 2) {
+                HStack {
                     HealthKitValueView(valueBinding, source)
                     if quantity != nil {
-                        MenuPicker<Unit>(unitBinding)
+                        /// Previously used a picker, but we've since removed it in favour of having unit changes in one place
+                //        MenuPicker<Unit>(unitBinding)
+                        
+                        Text(unitBinding.wrappedValue.abbreviation)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 if hasTwoComponents, quantity != nil {
-                    HStack(spacing: 2) {
+                    HStack {
                         HealthKitValueView(secondComponentBinding, source)
                         if let string = Unit.secondaryUnit {
                             Text(string)

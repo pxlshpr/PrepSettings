@@ -114,3 +114,13 @@ struct HealthLeanBodyMassSection: View {
         }
     }
 }
+
+#Preview {
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                HealthSummary(model: MockHealthModel)
+                    .environment(SettingsStore.shared)
+            }
+        }
+}

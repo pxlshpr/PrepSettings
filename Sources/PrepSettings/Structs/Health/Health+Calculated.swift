@@ -44,6 +44,8 @@ public extension Health {
             setQuantity(nil)
         }
 
+        print("calculating lean body mass")
+        
         guard let source = leanBodyMass?.source else {
 //            leanBodyMass = .init(
 //                source: .default,

@@ -4,35 +4,46 @@ import PrepShared
 public struct MaintenanceEstimateForm: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
-    
     @Bindable var model: HealthModel
-    
+    @State var hasAppeared = false
+
     public init(_ model: HealthModel) {
         self.model = model
     }
     
     public var body: some View {
+        Group {
+            if hasAppeared {
+                form
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear(perform: appeared)
+        .navigationTitle("Maintenance Energy")
+        .navigationBarTitleDisplayMode(.large)
+    }
+    
+    func appeared() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            hasAppeared = true
+        }
+    }
+
+    var form: some View {
         Form {
             estimateSection
-//                .listSectionSpacing(0)
             symbol("=")
-//                .listSectionSpacing(0)
             RestingEnergySection(
                 model: model,
                 settingsStore: settingsStore
             )
-//                .listSectionSpacing(0)
             symbol("+")
-//                .listSectionSpacing(0)
             ActiveEnergySection(
                 model: model,
                 settingsStore: settingsStore
             )
-//                .listSectionSpacing(0)
         }
-//        .navigationTitle("Estimated Energy Expenditure")
-//        .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle("Maintenance Energy")
     }
     
     func symbol(_ string: String) -> some View {

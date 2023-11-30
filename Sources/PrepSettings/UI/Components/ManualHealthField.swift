@@ -9,11 +9,11 @@ struct ManualHealthField<Unit: HealthUnit>: View {
     let secondComponentBinding: Binding<Double>
 
     var body: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: 4) {
             switch unitBinding.wrappedValue.hasTwoComponents {
             case true:
                 NumberTextField(placeholder: "Required", binding: firstComponentBinding)
-                unitPicker
+                unitView
                 NumberTextField(placeholder: "", binding: secondComponentBinding)
                 if let string = Unit.secondaryUnit {
                     Text(string)
@@ -21,12 +21,16 @@ struct ManualHealthField<Unit: HealthUnit>: View {
                 }
             case false:
                 NumberTextField(placeholder: "Required", binding: valueBinding)
-                unitPicker
+                unitView
             }
         }
     }
     
-    var unitPicker: some View {
-        MenuPicker<Unit>(unitBinding)
+    var unitView: some View {
+        /// Previously used a picker, but we've since removed it in favour of having unit changes in one place
+//        MenuPicker<Unit>(unitBinding)
+        
+        Text(unitBinding.wrappedValue.abbreviation)
+            .foregroundStyle(.secondary)
     }
 }

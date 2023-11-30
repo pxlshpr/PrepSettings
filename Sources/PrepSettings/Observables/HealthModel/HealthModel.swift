@@ -22,7 +22,9 @@ public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
     
     public var health: Health {
         didSet {
-            guard !ignoreChanges else { return }
+            guard !ignoreChanges else {
+                return
+            }
             handleChanges(from: oldValue)
         }
     }

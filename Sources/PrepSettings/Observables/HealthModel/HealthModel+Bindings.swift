@@ -112,112 +112,37 @@ public extension HealthModel {
     
     var ageSource: AgeSource {
         get { health.ageSource }
-        set {
-//            Task {
-//                await MainActor.run {
-                    health.ageSource = newValue
-//                }
-//                if newValue == .healthKit {
-//                    try await setAgeFromHealthKit()
-//                }
-//                if newValue != .userEnteredDateOfBirth {
-//                    health.ageDateOfBirth = nil
-//                }
-//            }
-        }
+        set { health.ageSource = newValue }
     }
     
     var sexSource: HealthSource {
         get { health.sexSource }
-        set {
-//            Task {
-//                await MainActor.run {
-                    health.sexSource = newValue
-//                }
-//                if newValue == .healthKit {
-//                    try await setSexFromHealthKit()
-//                }
-//            }
-        }
+        set { health.sexSource = newValue }
     }
 
     var weightSource: HealthSource {
         get { health.weightSource }
-        set {
-//            Task {
-//                await MainActor.run {
-                    health.weightSource = newValue
-//                }
-//                if newValue == .healthKit {
-//                    try await setWeightFromHealthKit()
-//                }
-//            }
-        }
+        set { health.weightSource = newValue }
     }
 
     var heightSource: HealthSource {
         get { health.heightSource }
-        set {
-//            Task {
-//                await MainActor.run {
-                    health.heightSource = newValue
-//                }
-//                if newValue == .healthKit {
-//                    try await setHeightFromHealthKit()
-//                }
-//            }
-        }
+        set { health.heightSource = newValue }
     }
 
     var leanBodyMassSource: LeanBodyMassSource {
         get { health.leanBodyMassSource }
-        set {
-//            Task {
-//                await MainActor.run {
-                    health.leanBodyMassSource = newValue
-//                }
-//                switch leanBodyMassSource {
-//                case .healthKit:
-//                    try await setLeanBodyMassFromHealthKit()
-//                case .equation, .fatPercentage, .userEntered:
-//                    break
-//                }
-//            }
-        }
+        set { health.leanBodyMassSource = newValue }
     }
 
     var restingEnergySource: RestingEnergySource {
         get { health.restingEnergySource }
-        set {
-//            Task {
-//                await MainActor.run {
-                    health.restingEnergySource = newValue
-//                }
-//                switch restingEnergySource {
-//                case .healthKit:
-//                    try await setRestingEnergyFromHealthKit()
-//                case .equation, .userEntered:
-//                    break
-//                }
-//            }
-        }
+        set { health.restingEnergySource = newValue }
     }
     
     var activeEnergySource: ActiveEnergySource {
         get { health.activeEnergySource }
-        set {
-//            Task {
-//                await MainActor.run {
-                    health.activeEnergySource = newValue
-//                }
-//                switch activeEnergySource {
-//                case .healthKit:
-//                    try await setActiveEnergyFromHealthKit()
-//                case .activityLevel, .userEntered:
-//                    break
-//                }
-//            }
-        }
+        set { health.activeEnergySource = newValue }
     }
     
     //MARK: Equations
