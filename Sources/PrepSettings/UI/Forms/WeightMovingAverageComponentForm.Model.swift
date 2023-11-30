@@ -5,24 +5,17 @@ extension WeightMovingAverageComponentForm {
     @Observable class Model {
         
         let initialValue: Double?
-        let initialUnit: BodyMassUnit
+        
         let healthModel: HealthModel
-        let settingsStore: SettingsStore
 
-        var value: Double?
-        var displayedValue: Double {
-            didSet {
-                value = displayedValue
-            }
-        }
+        var valueInKg: Double?
+        var displayedValue: Double
         var date: Date
         
-        init(value: Double?, date: Date, healthModel: HealthModel, settingsStore: SettingsStore) {
+        init(value: Double?, date: Date, healthModel: HealthModel) {
             self.initialValue = value
-            self.initialUnit = settingsStore.bodyMassUnit
             self.healthModel = healthModel
-            self.settingsStore = settingsStore
-            self.value = value
+            self.valueInKg = value
             self.displayedValue = value ?? 0
             self.date = date
         }
@@ -32,20 +25,18 @@ extension WeightMovingAverageComponentForm {
 extension WeightMovingAverageComponentForm.Model {
     
     var isNotDirty: Bool {
-        value == initialValue
-        && initialUnit == settingsStore.bodyMassUnit
+        valueInKg == initialValue
     }
     
     var isSaveDisabled: Bool {
         if isNotDirty { return true }
-        guard let value else { return false }
-        return value <= 0
+        guard let valueInKg else { return false }
+        return valueInKg <= 0
     }
     
     func bodyMassUnitChanged(old: BodyMassUnit, new: BodyMassUnit) {
-        guard let value else { return }
-        let converted = old.convert(value, to: new)
-        self.value = converted
+        guard let valueInKg else { return }
+        let converted = BodyMassUnit.kg.convert(valueInKg, to: new)
         displayedValue = converted
     }
     
@@ -53,7 +44,7 @@ extension WeightMovingAverageComponentForm.Model {
         get { Int(displayedValue.whole) }
         set {
             let value = Double(newValue) + (weightPoundsComponent / PoundsPerStone)
-            self.value = value
+            self.valueInKg = value
             displayedValue = value
         }
     }
@@ -63,7 +54,7 @@ extension WeightMovingAverageComponentForm.Model {
         set {
             let newValue = min(newValue, PoundsPerStone-1)
             let value = Double(weightStonesComponent) + (newValue / PoundsPerStone)
-            self.value = value
+            self.valueInKg = value
             displayedValue = value
         }
     }

@@ -21,25 +21,10 @@ struct WeightMovingAverageComponentForm: View {
         settingsStore: SettingsStore,
         didSaveWeight: @escaping DidSaveWeightHandler
     ) {
-        //TODO: Create a Model
-        /// [x] Store the value, have a textValue too, store the initial value too
-        /// [x] Store the date
-        /// [x] Pass in the delegate (do this for WeightSampleForm.Model too
-        /// [x] Use the delegate to show confirmation before saving
-        /// [x] Have a didSave closure passed in to this and WeightSampleForm.Model too
-        /// [x] When saved, set the value in the array of moving averages and recalculate the average
-        /// [x] Now display the average value not letting user edit in WeightSampleForm
-        /// [x] Handle the unit change by simply changing what the displayed value is, but still storing it using kilograms perhaps
-        /// [ ] Revisit `setBodyMassUnit`, and consider removing it in favour of saving weight in kilograms and always converting to display to the Health.bodyMassUnit, consider renaming this to `displayBodyMassUnit`, and changing the Weight and LBM structs to clearly say `weightInKilograms` or something
-        /// [ ] Also do the same thing with energy and height, changing from `heightUnit` to `displayHeightUnit`, changing from `energyUnit` to `displayEnergyUnit`, and changing `height` to `heightInCentimeters`
-        /// [ ] Have it so that displayed value in forms reacts to change in healthModel.health.bodyMassUnit by converting itself
-        /// [ ] Make sure we're calling the `HealthModel.setBodyMassUnit(_:whileEditing:)` when the unit changes and also revisit it and make sure we're doing the thing where we only chan
-        /// [ ] When not in kilograms, save entered value after converting to kilograms
         _model = State(initialValue: Model(
             value: value,
             date: date,
-            healthModel: healthModel,
-            settingsStore: settingsStore
+            healthModel: healthModel
         ))
         self.healthModel = healthModel
         self.settingsStore = settingsStore
@@ -70,7 +55,7 @@ struct WeightMovingAverageComponentForm: View {
     }
     
     var isRemoving: Bool {
-        model.value == nil
+        model.valueInKg == nil
     }
     
     func saveConfirmationMessage() -> some View {
@@ -106,46 +91,81 @@ struct WeightMovingAverageComponentForm: View {
     }
     
     func save() {
-        didSaveWeight(model.value)
+        didSaveWeight(model.valueInKg)
         dismiss()
     }
 
     var valueSection: some View {
-        Section {
+        var textField: some View {
+            
+            let binding = Binding<Double>(
+                get: { model.displayedValue },
+                set: { newValue in
+                    model.displayedValue = newValue
+                    model.valueInKg = settingsStore.bodyMassUnit.convert(newValue, to: .kg)
+                }
+            )
+            
+            return ManualHealthField(
+                unitBinding: $settingsStore.bodyMassUnit,
+                valueBinding: binding,
+                firstComponentBinding: $model.weightStonesComponent,
+                secondComponentBinding: $model.weightPoundsComponent
+            )
+        }
+        
+        return Section {
             HStack {
                 Text(model.date.adaptiveMaintenanceDateString)
                 Spacer()
-                if model.value == nil {
+                if model.valueInKg == nil {
                     Button("Set weight") {
                         withAnimation {
-                            model.value = 0
+                            model.valueInKg = 0
                             model.displayedValue = 0
                         }
                     }
                 } else {
-                    ManualHealthField(
-                        unitBinding: $settingsStore.bodyMassUnit,
-                        valueBinding: $model.displayedValue,
-                        firstComponentBinding: $model.weightStonesComponent,
-                        secondComponentBinding: $model.weightPoundsComponent
-                    )
+                    textField
                 }
             }
         }
     }
     
-    
     @ViewBuilder
     var removeButton: some View {
-        if model.value != nil {
+        if model.valueInKg != nil {
             Section {
                 Button("Remove") {
                     withAnimation {
-                        model.value = nil
+                        model.valueInKg = nil
                     }
                 }
             }
         }
     }
-    
+}
+
+#Preview {
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                WeightSampleForm(
+                    sample: .init(
+                        movingAverageInterval: .init(1, .week),
+                        movingAverageValues: [
+                            1: 93,
+                            5: 94
+                        ],
+                        value: 93.5
+                    ),
+                    date: Date.now,
+                    healthModel: MockHealthModel,
+                    settingsStore: SettingsStore.shared,
+                    didSave: { value in
+                        
+                    }
+                )
+            }
+        }
 }

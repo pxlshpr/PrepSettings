@@ -15,7 +15,7 @@ struct WeightSampleCell: View {
     
     @ViewBuilder
     var value: some View {
-        if let value = sample.value {
+        if let value = sample.value(in: settingsStore.bodyMassUnit) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("\(value.rounded(toPlaces: 1).cleanAmount)")
                     .font(NumberFont)

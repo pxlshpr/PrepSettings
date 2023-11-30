@@ -72,22 +72,21 @@ public struct HealthSummary: View {
 //                    .listRowBackground(EmptyView())
 //            }
         var section: some View {
+            
             Section {
                 HStack(alignment: .top) {
                     VStack {
                         Image(packageResource: "AppleHealthIcon", ofType: "png")
                             .resizable()
                             .frame(width: 50, height: 50)
-//                        Image(systemName: "heart.text.square")
-//                            .font(.system(size: 50))
-//                            .foregroundStyle(Color.accentColor)
                         Spacer()
                     }
                     VStack(alignment: .leading) {
                         Text("Apple Health")
                             .foregroundStyle(.white)
                             .fontWeight(.semibold)
-                        Text("Automatically sync your health details with Apple Health. Any goals based them will automatically update to changes.")
+//                        Text("Automatically sync your health details with Apple Health. Any goals based on them will automatically update to changes.")
+                        Text("Enable seamless syncing of your health data with Apple Health. Your personalized health goals will automatically adjust to reflect any changes in your health data.")
                             .font(.system(.callout))
                             .foregroundStyle(.white)
                             .opacity(0.8)
@@ -106,7 +105,7 @@ public struct HealthSummary: View {
                 }
                 .padding(.top)
             }
-            .listRowBackground(Color.accentColor)
+            .listRowBackground(Rectangle().fill(Color.accentColor.gradient))
         }
         
         return Group {

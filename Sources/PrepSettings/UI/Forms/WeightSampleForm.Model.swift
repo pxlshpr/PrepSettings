@@ -8,25 +8,38 @@ extension WeightSampleForm {
         var sample: WeightSample
 
         let date: Date
-        var value: Double?
-        var displayedValue: Double {
-            didSet {
-                value = displayedValue
-                sample.value = displayedValue
-            }
-        }
+//        var value: Double?
+        var displayedValue: Double
+//            didSet {
+//                if !isUsingMovingAverage {
+//                    sampleSampleValueAsDisplayedValueConvertedToKg()
+//                }
+//            }
+//        }
 
-        init(sample: WeightSample, date: Date) {
+        let healthModel: HealthModel
+        
+        init(sample: WeightSample, date: Date, healthModel: HealthModel) {
             self.initialSample = sample
             self.sample = sample
-            self.value = sample.value
-            self.displayedValue = sample.value ?? 0
             self.date = date
+            self.healthModel = healthModel
+            
+            if let value = sample.value {
+                self.displayedValue = BodyMassUnit.kg.convert(value, to: SettingsStore.shared.bodyMassUnit)
+            } else {
+                self.displayedValue = 0
+            }
         }
     }
 }
 
 extension WeightSampleForm.Model {
+    
+    func value(in unit: BodyMassUnit) -> Double? {
+        guard let value = sample.value else { return nil }
+        return BodyMassUnit.kg.convert(value, to: unit)
+    }
     
     var isNotDirty: Bool {
         sample == initialSample
@@ -37,36 +50,42 @@ extension WeightSampleForm.Model {
         if isNotDirty { return true }
 
         /// If we're using moving average but don't have a value (due to there not being any values entered), disable
-        if isUsingMovingAverage, value == nil { return true }
+        if isUsingMovingAverage, sample.value == nil { return true }
 
         /// If we've come to this point where value is nil, we're not using a moving average, and the form is dirty—enable
-        guard let value else { return false }
+        guard let value = sample.value else { return false }
 
         /// Finally, if the value is not greater than 0, disable
         return value <= 0
     }
 
     func bodyMassUnitChanged(old: BodyMassUnit, new: BodyMassUnit) {
-        guard let value else { return }
-        let converted = old.convert(value, to: new)
-        self.value = converted
-        displayedValue = converted
-        
+//        if !isUsingMovingAverage {
+//            sampleSampleValueAsDisplayedValueConvertedToKg()
+//        }
+//        guard let value = sample.value else { return }
+//        let converted = BodyMassUnit.kg.convert(value, to: new)
+        guard let value = self.value(in: new) else { return }
         withAnimation {
-            if let movingAverageValues = sample.movingAverageValues {
-                for (i, value) in movingAverageValues {
-                    let converted = old.convert(value, to: new)
-                    sample.movingAverageValues?[i] = converted
-                }
-            }
+            displayedValue = value
         }
+//        sample.value = converted
+//
+//        withAnimation {
+//            if let movingAverageValues = sample.movingAverageValues {
+//                for (i, value) in movingAverageValues {
+//                    let converted = old.convert(value, to: new)
+//                    sample.movingAverageValues?[i] = converted
+//                }
+//            }
+//        }
     }
     
     var weightStonesComponent: Int {
         get { Int(displayedValue.whole) }
         set {
             let value = Double(newValue) + (weightPoundsComponent / PoundsPerStone)
-            self.value = value
+//            self.value = value
             displayedValue = value
         }
     }
@@ -76,7 +95,7 @@ extension WeightSampleForm.Model {
         set {
             let newValue = min(newValue, PoundsPerStone-1)
             let value = Double(weightStonesComponent) + (newValue / PoundsPerStone)
-            self.value = value
+//            self.value = value
             displayedValue = value
         }
     }
@@ -93,36 +112,21 @@ extension WeightSampleForm.Model {
     
     func calculateAverage() {
         guard let values = sample.movingAverageValues, !values.isEmpty else {
-            value = nil
+            sample.value = nil
             return
         }
-        displayedValue = (values.reduce(0) { $0 + $1.value }) / Double(values.count)
+        let averageInKg = (values.reduce(0) { $0 + $1.value }) / Double(values.count)
+        sample.value = averageInKg
+        displayedValue = BodyMassUnit.kg.convert(averageInKg, to: SettingsStore.shared.bodyMassUnit)
     }
     
     var movingAverageNumberOfDays: Int {
         sample.movingAverageInterval?.numberOfDays ?? DefaultNumberOfDaysForMovingAverage
     }
     
-    var usingMovingAverageBinding: Binding<Bool> {
-        Binding<Bool>(
-            get: { self.isUsingMovingAverage },
-            set: { newValue in
-                withAnimation {
-                    switch newValue {
-                    case false:
-                        self.sample.movingAverageValues = nil
-                    case true:
-                        /// If the user has entered a weight already, set that as the first weight
-                        if let value = self.value, value > 0 {
-                            self.sample.movingAverageValues = [0: value]
-                        } else {
-                            self.sample.movingAverageValues = [:]
-                        }
-                        self.calculateAverage()
-                    }
-                }
-            }
-        )
+    func setMovingAverageValues(_ values: [Int: Double]) {
+        sample.movingAverageValues = values
+        calculateAverage()
     }
     
     var movingAverageIntervalPeriodBinding: Binding<HealthPeriod> {
@@ -139,6 +143,7 @@ extension WeightSampleForm.Model {
                     }
                     self.sample.movingAverageInterval = .init(value, newValue)
                 }
+                self.setMovingAverageValuesFromBackend()
             }
         )
     }
@@ -147,28 +152,70 @@ extension WeightSampleForm.Model {
         sample.movingAverageInterval?.period ?? .week
     }
     
-    var movingAverageIntervalValueBinding: Binding<Int> {
+    var intervalValueBinding: Binding<Int> {
         Binding<Int>(
             get: { self.movingAverageIntervalValue },
             set: { newValue in
-//                guard let interval = self.sample.movingAverageInterval else { return }
+                //TODO: Fetch values here for new range
+                let interval = HealthInterval(newValue, self.movingAverageIntervalPeriod)
                 withAnimation {
-                    self.sample.movingAverageInterval = .init(newValue, self.movingAverageIntervalPeriod)
+                    self.sample.movingAverageInterval = interval
+                }
+                self.setMovingAverageValuesFromBackend()
+            }
+        )
+    }
+     
+    func setMovingAverageValuesFromBackend() {
+        Task {
+            let backendValues = try await self.backendValuesForMovingAverage()
+            let values: [Int: Double] = if !backendValues.isEmpty {
+                backendValues
+            } else if let value = self.sample.value, value > 0 {
+                /// If the user has entered a weight already, set that as the first weight
+                [0: value]
+            } else {
+                [:]
+            }
+            await MainActor.run {
+                withAnimation {
+                    self.setMovingAverageValues(values)
+                }
+            }
+        }
+    }
+    
+    var isUsingMovingAverageBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { self.isUsingMovingAverage },
+            set: { newValue in
+                switch newValue {
+                case false:
+                    withAnimation {
+                        self.sample.movingAverageValues = nil
+                    }
+                case true:
+                    self.setMovingAverageValuesFromBacked()
                 }
             }
         )
     }
-
-    var movingAverageIntervalValue: Int {
-        sample.movingAverageInterval?.value ?? 1
-    }
     
+    
+    func backendValuesForMovingAverage() async throws -> [Int: Double] {
+        let interval = sample.movingAverageInterval ?? DefaultWeightMovingAverageInterval
+        return try await healthModel.weightValuesForMovingAverage(
+            interval: interval,
+            date: date
+        )
+    }
+
     var isUsingMovingAverage: Bool {
         sample.movingAverageValues != nil
     }
     
-    func movingAverageValue(at index: Int) -> Double? {
-        sample.movingAverageValues?[index]
+    var movingAverageIntervalValue: Int {
+        sample.movingAverageInterval?.value ?? 1
     }
 }
 

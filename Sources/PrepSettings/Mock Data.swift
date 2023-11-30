@@ -13,15 +13,25 @@ struct MockHealthModelDelegate: HealthModelDelegate {
     }
     
     func maintenanceBackendValues(for dateRange: ClosedRange<Date>) async throws -> MaintenanceValues {
-        try await fetchMaintenanceValuesFromDocuments()
+        .init(MockMaintenanceValues)
+//        try await fetchMaintenanceValuesFromDocuments()
     }
     
     func updateBackendWeight(for date: Date, with quantity: Quantity?, source: HealthSource) async throws {
         /// [ ] Load the struct from documents—simply amend the value we have, and then save it so that we can test the persistencen
+        var values = try await fetchMaintenanceValuesFromDocuments()
+        let value = values.values[date]
+        values.values[date] = .init(
+            weightInKg: quantity?.value,
+            dietaryEnergyInKcal: value?.dietaryEnergyInKcal,
+            dietaryEnergyType: value?.dietaryEnergyType ?? .userEntered
+        )
+        try await saveMaintenanceValuesInDocuments(values)
     }
     
     func planIsWeightDependent(on date: Date) async throws -> Bool {
-        true
+        false
+//        true
     }
     
     func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
@@ -133,6 +143,31 @@ public extension MaintenanceValues {
     }
 }
 
+let MockMaintenanceValues = [
+    Date(fromDateString: "2021_08_28")!: (nil, 1800.0),
+    Date(fromDateString: "2021_08_27")!: (93, nil), /// weight
+    Date(fromDateString: "2021_08_26")!: (nil, nil), /// weight
+    Date(fromDateString: "2021_08_25")!: (nil, nil),
+    Date(fromDateString: "2021_08_24")!: (nil, nil),
+    Date(fromDateString: "2021_08_23")!: (94, nil), /// weight
+    Date(fromDateString: "2021_08_22")!: (nil, 2300),
+    Date(fromDateString: "2021_08_21")!: (94.5, nil),
+
+    Date(fromDateString: "2021_08_20")!: (nil, 2250),
+    Date(fromDateString: "2021_08_19")!: (92.4, 1950), /// weight
+    Date(fromDateString: "2021_08_18")!: (94.15, 2650), /// weight
+    Date(fromDateString: "2021_08_17")!: (nil, 2534),
+    Date(fromDateString: "2021_08_16")!: (92.75, 2304), /// weight
+    Date(fromDateString: "2021_08_15")!: (nil, 2055),
+    Date(fromDateString: "2021_08_14")!: (nil, nil),
+]
+
+func resetMockMaintenanceValues() {
+    Task {
+        try await saveMaintenanceValuesInDocuments(.init(MockMaintenanceValues))
+    }
+}
+
 func fetchMaintenanceValuesFromDocuments() async throws -> MaintenanceValues {
     let url = getDocumentsDirectory().appendingPathComponent("maintenanceValues.json")
     do {
@@ -159,24 +194,7 @@ func fetchMaintenanceValuesFromDocuments() async throws -> MaintenanceValues {
 //            Date(fromDateString: "2021_08_14")!: (101.5, nil),
 //        ])
 
-        return .init([
-            Date(fromDateString: "2021_08_28")!: (nil, 1800),
-            Date(fromDateString: "2021_08_27")!: (nil, nil), /// weight
-            Date(fromDateString: "2021_08_26")!: (nil, nil), /// weight
-            Date(fromDateString: "2021_08_25")!: (nil, nil),
-            Date(fromDateString: "2021_08_24")!: (nil, nil),
-            Date(fromDateString: "2021_08_23")!: (nil, nil), /// weight
-            Date(fromDateString: "2021_08_22")!: (94.5, 2300),
-            Date(fromDateString: "2021_08_21")!: (nil, nil),
-
-            Date(fromDateString: "2021_08_20")!: (nil, 2250),
-            Date(fromDateString: "2021_08_19")!: (92.4, 1950), /// weight
-            Date(fromDateString: "2021_08_18")!: (94.15, 2650), /// weight
-            Date(fromDateString: "2021_08_17")!: (nil, 2534),
-            Date(fromDateString: "2021_08_16")!: (92.75, 2304), /// weight
-            Date(fromDateString: "2021_08_15")!: (nil, 2055),
-            Date(fromDateString: "2021_08_14")!: (nil, nil),
-        ])
+        return .init(MockMaintenanceValues)
 
         /** Backend values
          

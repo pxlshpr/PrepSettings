@@ -123,7 +123,7 @@ extension HealthType {
             "The estimated energy you burn while being active."
         case .maintenanceEnergy:
 //            "Your daily energy burn is used in energy goals targeting a desired weight change."
-            "The daily energy needed to maintain your weight. Used too create relative energy goals."
+            "The daily energy needed to maintain your weight. Used to create relative energy goals."
         case .sex:
             "Used to calculate resting energy or lean body mass. Also used as a criteria when choosing daily values for micronutrients."
         case .age:

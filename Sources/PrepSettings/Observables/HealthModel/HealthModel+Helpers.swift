@@ -84,6 +84,25 @@ import SwiftUI
 
 extension HealthModel {
 
+    /// Returns any backend weight values we have for the date range (specified by `interval`) used for the moving average for `date`
+    func weightValuesForMovingAverage(interval: HealthInterval, date: Date) async throws -> [Int: Double] {
+        let startDate = interval.startDate(with: date)
+        let range = startDate...date
+        print("range: \(range)")
+        let values = try await delegate.maintenanceBackendValues(for: range)
+        print("Got back: \(values.values.count) values")
+        print(values.values)
+        var weightValues: [Int: Double] = [:]
+        for i in 0..<interval.numberOfDays {
+            let date = date.moveDayBy(-i).startOfDay
+            print("Getting date: \(date)")
+            if let weightInKg = values.values[date]?.weightInKg {
+                weightValues[i] = weightInKg
+            }
+        }
+        return weightValues
+    }
+    
     /// Used when turning on adaptive calculation initially. Fetches backend and HealthKit data and calculates using those
     func turnOnAdaptiveMaintenance() async throws {
         

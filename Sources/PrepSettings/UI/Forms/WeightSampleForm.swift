@@ -24,7 +24,11 @@ struct WeightSampleForm: View {
         settingsStore: SettingsStore,
         didSave: @escaping DidSaveWeightSampleHandler
     ) {
-        _model = State(initialValue: Model(sample: sample, date: date))
+        _model = State(initialValue: Model(
+            sample: sample,
+            date: date,
+            healthModel: healthModel
+        ))
         self.didSaveWeight = didSave
         self.healthModel = healthModel
         self.settingsStore = settingsStore
@@ -56,7 +60,7 @@ struct WeightSampleForm: View {
     }
     
     var isRemoving: Bool {
-        model.value == nil
+        model.sample.value == nil
     }
     
     func save() {
@@ -89,11 +93,11 @@ struct WeightSampleForm: View {
     
     @ViewBuilder
     var removeButton: some View {
-        if !(model.value == nil && !model.isUsingMovingAverage) {
+        if !(model.sample.value == nil && !model.isUsingMovingAverage) {
             Section {
                 Button("Remove") {
                     withAnimation {
-                        model.value = nil
+//                        model.value = nil
                         model.sample.value = nil
                     }
                 }
@@ -102,13 +106,31 @@ struct WeightSampleForm: View {
     }
     
     var valueSection: some View {
-        Section {
+        
+        var textField: some View {
+            let valueBinding = Binding<Double>(
+                get: { model.displayedValue },
+                set: { newValue in
+                    model.displayedValue = newValue
+                    model.sample.value = settingsStore.bodyMassUnit.convert(newValue, to: .kg)
+                }
+            )
+            
+            return ManualHealthField(
+                unitBinding: $settingsStore.bodyMassUnit,
+                valueBinding: valueBinding,
+                firstComponentBinding: $model.weightStonesComponent,
+                secondComponentBinding: $model.weightPoundsComponent
+            )
+        }
+        
+        return Section {
             HStack {
                 Text(model.date.adaptiveMaintenanceDateString)
 //                    .foregroundStyle(.secondary)
                 Spacer()
                 if model.isUsingMovingAverage {
-                    if let value = model.value {
+                    if let value = model.value(in: settingsStore.bodyMassUnit) {
                         CalculatedHealthView(
                             quantityBinding: .constant(Quantity(value: value)),
                             secondComponent: 0,
@@ -119,17 +141,12 @@ struct WeightSampleForm: View {
                         Text("Not enough values")
                             .foregroundStyle(.tertiary)
                     }
-                } else if model.value != nil {
-                    ManualHealthField(
-                        unitBinding: $settingsStore.bodyMassUnit,
-                        valueBinding: $model.displayedValue,
-                        firstComponentBinding: $model.weightStonesComponent,
-                        secondComponentBinding: $model.weightPoundsComponent
-                    )
+                } else if model.sample.value != nil {
+                    textField
                 } else {
                     Button("Set weight") {
                         withAnimation {
-                            model.value = 0
+//                            model.value = 0
                             model.displayedValue = 0
                         }
                     }
@@ -146,14 +163,18 @@ struct WeightSampleForm: View {
         var section: some View {
             Section(footer: footer) {
                 HStack {
-                    Toggle("Use Moving Average", isOn: model.usingMovingAverageBinding)
+                    Toggle("Use Moving Average", isOn: model.isUsingMovingAverageBinding)
                 }
                 if model.isUsingMovingAverage {
                     HStack {
                         Spacer()
                         Text("of the past")
-                        Stepper("", value: model.movingAverageIntervalValueBinding, in: model.movingAverageIntervalPeriod.range)
-                            .fixedSize()
+                        Stepper(
+                            "",
+                            value: model.intervalValueBinding,
+                            in: model.movingAverageIntervalPeriod.range
+                        )
+                        .fixedSize()
                         Text("\(model.movingAverageIntervalValue)")
                             .font(NumberFont)
                             .contentTransition(.numericText(value: Double(model.movingAverageIntervalValue)))
@@ -165,10 +186,15 @@ struct WeightSampleForm: View {
         }
         
         return Group {
-            if !(model.value == nil && !model.isUsingMovingAverage) {
+            if !(model.sample.value == nil && !model.isUsingMovingAverage) {
                 section
             }
         }
+    }
+
+    func movingAverageValue(at index: Int) -> Double? {
+        guard let value = model.sample.movingAverageValues?[index] else { return nil }
+        return BodyMassUnit.kg.convert(value, to: settingsStore.bodyMassUnit)
     }
 
     var movingAverageValuesSection: some View {
@@ -182,7 +208,7 @@ struct WeightSampleForm: View {
             
             @ViewBuilder
             var valueText: some View {
-                if let value = model.movingAverageValue(at: index) {
+                if let value = movingAverageValue(at: index) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(value.cleanAmount)
                             .font(NumberFont)
@@ -228,7 +254,7 @@ struct WeightSampleForm: View {
             
             return NavigationLink {
                 WeightMovingAverageComponentForm(
-                    value: model.movingAverageValue(at: index),
+                    value: movingAverageValue(at: index),
                     date: date,
                     healthModel: healthModel,
                     settingsStore: settingsStore,
@@ -274,8 +300,15 @@ struct WeightSampleForm: View {
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
                 WeightSampleForm(
-                    sample: .init(),
-                    date: Date.now,
+                    sample: .init(
+                        movingAverageInterval: .init(1, .week),
+                        movingAverageValues: [
+                            1: 93,
+                            5: 94
+                        ],
+                        value: 93.5
+                    ),
+                    date: Date(fromDateString: "2021_08_28")!,
                     healthModel: MockHealthModel,
                     settingsStore: SettingsStore.shared,
                     didSave: { value in
@@ -284,4 +317,7 @@ struct WeightSampleForm: View {
                 )
             }
         }
+//        .onAppear {
+//            resetMockMaintenanceValues()
+//        }
 }
