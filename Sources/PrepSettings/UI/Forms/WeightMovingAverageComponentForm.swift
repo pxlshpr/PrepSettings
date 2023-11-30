@@ -23,8 +23,7 @@ struct WeightMovingAverageComponentForm: View {
     ) {
         _model = State(initialValue: Model(
             value: value,
-            date: date,
-            healthModel: healthModel
+            date: date
         ))
         self.healthModel = healthModel
         self.settingsStore = settingsStore
@@ -166,6 +165,15 @@ struct WeightMovingAverageComponentForm: View {
                         
                     }
                 )
+                
+//                WeightMovingAverageComponentForm(
+//                    value: 93.5,
+//                    date: Date.now,
+//                    healthModel: MockHealthModel,
+//                    settingsStore: SettingsStore.shared,
+//                    didSaveWeight: { weight in
+//                    }
+//                )
             }
         }
 }

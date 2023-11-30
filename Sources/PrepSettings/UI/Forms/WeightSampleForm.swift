@@ -130,13 +130,13 @@ struct WeightSampleForm: View {
 //                    .foregroundStyle(.secondary)
                 Spacer()
                 if model.isUsingMovingAverage {
-                    if let value = model.value(in: settingsStore.bodyMassUnit) {
-                        CalculatedHealthView(
-                            quantityBinding: .constant(Quantity(value: value)),
-                            secondComponent: 0,
-                            unitBinding: $settingsStore.bodyMassUnit,
+                    if let value = model.sample.value {
+                        CalculatedBodyMassView(
+                            unit: $settingsStore.bodyMassUnit,
+                            quantityInKg: .constant(Quantity(value: value)),
                             source: HealthSource.userEntered
                         )
+                        .layoutPriority(1)
                     } else {
                         Text("Not enough values")
                             .foregroundStyle(.tertiary)
@@ -210,7 +210,7 @@ struct WeightSampleForm: View {
             var valueText: some View {
                 if let value = movingAverageValue(at: index) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(value.cleanAmount)
+                        Text(value.healthString)
                             .font(NumberFont)
                             .animation(.default, value: value)
                             .contentTransition(.numericText(value: value))

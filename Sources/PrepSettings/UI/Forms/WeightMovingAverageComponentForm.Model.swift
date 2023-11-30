@@ -6,16 +6,19 @@ extension WeightMovingAverageComponentForm {
         
         let initialValue: Double?
         
-        let healthModel: HealthModel
-
         var valueInKg: Double?
-        var displayedValue: Double
+        var displayedValue: Double {
+            didSet {
+                valueInKg = SettingsStore.shared.bodyMassUnit.convert(displayedValue, to: .kg)
+            }
+        }
         var date: Date
         
-        init(value: Double?, date: Date, healthModel: HealthModel) {
+        init(value: Double?, date: Date) {
             self.initialValue = value
-            self.healthModel = healthModel
-            self.valueInKg = value
+            self.valueInKg = if let value {
+                SettingsStore.shared.bodyMassUnit.convert(value, to: .kg)
+            } else { nil }
             self.displayedValue = value ?? 0
             self.date = date
         }
@@ -35,9 +38,9 @@ extension WeightMovingAverageComponentForm.Model {
     }
     
     func bodyMassUnitChanged(old: BodyMassUnit, new: BodyMassUnit) {
-        guard let valueInKg else { return }
-        let converted = BodyMassUnit.kg.convert(valueInKg, to: new)
-        displayedValue = converted
+        /// Convert the `valueInKg` value stored internally to reflect the new unit
+        let converted = new.convert(displayedValue, to: .kg)
+        self.valueInKg = converted
     }
     
     var weightStonesComponent: Int {

@@ -60,15 +60,21 @@ extension WeightSampleForm.Model {
     }
 
     func bodyMassUnitChanged(old: BodyMassUnit, new: BodyMassUnit) {
+        if isUsingMovingAverage {
+            guard let value = self.value(in: new) else { return }
+            withAnimation {
+                displayedValue = value
+            }
+        } else {
+            /// Otherwise, if user is manually entering value—don't change it, but convert the `valueInKg` value stored internally to reflect the new unit
+            let converted = new.convert(displayedValue, to: .kg)
+            self.sample.value = converted
+        }
 //        if !isUsingMovingAverage {
 //            sampleSampleValueAsDisplayedValueConvertedToKg()
 //        }
 //        guard let value = sample.value else { return }
 //        let converted = BodyMassUnit.kg.convert(value, to: new)
-        guard let value = self.value(in: new) else { return }
-        withAnimation {
-            displayedValue = value
-        }
 //        sample.value = converted
 //
 //        withAnimation {
@@ -143,7 +149,7 @@ extension WeightSampleForm.Model {
                     }
                     self.sample.movingAverageInterval = .init(value, newValue)
                 }
-                self.setMovingAverageValuesFromBackend()
+                self.setWeightsFromBackend()
             }
         )
     }
@@ -161,12 +167,30 @@ extension WeightSampleForm.Model {
                 withAnimation {
                     self.sample.movingAverageInterval = interval
                 }
-                self.setMovingAverageValuesFromBackend()
+                self.setWeightsFromBackend()
             }
         )
     }
-     
-    func setMovingAverageValuesFromBackend() {
+    
+    var isUsingMovingAverageBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { self.isUsingMovingAverage },
+            set: { newValue in
+                switch newValue {
+                case false:
+                    /// When turning the calculated moving average off—round the value to 1 decimal place in case we had a more precise value stored
+                    self.displayedValue = self.displayedValue.rounded(toPlaces: 1)
+                    withAnimation {
+                        self.sample.movingAverageValues = nil
+                    }
+                case true:
+                    self.setWeightsFromBackend()
+                }
+            }
+        )
+    }
+    
+    func setWeightsFromBackend() {
         Task {
             let backendValues = try await self.backendValuesForMovingAverage()
             let values: [Int: Double] = if !backendValues.isEmpty {
@@ -184,23 +208,6 @@ extension WeightSampleForm.Model {
             }
         }
     }
-    
-    var isUsingMovingAverageBinding: Binding<Bool> {
-        Binding<Bool>(
-            get: { self.isUsingMovingAverage },
-            set: { newValue in
-                switch newValue {
-                case false:
-                    withAnimation {
-                        self.sample.movingAverageValues = nil
-                    }
-                case true:
-                    self.setMovingAverageValuesFromBackend()
-                }
-            }
-        )
-    }
-    
     
     func backendValuesForMovingAverage() async throws -> [Int: Double] {
         let interval = sample.movingAverageInterval ?? DefaultWeightMovingAverageInterval
