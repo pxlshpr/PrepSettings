@@ -87,7 +87,7 @@ struct DietaryEnergySampleForm: View {
             case .userEntered:
                 ManualHealthField(
                     unitBinding: unitBinding,
-                    valueBinding: .constant(0),
+                    valueBinding: $model.displayedValue,
                     firstComponentBinding: .constant(0),
                     secondComponentBinding: .constant(0)
                 )

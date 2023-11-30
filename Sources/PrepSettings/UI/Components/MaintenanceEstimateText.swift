@@ -2,6 +2,7 @@ import SwiftUI
 import PrepShared
 
 public let UnitSpacing: CGFloat? = nil
+
 struct MaintenanceEstimateText: View {
 
     @Bindable var model: HealthModel
