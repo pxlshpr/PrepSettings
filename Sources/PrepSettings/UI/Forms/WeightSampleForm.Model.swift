@@ -260,6 +260,19 @@ extension HealthModel {
         health.maintenanceEnergy ?? .init()
     }
     
+    var hasCalculatedMaintenance: Bool {
+        maintenance.adaptiveValue != nil
+    }
+    
+    var hasEstimatedMaintenance: Bool {
+        health.tdeeRequiredString == nil
+        && health.estimatedMaintenanceInKcal != nil
+    }
+    
+    var hasMaintenanceValue: Bool {
+        hasCalculatedMaintenance || hasEstimatedMaintenance
+    }
+    
     var intervalPeriod: HealthPeriod {
         maintenance.interval.period
     }

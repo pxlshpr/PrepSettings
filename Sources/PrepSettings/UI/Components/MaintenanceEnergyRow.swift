@@ -90,7 +90,8 @@ struct MaintenanceEnergyRow: View {
         
         var string: String {
 //            showAdaptive ? "Adaptive" : "Estimated"
-            showAdaptive ? "Calculated" : "Estimated"
+//            showAdaptive ? "Calculated" : "Estimated"
+            showAdaptive ? "Adaptive" : "Estimate"
         }
         
         var foregroundColor: Color {
@@ -180,26 +181,23 @@ struct MaintenanceEnergyRow: View {
         
         @ViewBuilder
         var content: some View {
-            if model.isSettingMaintenanceFromHealthKit {
-                loadingContent
-            } else if let message = model.health.tdeeRequiredString {
-                emptyContent(message)
+            if !model.hasAdaptiveMaintenanceEnergyValue {
+                if model.isSettingMaintenanceFromHealthKit {
+                    loadingContent
+                } else if let message = model.health.tdeeRequiredString {
+                    emptyContent(message)
+                }
             }
-//            } else if let value {
-//                valueContent(value)
-//            } else {
-//                EmptyView()
-//            }
         }
         
-        var valueOpacity: CGFloat {
-            model.isSettingMaintenanceFromHealthKit ? 0 : 1
+        var showValue: Bool {
+            model.hasMaintenanceValue
         }
         
         return ZStack(alignment: .trailing) {
             content
             valueContent(value)
-                .opacity(valueOpacity)
+                .opacity(showValue ? 1 : 0)
 //                .opacity(0)
         }
     }

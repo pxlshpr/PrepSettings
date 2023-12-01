@@ -21,7 +21,7 @@ public struct MaintenanceEstimateView: View {
         }
         .onAppear(perform: appeared)
 //        .navigationTitle("Maintenance Energy")
-        .navigationTitle("Estimated Maintenance")
+        .navigationTitle("Estimate")
         .navigationBarTitleDisplayMode(.large)
     }
     
@@ -45,9 +45,9 @@ public struct MaintenanceEstimateView: View {
                 model: model,
                 settingsStore: settingsStore
             )
-            Section {
-                symbol("=")
-            }
+//            Section {
+//                symbol("=")
+//            }
 //            .listSectionSpacing(0)
             estimateSection
         }

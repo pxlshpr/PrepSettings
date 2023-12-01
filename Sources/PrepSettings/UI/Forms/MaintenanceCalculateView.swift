@@ -23,7 +23,7 @@ struct MaintenanceCalculateView: View {
                 Color.clear
             }
         }
-        .navigationTitle("True Maintenance")
+        .navigationTitle("Adaptive")
 //        .navigationTitle("Maintenance Energy")
 //        .navigationTitle("Calculation")
 //        .navigationTitle("Adaptive Calculation")

@@ -65,12 +65,12 @@ public struct MaintenanceFormSections: View {
         var calculateSection: some View {
             var footer: some View {
 //                Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
-                Text("Your weight change is comapred to the dietary energy you consumed to determine your true maintenance. [Learn More.](https://example.com)")
+                Text("Compares your weight change to the dietary energy you consumed to determine your true maintenance. [Learn More.](https://example.com)")
             }
             
             var toggleRow: some View {
                 HStack {
-                    Text("Calculate True Maintenance")
+                    Text("Calculate Adaptive Maintenance")
 //                    Text("Use Adaptive Calculation")
                         .layoutPriority(1)
                     Spacer()
