@@ -109,7 +109,8 @@ extension WeightSampleForm.Model {
 
 extension WeightSampleForm.Model {
     
-    func saveWeight(_ weight: Double?, at index: Int) {
+    func saveWeight(_ weight: Double?, for date: Date) {
+        let index = -date.numberOfDaysFrom(self.date)
         withAnimation {
             sample.movingAverageValues?[index] = weight
             calculateAverage()
@@ -235,7 +236,7 @@ extension HealthModel {
                     self.health.maintenanceEnergy?.interval = .init(newValue, self.intervalPeriod)
                 }
                 Task {
-                    try await self.turnOnAdaptiveMaintenance()
+                    try await self.calculateAdaptiveMaintenance()
                 }
             }
         )
@@ -256,7 +257,7 @@ extension HealthModel {
                     self.health.maintenanceEnergy?.interval = .init(value, newValue)
                 }
                 Task {
-                    try await self.turnOnAdaptiveMaintenance()
+                    try await self.calculateAdaptiveMaintenance()
                 }
             }
         )

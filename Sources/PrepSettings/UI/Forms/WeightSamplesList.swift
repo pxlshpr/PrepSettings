@@ -109,27 +109,39 @@ struct WeightSamplesList: View {
     
     func weightCell(sample: WeightSample, isPrevious: Bool) -> some View {
         
-        var date: Date {
-            isPrevious ? previousDate : currentDate
-        }
+        var date: Date { isPrevious ? previousDate : currentDate }
         
-        func didSaveWeight(_ sample: WeightSample) {
-            healthModel.setWeightSample(sample, isPrevious: isPrevious)
-//            dismiss()
-        }
-        
-        return NavigationLink {
-            WeightSampleForm(
-                sample: sample,
-                date: date,
-                healthModel: healthModel,
-                settingsStore: settingsStore,
-                didSave: didSaveWeight
-            )
-        } label: {
+        return NavigationLink(value: WeightSampleRoute(
+            sample: sample,
+            date: date,
+            isPrevious: isPrevious)
+        ) {
             WeightSampleCell(sample: sample, date: date)
                 .environment(settingsStore)
         }
+        .navigationDestination(for: WeightSampleRoute.self) { route in
+            sampleForm(for: route)
+        }
+    }
+    
+    func sampleForm(for route: WeightSampleRoute) -> some View {
+        func didSaveWeight(_ sample: WeightSample) {
+            healthModel.setWeightSample(sample, isPrevious: route.isPrevious)
+        }
+        
+        return WeightSampleForm(
+            sample: route.sample,
+            date: route.date,
+            healthModel: healthModel,
+            settingsStore: settingsStore,
+            didSave: didSaveWeight
+        )
+    }
+    
+    struct WeightSampleRoute: Hashable {
+        let sample: WeightSample
+        let date: Date
+        let isPrevious: Bool
     }
     
     var currentDate: Date {

@@ -79,17 +79,25 @@ struct HealthLeanBodyMassSection: View {
         }
     }
     
+    enum Route {
+        case params
+    }
+    
     @ViewBuilder
     var healthLink: some View {
         if let leanBodyMass, leanBodyMass.source.isCalculated {
-            NavigationLink {
-                HealthForm(model, leanBodyMass.source.params)
-                    .environment(settingsStore)
-            } label: {
+            NavigationLink(value: Route.params) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(model.leanBodyMassHealthLinkTitle)
                     Spacer()
                     HealthTexts(model.health, settingsStore).leanBodyMassHealthLinkText
+                }
+            }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .params:
+                    HealthForm(model, leanBodyMass.source.params)
+                        .environment(settingsStore)
                 }
             }
         }

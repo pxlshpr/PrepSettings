@@ -26,16 +26,26 @@ struct MaintenanceCalculationView: View {
         List {
             content
         }
+        .navigationDestination(for: Route.self) { route in
+            switch route {
+            case .weightSamples:
+                WeightSamplesList()
+                    .environment(settingsStore)
+                    .environment(healthModel)
+            case .dietaryEnergySamples:
+                DietaryEnergySamplesList()
+                    .environment(settingsStore)
+                    .environment(healthModel)
+            }
+        }
     }
     
     @ViewBuilder
     var content: some View {
         daysSection
-//        if !isEditing {
-            weightSection
-            dietaryEnergySection
-            calculationSections
-//        }
+        weightSection
+        dietaryEnergySection
+        calculationSections
     }
     
     var maintenance: Health.MaintenanceEnergy {
@@ -93,11 +103,7 @@ struct MaintenanceCalculationView: View {
         }
         
         var samplesLink: some View {
-            NavigationLink {
-                WeightSamplesList()
-                    .environment(settingsStore)
-                    .environment(healthModel)
-            } label: {
+            NavigationLink(value: Route.weightSamples) {
                 Text("Show Data")
             }
         }
@@ -111,18 +117,17 @@ struct MaintenanceCalculationView: View {
         }
     }
     
+    enum Route {
+        case weightSamples
+        case dietaryEnergySamples
+    }
+    
     var daysSection: some View {
         var footer: some View {
-//            EmptyView()
             Text("The period over which to compare your weight change against your consumed dietary energy.")
         }
         
-        var header: some View {
-            EmptyView()
-//            Text("Calculated over")
-        }
-        
-        return Section(header: header, footer: footer) {
+        return Section(footer: footer) {
             HStack {
                 Text("Period")
                 Spacer()
@@ -153,11 +158,7 @@ struct MaintenanceCalculationView: View {
         }
         
         var samplesLink: some View {
-            NavigationLink {
-                DietaryEnergySamplesList()
-                    .environment(settingsStore)
-                    .environment(healthModel)
-            } label: {
+            NavigationLink(value: Route.dietaryEnergySamples) {
                 Text("Show Data")
             }
         }
@@ -220,48 +221,6 @@ struct MaintenanceCalculationView: View {
     var movingAverageFooter: some View {
         Text("Use a 7-day moving average of your weight data when available.\n\nThis makes the calculation less affected by cyclical fluctuations in your weight due to factors like fluid loss.")
     }
-    
-    //TODO: Next
-    /// [x] Store data points in health (2 for weight, and 7 for dietary energy)
-    /// [ ] Now write the automatic healthkit fetching code that grabs the values from HealthKit
-    /// [ ] Now test the maintenance thing for a date in the past where we have health kit data
-    /// [ ] Feed in data points that are stored in health here in the cell
-    /// [ ] Let values be nil and if nil, show "Not set" in list itself
-    /// [ ] Now complete the form, with bindings for picker and value
-    /// [ ] Make sure the data is only saved when the user actually taps on "Save" (simply going back shouldn't save it\
-    /// [ ] Add the field in HealthSummary for date (when not today) – but first try showing today as well
-    func cell(daysAgo: Int, component: MaintenanceComponent) -> some View {
-        var sample: MaintenanceSample {
-            .init(type: .userEntered, value: 0)
-        }
-        return NavigationLink {
-            AdaptiveDataForm(sample, component, Date.now)
-        } label: {
-            AdaptiveDataCell(sample, Date.now)
-        }
-    }
-
-//    @State var isEditing = false
-//    
-//    var toolbarContent: some ToolbarContent {
-//        Group {
-//            ToolbarItem(placement: .topBarTrailing) {
-//                Button(isEditing ? "Done" : "Edit") {
-//                    withAnimation {
-//                        isEditing.toggle()
-//                    }
-//                }
-//                .fontWeight(isEditing ? .semibold : .regular)
-//            }
-//            if isEditing {
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button("Cancel") {
-//                        isEditing = false
-//                    }
-//                }
-//            }
-//        }
-//    }
 }
 
 let MockMaintenanceSamples: [MaintenanceSample] = [
@@ -280,26 +239,11 @@ let MockMaintenanceSamples: [MaintenanceSample] = [
     Text("Health Details")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-//                NavigationLink {
                 MaintenanceCalculationView(MockHealthModel)
                     .environment(SettingsStore.shared)
                     .onAppear {
                         SettingsStore.configureAsMock()
                     }
-//                } label: {
-//                    Text("Show Data")
-//                }
             }
-        }
-        
-//        HealthSummary(model: MockHealthModel)
-//        List {
-//            ForEach(MockDataPoints, id: \.self) { sample in
-//                NavigationLink {
-//                    AdaptiveDataForm(sample, .dietaryEnergy, Date.now)
-//                } label: {
-//                    AdaptiveDataCell(sample, Date.now)
-//                }
-//            }
-//        }
+        }        
 }

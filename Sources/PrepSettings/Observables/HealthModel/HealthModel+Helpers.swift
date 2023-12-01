@@ -85,17 +85,17 @@ import SwiftUI
 extension HealthModel {
 
     /// Returns any backend weight values we have for the date range (specified by `interval`) used for the moving average for `date`
-    func weightValuesForMovingAverage(interval: HealthInterval, date: Date) async throws -> [Int: Double] {
+    func weightValuesForMovingAverage(
+        interval: HealthInterval, date: Date
+    ) async throws -> [Int: Double] {
+
         let startDate = interval.startDate(with: date)
         let range = startDate...date
-        print("range: \(range)")
         let values = try await delegate.maintenanceBackendValues(for: range)
-        print("Got back: \(values.values.count) values")
-        print(values.values)
+
         var weightValues: [Int: Double] = [:]
         for i in 0..<interval.numberOfDays {
             let date = date.moveDayBy(-i).startOfDay
-            print("Getting date: \(date)")
             if let weightInKg = values.values[date]?.weightInKg {
                 weightValues[i] = weightInKg
             }
@@ -104,45 +104,17 @@ extension HealthModel {
     }
     
     /// Used when turning on adaptive calculation initially. Fetches backend and HealthKit data and calculates using those
-    func turnOnAdaptiveMaintenance() async throws {
+    func calculateAdaptiveMaintenance() async throws {
         
         /// Get the backend values for the date range spanning the st
         let dateRange = health.dateRangeForMaintenanceBackendValues
         var values = try await delegate.maintenanceBackendValues(for: dateRange)
         
-        /// Get the range of days that are missing weight data and query them from HealthKit
-        if let dates = values.datesWithoutWeights {
-            
-            let healthKitValues = try await HealthKitQuantityRequest.weight
-                .quantities(for: dates)
-                .valuesGroupedByDate
-            
-            for (date, quantities) in healthKitValues {
-                guard
-                    let averageValue = quantities.averageValue,
-                    let lastQuantity = quantities.sortedByDate.last
-                else { continue }
-                
-                /// Set the fetched value
-                values.setWeightInKg(averageValue, for: date)
-                
-                //TODO: Consider sending this to another parallel task so we don't have to wait for it (first test how long this takes in practice)
-                try await delegate.updateBackendWeight(
-                    for: date,
-                    with: lastQuantity,
-                    source: .healthKit
-                )
-            }
-        }
-        
-        /// [ ] Now get the range of days that are missing dietary energy data and query them from HealthKit
-        if let dates = values.datesWithoutDietaryEnergy {
-            let healthKitValues = try await HealthStore
-                .dailyDietaryEnergyTotalsInKcal(for: dates)
-            
-            for (date, value) in  healthKitValues {
-                values.setDietaryEnergyInKcal(value, for: date, type: .healthKit)
-            }
+        if !isPreview {
+            //TODO: Do these in parallel
+            try await values.fillInMissingWeights(healthModel: self)
+            try await values.fillInMissingDietaryEnergy()
+        } else {
         }
         
         let maintenance = Health.MaintenanceEnergy(
@@ -155,6 +127,47 @@ extension HealthModel {
             withAnimation {
                 health.maintenanceEnergy = maintenance
             }
+        }
+    }
+}
+
+extension MaintenanceValues {
+    mutating func fillInMissingWeights(healthModel: HealthModel) async throws {
+
+        /// Get the range of days that are missing weight data and query them from HealthKit
+        guard let datesWithoutWeights else { return }
+
+        let healthKitValues = try await HealthKitQuantityRequest.weight
+            .quantities(for: datesWithoutWeights)
+            .valuesGroupedByDate
+        
+        for (date, quantities) in healthKitValues {
+            guard
+                let averageValue = quantities.averageValue,
+                let lastQuantity = quantities.sortedByDate.last
+            else { continue }
+            
+            /// Set the fetched value
+            setWeightInKg(averageValue, for: date)
+            
+            //TODO: Consider sending this to another parallel task so we don't have to wait for it (first test how long this takes in practice)
+            try await healthModel.delegate.updateBackendWeight(
+                for: date,
+                with: lastQuantity,
+                source: .healthKit
+            )
+        }
+    }
+    
+    mutating func fillInMissingDietaryEnergy() async throws {
+        
+        guard let dates = datesWithoutDietaryEnergy else { return }
+        
+        let healthKitValues = try await HealthStore
+            .dailyDietaryEnergyTotalsInKcal(for: dates)
+        
+        for (date, value) in  healthKitValues {
+            setDietaryEnergyInKcal(value, for: date, type: .healthKit)
         }
     }
 }

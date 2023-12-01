@@ -59,14 +59,22 @@ struct MaintenanceEnergyRow: View {
         }
     }
     
+    enum Route {
+        case adaptiveCalculation
+    }
+    
     @ViewBuilder
     var viewDataRow: some View {
         if model.maintenanceEnergyIsAdaptive {
-            NavigationLink {
-                MaintenanceCalculationView(model)
-                    .environment(settingsStore)
-            } label: {
+            NavigationLink(value: Route.adaptiveCalculation) {
                 Text("Show Adaptive Calculation")
+            }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .adaptiveCalculation:
+                    MaintenanceCalculationView(model)
+                        .environment(settingsStore)
+                }
             }
         }
     }

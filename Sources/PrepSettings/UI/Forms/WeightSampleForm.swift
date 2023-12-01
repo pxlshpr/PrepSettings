@@ -197,87 +197,51 @@ struct WeightSampleForm: View {
         return BodyMassUnit.kg.convert(value, to: settingsStore.bodyMassUnit)
     }
 
+    @ViewBuilder
     var movingAverageValuesSection: some View {
-        
-        var footer: some View {
-//            Text("The average of these values is being used.")
-            EmptyView()
-        }
-        
-        func cell(_ index: Int) -> some View {
-            
-            @ViewBuilder
-            var valueText: some View {
-                if let value = movingAverageValue(at: index) {
-                    HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                        Text(value.healthString)
-                            .font(NumberFont)
-                            .animation(.default, value: value)
-                            .contentTransition(.numericText(value: value))
-                            .foregroundStyle(Color(.secondaryLabel))
-                        Text(settingsStore.bodyMassUnit.abbreviation)
-                            .foregroundStyle(.secondary)
-                    }
-                } else {
-                    Text("Not set")
-                        .foregroundStyle(.tertiary)
+        if model.isUsingMovingAverage {
+            Section("Averaged values") {
+                ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) {
+                    cell(weight: DatedWeight(
+                        value: movingAverageValue(at: $0),
+                        date: model.date.moveDayBy(-$0)
+                    ))
                 }
-            }
-            
-            var date: Date {
-                model.date.moveDayBy(-index)
-            }
-            
-            var dateText: some View {
-                Text(date.adaptiveMaintenanceDateString)
-//                    .foregroundStyle(.secondary)
-            }
-            
-            var label: some View {
-                HStack {
-                    dateText
-                    Spacer()
-                    valueText
-                }
-            }
-            
-            func didSaveWeight(_ value: Double?) {
-                model.saveWeight(value, at: index)
-                Task {
-                    try await healthModel.delegate.updateBackendWeight(
-                        for: date,
-                        with: .init(value: value),
-                        source: .userEntered
-                    )
-                }
-            }
-            
-            return NavigationLink {
-                WeightMovingAverageComponentForm(
-                    value: movingAverageValue(at: index),
-                    date: date,
-                    healthModel: healthModel,
-                    settingsStore: settingsStore,
-                    didSaveWeight: didSaveWeight
-                )
-                .environment(healthModel)
-            } label: {
-                label
             }
         }
-        
-        var header: some View {
-            Text("Averaged values")
+    }
+    
+    
+    
+     func cell(weight: DatedWeight) -> some View {
+        NavigationLink(value: weight) {
+            WeightCell(weight: weight)
+                .environment(settingsStore)
         }
-        
-        return Group {
-            if model.isUsingMovingAverage {
-                Section(header: header, footer: footer) {
-                    ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) { daysAgo in
-                        cell(daysAgo)
-                    }
-                }
-            }
+        .navigationDestination(for: DatedWeight.self) { weight in
+            averagedWeightForm(weight: weight)
+        }
+    }
+    
+    func averagedWeightForm(weight: DatedWeight) -> some View {
+        WeightAveragedSampleForm(
+            value: weight.value,
+            date: weight.date,
+            healthModel: healthModel,
+            settingsStore: settingsStore,
+            didSaveWeight: { didSaveAveragedWeight($0, for: weight.date)}
+        )
+        .environment(healthModel)
+    }
+    
+    func didSaveAveragedWeight(_ value: Double?, for date: Date) {
+        model.saveWeight(value, for: date)
+        Task {
+            try await healthModel.delegate.updateBackendWeight(
+                for: date,
+                with: .init(value: value),
+                source: .userEntered
+            )
         }
     }
     

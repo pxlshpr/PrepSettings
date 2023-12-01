@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-struct WeightMovingAverageComponentForm: View {
+struct WeightAveragedSampleForm: View {
 
     @Environment(\.dismiss) var dismiss
     

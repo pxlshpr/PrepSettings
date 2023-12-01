@@ -208,13 +208,7 @@ public struct HealthSummary: View {
                 content(for: .isSmoker)
             }
         }
-    }
-    
-//    func link(_ type: HealthType) -> some View {
-//        HealthLink(type: type)
-//            .environment(model)
-//            .environment(settingsStore)
-//    }
+    }    
 }
 
 #Preview {

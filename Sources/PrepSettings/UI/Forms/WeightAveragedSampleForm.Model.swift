@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-extension WeightMovingAverageComponentForm {
+extension WeightAveragedSampleForm {
     @Observable class Model {
         
         let initialValue: Double?
@@ -25,7 +25,7 @@ extension WeightMovingAverageComponentForm {
     }
 }
 
-extension WeightMovingAverageComponentForm.Model {
+extension WeightAveragedSampleForm.Model {
     
     var isNotDirty: Bool {
         valueInKg == initialValue

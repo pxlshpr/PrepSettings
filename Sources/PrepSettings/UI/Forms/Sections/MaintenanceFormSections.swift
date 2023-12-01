@@ -43,7 +43,6 @@ public struct MaintenanceFormSections: View {
         }
         
         return Section(footer: footer) {
-            /// Using this instead of `NavigationLink(destination:label:)` as that results in the offset bug mentioned here https://www.reddit.com/r/SwiftUI/comments/17pqj3d/on_ios_17_how_to_work_around_list_offset_jumping/
             NavigationLink(value: Route.maintenance) {
                 label
             }

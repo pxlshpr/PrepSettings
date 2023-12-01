@@ -10,18 +10,12 @@ struct DietaryEnergySamplesList: View {
     var body: some View {
         Form {
             samplesSection
-//            logMissingDaysAsEmptySection
         }
         .navigationTitle("Dietary Energy")
     }
     
     var samplesSection: some View {
-        var footer: some View {
-            EmptyView()
-//            Text("You can choose to disregard days that were inaccurately or incompletely logged by setting them to use the average.")
-        }
-        
-        return Section(footer: footer) {
+        Section {
             ForEach(0..<maintenance.dietaryEnergy.samples.count, id: \.self) {
                 dietaryEnergyCell(
                     sample: maintenance.dietaryEnergy.samples[$0],
@@ -43,21 +37,27 @@ struct DietaryEnergySamplesList: View {
         }
     }
     
+    enum Route: Hashable {
+        case sample(DietaryEnergySample, Date)
+    }
+    
     func dietaryEnergyCell(sample: DietaryEnergySample, date: Date) -> some View {
-        NavigationLink {
-            DietaryEnergySampleForm(
-                sample: sample,
-                date: date,
-                healthModel: healthModel,
-                settingsStore: settingsStore,
-                didSave: { value in
-                    
-                }
-            )
-//            EmptyView()
-//            WeightSampleForm(sample: sample, date: date)
-        } label: {
+        NavigationLink(value: Route.sample(sample, date)) {
             DietaryEnergySampleCell(sample: sample, date: date)
+        }
+        .navigationDestination(for: Route.self) { route in
+            switch route {
+            case .sample(let sample, let date):
+                DietaryEnergySampleForm(
+                    sample: sample,
+                    date: date,
+                    healthModel: healthModel,
+                    settingsStore: settingsStore,
+                    didSave: { value in
+                        
+                    }
+                )
+            }
         }
     }
     

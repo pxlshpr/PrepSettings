@@ -44,6 +44,10 @@ struct RestingEnergySection: View {
         }
     }
 
+    enum Route {
+        case params
+    }
+    
     var equationContent: some View {
         var healthLink: some View {
             var params: [HealthType] {
@@ -58,15 +62,18 @@ struct RestingEnergySection: View {
                 }
             }
             
-            return NavigationLink {
-                HealthForm(model)
-                    .environment(settingsStore)
-            } label: {
+            return NavigationLink(value: Route.params) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(title)
                     Spacer()
                     HealthTexts(model.health, settingsStore).restingEnergyHealthLinkText
-//                    model.health.restingEnergyHealthLinkText
+                }
+            }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .params:
+                    HealthForm(model)
+                        .environment(settingsStore)
                 }
             }
         }
