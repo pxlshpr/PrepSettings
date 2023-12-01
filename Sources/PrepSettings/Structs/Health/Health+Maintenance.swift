@@ -13,7 +13,13 @@ extension Health {
         let movingAverageStartDate = previousWeightMovingAverageInterval.startDate(with: intervalStartDate)
         return movingAverageStartDate...date
     }
-    
+
+    var dateRangeForMaintenanceCalculation: ClosedRange<Date> {
+        let interval = maintenanceEnergy?.interval ?? DefaultMaintenanceEnergyInterval
+        let intervalStartDate = interval.startDate(with: date)
+        return intervalStartDate...date
+    }
+
 }
 
 //extension Health {

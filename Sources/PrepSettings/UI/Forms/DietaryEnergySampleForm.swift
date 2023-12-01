@@ -267,8 +267,17 @@ struct DietaryEnergySampleForm: View {
             Button {
                 withAnimation {
                     model.selected(type)
-                    if type == .userEntered {
-                        isFocused = true
+                    /// Give the text field some time to display before triggering the focus
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        if type == .userEntered {
+                            isFocused = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                sendSelectAllTextAction()
+                            }
+                        } else {
+                            /// This is required to ensure setting it to `true` later invokes a change to be reacted upon by the `NumberTextField`
+                            isFocused = false
+                        }
                     }
                 }
             } label: {

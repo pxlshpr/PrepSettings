@@ -2,13 +2,17 @@ import Foundation
 import PrepShared
 
 public struct WeightChange: Hashable, Codable {
+    public var type: WeightChangeType
+    public var delta: Double?
     public var current: WeightSample
     public var previous: WeightSample
     
     public init() {
         self.current = WeightSample()
         self.previous = WeightSample()
-    }    
+        self.type = .usingWeights
+        self.delta = nil
+    }
 }
 
 public extension WeightChange {

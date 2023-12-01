@@ -41,7 +41,7 @@ struct WeightSampleForm: View {
             movingAverageValuesSection
             removeButton
         }
-        .navigationTitle(title)
+        .navigationTitle("Weight")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarContent }
         .task(loadRequiresSaveConfirmation)
@@ -85,10 +85,6 @@ struct WeightSampleForm: View {
         } catch {
             /// Handle error
         }
-    }
-    
-    var title: String {
-        "Weight"
     }
     
     @ViewBuilder

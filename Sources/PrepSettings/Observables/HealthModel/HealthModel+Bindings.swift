@@ -25,6 +25,49 @@ public extension HealthModel {
             }
         }
     }
+
+    var maintenanceWeightChangeDeltaIsNegative: Bool {
+        maintenanceWeightChangeDelta < 0
+    }
+    
+    var maintenanceWeightChangeDelta: Double {
+        get { health.maintenanceEnergy?.weightChange.delta ?? 0 }
+        set {
+            Task {
+                await MainActor.run {
+                    withAnimation {
+                        health.maintenanceEnergy?.weightChange.delta = newValue
+                    }
+                }
+                
+                try await calculateAdaptiveMaintenance()
+            }
+        }
+    }
+    
+    var maintenanceWeightChangeType: WeightChangeType {
+        get { health.maintenanceEnergy?.weightChange.type ?? .usingWeights }
+        set {
+            Task {
+                await MainActor.run {
+                    withAnimation {
+                        health.maintenanceEnergy?.weightChange.type = newValue
+                    }
+                }
+                
+                switch newValue {
+                case .userEntered:
+                    /// Reset the weight samples
+                    health.maintenanceEnergy?.weightChange.current = .init()
+                    health.maintenanceEnergy?.weightChange.previous = .init()
+                case .usingWeights:
+                    break
+                }
+                
+                try await calculateAdaptiveMaintenance()
+            }
+        }
+    }
     
     //MARK: Interval Types
     
