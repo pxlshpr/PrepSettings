@@ -118,7 +118,7 @@ struct WeightAveragedSampleForm: View {
                 Text(model.date.adaptiveMaintenanceDateString)
                 Spacer()
                 if model.valueInKg == nil {
-                    Button("Set weight") {
+                    Button("Set") {
                         withAnimation {
                             model.valueInKg = 0
                             model.displayedValue = 0

@@ -55,6 +55,7 @@ public extension DietaryEnergy {
     
     var average: Double? {
         let values = samples
+            .filter { $0.type != .average }
             .compactMap { $0.value }
         guard !values.isEmpty else { return nil }
         let sum = values.reduce(0) { $0 + $1 }
@@ -64,8 +65,8 @@ public extension DietaryEnergy {
     mutating func fillEmptyValuesWithAverages() {
         guard let average else { return }
         for i in 0..<samples.count {
-            /// Only fill with average if there is no value for it
-            guard samples[i].value == nil else { continue }
+            /// Only fill with average if there is no value for it or it already has a type of `average`
+            guard samples[i].value == nil || samples[i].type == .average else { continue }
             samples[i] = .init(
                 type: .average,
                 value: average

@@ -53,8 +53,8 @@ struct DietaryEnergySamplesList: View {
                     date: date,
                     healthModel: healthModel,
                     settingsStore: settingsStore,
-                    didSave: { value in
-                        
+                    didSave: { sample in
+                        healthModel.setDietaryEnergySample(sample, for: date)
                     }
                 )
             }

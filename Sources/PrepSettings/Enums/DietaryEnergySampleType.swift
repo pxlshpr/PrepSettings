@@ -5,19 +5,23 @@ public enum DietaryEnergySampleType: Int, Hashable, Codable, CaseIterable {
     case logged = 1
     case healthKit
     case average
-    case notConsumed
+//    case notConsumed
     case userEntered
 }
 
 public extension DietaryEnergySampleType {
     
+    static var userCases: [DietaryEnergySampleType] {
+        [.logged, .healthKit, .userEntered]
+    }
+    
     var name: String {
         switch self {
         case .healthKit:    "Apple Health"
         case .average:      "Average"
-        case .logged:       "Logged"
-        case .notConsumed:  "Not Consumed"
-        case .userEntered:  "Entered Manually"
+        case .logged:       "Log"
+//        case .notConsumed:  "Not Consumed"
+        case .userEntered:  "Custom"
         }
     }
 }

@@ -7,6 +7,7 @@ struct MaintenanceCalculateView: View {
 
     @Bindable var healthModel: HealthModel
     
+    @State var hasAppeared = false
     @State var useMovingAverageForWeight = true
     @State var showingWeightConversionInfo = false
 
@@ -15,13 +16,27 @@ struct MaintenanceCalculateView: View {
     }
     
     var body: some View {
-        list
-            .navigationTitle("Maintenance Energy")
-//            .navigationTitle("Calculation")
-//            .navigationTitle("Adaptive Calculation")
-            .navigationBarTitleDisplayMode(.large)
-//            .toolbar { toolbarContent }
-//            .navigationBarBackButtonHidden(isEditing)
+        Group {
+            if hasAppeared {
+                list
+            } else {
+                Color.clear
+            }
+        }
+        .navigationTitle("True Maintenance")
+//        .navigationTitle("Maintenance Energy")
+//        .navigationTitle("Calculation")
+//        .navigationTitle("Adaptive Calculation")
+        .navigationBarTitleDisplayMode(.large)
+//        .toolbar { toolbarContent }
+//        .navigationBarBackButtonHidden(isEditing)
+        .onAppear(perform: appeared)
+    }
+    
+    func appeared() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            hasAppeared = true
+        }
     }
     
     var list: some View {
@@ -111,7 +126,8 @@ struct MaintenanceCalculateView: View {
         }
         
         return Group {
-            Section(header: header, footer: footer) {
+//            Section(header: header, footer: footer) {
+            Section(header: header) {
                 maintenance.weightChangeRow(bodyMassUnit: settingsStore.bodyMassUnit)
                 maintenance.equivalentEnergyRow(energyUnit: settingsStore.energyUnit)
                 samplesLink
@@ -179,7 +195,8 @@ struct MaintenanceCalculateView: View {
             }
         }
         
-        return Section(header: header, footer: footer) {
+//        return Section(header: header, footer: footer) {
+        return Section(header: header) {
             totalRow
             samplesLink
         }
@@ -187,35 +204,53 @@ struct MaintenanceCalculateView: View {
     
     var calculatedSection: some View {
         var footer: some View {
-            Text("The energy you would have to consume daily to maintain your weight.")
+            Text("The energy needed to maintain your current weight. Consume less or more than this to lose or gain weight.")
         }
+        
+        var topRow: some View {
+            HStack {
+                Text("Calculated")
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+        }
+        
+        var valueRow: some View {
+            HStack {
+                if maintenance.adaptiveValue != nil {
+                    Image(systemName: "equal")
+//                    Text("=")
+                        .foregroundStyle(.secondary)
+                        .font(.title2)
+                        .fontWeight(.heavy)
+//                        .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+//                        .font(.system(.body, design: .default, weight: .semibold))
+                }
+                Spacer()
+                if let value = maintenance.adaptiveValue {
+                    HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
+                        Text(value.formattedEnergy)
+                            .animation(.default, value: value)
+                            .contentTransition(.numericText(value: value))
+                            .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+                        Text("\(settingsStore.energyUnit.abbreviation) / day")
+                            .foregroundStyle(.secondary)
+                            .font(.system(.body, design: .default, weight: .semibold))
+                    }
+//                    Text("\(value.formattedEnergy) kcal")
+//                        .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.trailing)
+                } else {
+                    Text("Not enough data")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        
         return Section(footer: footer) {
             VStack {
-                HStack {
-                    Text("Calculated")
-                        .fontWeight(.semibold)
-                    Spacer()
-                }
-                HStack {
-                    Spacer()
-                    if let value = maintenance.adaptiveValue {
-                        HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                            Text(value.formattedEnergy)
-                                .animation(.default, value: value)
-                                .contentTransition(.numericText(value: value))
-                                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                            Text(settingsStore.energyUnit.abbreviation)
-                                .foregroundStyle(.secondary)
-                                .font(.system(.body, design: .default, weight: .semibold))
-                        }
-//                        Text("\(value.formattedEnergy) kcal")
-//                            .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.trailing)
-                    } else {
-                        Text("Not enough data")
-                            .foregroundStyle(.tertiary)
-                    }
-                }
+//                topRow
+                valueRow
             }
         }
     }

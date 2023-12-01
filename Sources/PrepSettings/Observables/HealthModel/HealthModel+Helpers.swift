@@ -19,6 +19,22 @@ extension HealthModel {
 }
 
 extension HealthModel {
+    
+    func setDietaryEnergySample(_ sample: DietaryEnergySample, for date: Date) {
+        var dietaryEnergy = health.maintenanceEnergy?.dietaryEnergy ?? .init()
+        let index = -date.numberOfDaysFrom(health.date)
+        dietaryEnergy.samples[index] = sample
+        dietaryEnergy.fillEmptyValuesWithAverages()
+        
+        let maintenance = Health.MaintenanceEnergy(
+            interval: health.maintenanceEnergy?.interval ?? DefaultMaintenanceEnergyInterval,
+            weightChange: health.maintenanceEnergy?.weightChange ?? .init(),
+            dietaryEnergy: dietaryEnergy
+        )
+
+        health.maintenanceEnergy = maintenance
+    }
+    
     func setWeightSample(_ sample: WeightSample, isPrevious: Bool) {
         var weightChange = health.maintenanceEnergy?.weightChange ?? .init()
         if isPrevious {

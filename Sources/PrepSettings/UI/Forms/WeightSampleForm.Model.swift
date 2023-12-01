@@ -8,14 +8,7 @@ extension WeightSampleForm {
         var sample: WeightSample
 
         let date: Date
-//        var value: Double?
         var displayedValue: Double
-//            didSet {
-//                if !isUsingMovingAverage {
-//                    sampleSampleValueAsDisplayedValueConvertedToKg()
-//                }
-//            }
-//        }
 
         let healthModel: HealthModel
         

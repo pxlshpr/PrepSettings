@@ -14,17 +14,22 @@ struct DietaryEnergySampleCell: View {
     }
     
     var body: some View {
-        HStack {
-            Text(date.adaptiveMaintenanceDateString)
-            Spacer()
-//            healthKitIcon
-            value
+        VStack {
+            HStack {
+                Text(date.adaptiveMaintenanceDateString)
+                Spacer()
+                value
+            }
         }
+    }
+    
+    var typeView: some View {
+        TagView(string: sample.type.name)
     }
     
     @ViewBuilder
     var value: some View {
-        if sample.type != .average, let value = sample.value(in: settingsStore.energyUnit) {
+        if let value = sample.value(in: settingsStore.energyUnit), sample.type != .average {
             HStack(spacing: UnitSpacing) {
                 Text(value.formattedEnergy)
                     .font(NumberFont)
@@ -33,7 +38,7 @@ struct DietaryEnergySampleCell: View {
             }
             .foregroundStyle(.secondary)
         } else {
-            Text("Using average")
+            Text("Not set")
                 .foregroundStyle(.tertiary)
         }
     }
@@ -44,6 +49,30 @@ struct DietaryEnergySampleCell: View {
             Image(packageResource: "AppleHealthIcon", ofType: "png")
                 .resizable()
                 .frame(width: 25, height: 25)
+        }
+    }
+}
+
+#Preview {
+    let samples: [DietaryEnergySample] = [
+        .init(type: .logged, value: 1500),
+//        .init(type: .average, value: 1500),
+        .init(type: .healthKit, value: 1500),
+//        .init(type: .notConsumed, value: 1500),
+        .init(type: .userEntered, value: 1500),
+        .init(type: .userEntered, value: 0),
+        .init(type: .userEntered, value: nil),
+    ]
+    return NavigationStack {
+        List {
+            ForEach(samples, id: \.self) { sample in
+                NavigationLink {
+                    
+                } label: {
+                    DietaryEnergySampleCell(sample: sample, date: Date.now)
+                        .environment(SettingsStore.shared)
+                }
+            }
         }
     }
 }

@@ -35,7 +35,8 @@ struct MockHealthModelDelegate: HealthModelDelegate {
     }
     
     func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
-        nil
+        try await fetchMaintenanceValuesFromDocuments()
+            .dietaryEnergyInKcal(for: date)
     }
 }
 

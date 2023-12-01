@@ -30,7 +30,11 @@ struct DietaryEnergySampleForm: View {
         settingsStore: SettingsStore,
         didSave: @escaping DidSaveDietaryEnergySampleHandler
     ) {
-        _model = State(initialValue: Model(sample: sample, date: date))
+        _model = State(initialValue: Model(
+            sample: sample,
+            date: date,
+            healthModel: healthModel
+        ))
         self.didSave = didSave
         self.healthModel = healthModel
         self.settingsStore = settingsStore
@@ -40,15 +44,36 @@ struct DietaryEnergySampleForm: View {
         Form {
             valueSection
             chooseSection
+            removeSection
         }
         .navigationTitle("Dietary Energy")
         .navigationBarTitleDisplayMode(.inline)
         .task(model.loadValues)
+        .toolbar { toolbarContent }
     }
     
-    func value(for type: DietaryEnergySampleType) -> Double? {
-        guard let valueInKcal = model.valueInKcal(for: type) else { return nil }
-        return EnergyUnit.kcal.convert(valueInKcal, to: settingsStore.energyUnit)
+    var toolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            Button("Update") {
+                didSave(model.sample)
+                dismiss()
+            }
+            .fontWeight(.semibold)
+            .disabled(model.saveIsDisabled)
+        }
+    }
+    
+    @ViewBuilder
+    var removeSection: some View {
+        if model.hasValue {
+            Section {
+                Button("Remove") {
+                    withAnimation {
+                        model.removeValue()
+                    }
+                }
+            }
+        }
     }
     
     var valueSection: some View {
@@ -69,30 +94,49 @@ struct DietaryEnergySampleForm: View {
                     "You are using the logged dietary energy."
                 case .healthKit:
                     "You are using the dietary energy data from Apple Health."
-                case .average:
-                    "You are using the average dietary energy consumed for the other days."
+//                case .average:
+//                    "You are using the average dietary energy consumed for the other days."
                 case .userEntered:
                     "You are using a custom entered value."
-                case .notConsumed:
-                    "You have marked this day as having consumed no dietary energy."
+                default:
+                    ""
+//                case .notConsumed:
+//                    "You have marked this day as having consumed no dietary energy."
                 }
             }
-            
-            return Text(string)
+         
+            return Group {
+                if model.hasValue {
+                    Text(string)
+                } else {
+                    EmptyView()
+                }
+            }
+        }
+        
+        var textField: some View {
+            let binding = Binding<Double>(
+                get: { model.displayedValue },
+                set: { newValue in
+                    model.displayedValue = newValue
+                    model.sample.value = settingsStore.energyUnit.convert(newValue, to: .kcal)
+                }
+            )
+            return ManualHealthField(
+                unitBinding: unitBinding,
+                valueBinding: binding,
+                firstComponentBinding: .constant(0),
+                secondComponentBinding: .constant(0)
+            )
         }
         
         @ViewBuilder
         var detail: some View {
             switch model.type {
             case .userEntered:
-                ManualHealthField(
-                    unitBinding: unitBinding,
-                    valueBinding: $model.displayedValue,
-                    firstComponentBinding: .constant(0),
-                    secondComponentBinding: .constant(0)
-                )
+                textField
             default:
-                if let value = value(for: model.type) {
+                if let value = model.sample.value(in: settingsStore.energyUnit) {
                     HStack(spacing: UnitSpacing) {
                         Text("\(value.formattedEnergy)")
                             .contentTransition(.numericText(value: value))
@@ -107,7 +151,15 @@ struct DietaryEnergySampleForm: View {
             HStack {
                 Text(model.date.adaptiveMaintenanceDateString)
                 Spacer()
-                detail
+                if model.sample.value == nil {
+                    Button("Set") {
+                        withAnimation {
+                            model.setValue(energyUnit: settingsStore.energyUnit)
+                        }
+                    }
+                } else {
+                    detail
+                }
             }
         }
     }
@@ -116,97 +168,112 @@ struct DietaryEnergySampleForm: View {
         Text("Choose a value you would like to use for this day.\n\nIf the logged value is inaccurate or incomplete, you can choose to use the average of the days in the period you are calculating your maintenance energy for.")
     }
     
+//    var chooseSection_: some View {
+//        
+//        let selection = Binding<DietaryEnergySampleType>(
+//            get: { model.type },
+//            set: { newValue in
+//                withAnimation {
+//                    model.type = newValue
+//                    model.sample.value = model.value(
+//                        for: newValue,
+//                        in: settingsStore.energyUnit
+//                    )
+//                    model.sample.type = newValue
+//                }
+//            }
+//        )
+//        
+//        var picker: some View {
+//            Picker("", selection: selection) {
+//                ForEach(DietaryEnergySampleType.userCases, id: \.self) {
+//                    cell(type: $0)
+//                }
+//            }
+//            .pickerStyle(.inline)
+//        }
+//        
+//        return Group {
+//            if model.sample.value != nil {
+//                picker
+//            }
+//        }
+//    }
+    
     var chooseSection: some View {
-        
-        let selection = Binding<DietaryEnergySampleType>(
-            get: { model.type },
-            set: { newValue in
-                withAnimation {
-                    model.type = newValue
+        var section: some View {
+            Section {
+                ForEach(DietaryEnergySampleType.userCases, id: \.self) {
+                    cell(type: $0)
                 }
-            }
-        )
-        
-        return Picker("Source", selection: selection) {
-            ForEach(DietaryEnergySampleType.allCases, id: \.self) {
-                cell(type: $0)
+//                Text("Hello")
             }
         }
-        .pickerStyle(.inline)
+        
+        return Group {
+            if model.sample.value != nil {
+                section
+            }
+        }
     }
-    
-    func haveValue(for type: DietaryEnergySampleType) -> Bool {
-        value(for: type) != nil
-    }
-    
-    @ViewBuilder
     func cell(type: DietaryEnergySampleType) -> some View {
-        if type == .userEntered || haveValue(for: type) {
+        
+        var value: Double? {
+            model.value(for: type, in: settingsStore.energyUnit)
+        }
+        
+        @ViewBuilder
+        var detail: some View {
+            if let value {
+                HStack(spacing: UnitSpacing) {
+                    Text(value.formattedEnergy)
+                        .contentTransition(.numericText(value: value))
+                    Text(settingsStore.energyUnit.abbreviation)
+                }
+                .foregroundStyle(Color(.secondaryLabel))
+            } else {
+                Text("No data")
+                    .foregroundStyle(Color(.tertiaryLabel))
+            }
+        }
+        
+        var isDisabled: Bool {
+            type != .userEntered && value == nil
+        }
+        
+        var labelColor: Color {
+            isDisabled ? Color(.tertiaryLabel) : Color(.label)
+        }
+        
+        var checkmark: some View {
+            Image(systemName: "checkmark")
+                .opacity(model.type == type ? 1 : 0)
+        }
+        
+        var label: some View {
             HStack {
+                checkmark
                 Text(type.name)
-                    .foregroundStyle(Color(.label))
+                    .foregroundStyle(labelColor)
                 Spacer()
-                if type != .userEntered, let value = value(for: type) {
-                    HStack(spacing: UnitSpacing) {
-                        Text(value.formattedEnergy)
-                            .contentTransition(.numericText(value: value))
-                        Text(settingsStore.energyUnit.abbreviation)
-                    }
-                    .foregroundStyle(Color(.secondaryLabel))
+                if type != .userEntered {
+                    detail
                 }
             }
         }
-    }
-}
-
-extension DietaryEnergySampleForm {
-    @Observable class Model {
-        let initialSample: DietaryEnergySample
-        var sample: DietaryEnergySample
         
-        let date: Date
-        var value: Double?
-        var displayedValue: Double {
-            didSet {
-                value = displayedValue
-                sample.value = displayedValue
+        var button: some View {
+            Button {
+                withAnimation {
+                    model.selected(type)
+                }
+            } label: {
+                label
             }
         }
         
-        var fetchedValuesInKcal: [DietaryEnergySampleType: Double] = [:]
-
-        var type: DietaryEnergySampleType
-
-        init(sample: DietaryEnergySample, date: Date) {
-            self.initialSample = sample
-            self.sample = sample
-            self.value = sample.value
-            self.displayedValue = sample.value ?? 0
-            self.date = date
-            self.type = sample.type
-        }
-
-    }
-}
-
-extension DietaryEnergySampleForm.Model {
-    func valueInKcal(for type: DietaryEnergySampleType) -> Double? {
-        switch type {
-        case .userEntered:  value
-        default:            fetchedValuesInKcal[type]
-        }
-    }
-    
-    @Sendable
-    func loadValues() async {
-        await MainActor.run {
-            fetchedValuesInKcal = [
-                .healthKit: 1024,
-                .logged: 1526,
-                .average: 1852,
-//                .notConsumed: 0
-            ]
-        }
+        return button
+            .disabled(isDisabled)
     }
 }
 
