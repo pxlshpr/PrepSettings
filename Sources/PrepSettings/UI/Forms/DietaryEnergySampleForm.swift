@@ -125,8 +125,7 @@ struct DietaryEnergySampleForm: View {
             return ManualHealthField(
                 unitBinding: unitBinding,
                 valueBinding: binding,
-                firstComponentBinding: .constant(0),
-                secondComponentBinding: .constant(0)
+                isFocusedBinding: $isFocused
             )
         }
         
@@ -163,6 +162,8 @@ struct DietaryEnergySampleForm: View {
             }
         }
     }
+    
+    @State var isFocused: Bool = false
     
     var footer: some View {
         Text("Choose a value you would like to use for this day.\n\nIf the logged value is inaccurate or incomplete, you can choose to use the average of the days in the period you are calculating your maintenance energy for.")
@@ -266,6 +267,9 @@ struct DietaryEnergySampleForm: View {
             Button {
                 withAnimation {
                     model.selected(type)
+                    if type == .userEntered {
+                        isFocused = true
+                    }
                 }
             } label: {
                 label

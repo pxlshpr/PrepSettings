@@ -7,20 +7,47 @@ struct ManualHealthField<Unit: HealthUnit>: View {
     let valueBinding: Binding<Double>
     let firstComponentBinding: Binding<Int>
     let secondComponentBinding: Binding<Double>
+    let isFocusedBinding: Binding<Bool>?
 
+    init(
+        unitBinding: Binding<Unit>,
+        valueBinding: Binding<Double>,
+        firstComponentBinding: Binding<Int> = .constant(0),
+        secondComponentBinding: Binding<Double> = .constant(0),
+        isFocusedBinding: Binding<Bool>? = nil
+    ) {
+        self.unitBinding = unitBinding
+        self.valueBinding = valueBinding
+        self.firstComponentBinding = firstComponentBinding
+        self.secondComponentBinding = secondComponentBinding
+        self.isFocusedBinding = isFocusedBinding
+    }
+    
     var body: some View {
         HStack {
             switch unitBinding.wrappedValue.hasTwoComponents {
             case true:
-                NumberTextField(placeholder: "Required", binding: firstComponentBinding)
+                NumberTextField(
+                    placeholder: "Required",
+                    binding: firstComponentBinding,
+                    isFocused: isFocusedBinding
+                )
                 unitView
-                NumberTextField(placeholder: "", binding: secondComponentBinding)
+                NumberTextField(
+                    placeholder: "",
+                    binding: secondComponentBinding
+                    /// only pass the isFocusedBinding to first component
+                )
                 if let string = Unit.secondaryUnit {
                     Text(string)
                         .foregroundStyle(.secondary)
                 }
             case false:
-                NumberTextField(placeholder: "Required", binding: valueBinding)
+                NumberTextField(
+                    placeholder: "Required",
+                    binding: valueBinding,
+                    isFocused: isFocusedBinding
+                )
                 unitView
             }
         }

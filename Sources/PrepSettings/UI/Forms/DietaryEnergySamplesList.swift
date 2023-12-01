@@ -19,7 +19,7 @@ struct DietaryEnergySamplesList: View {
             ForEach(0..<maintenance.dietaryEnergy.samples.count, id: \.self) {
                 dietaryEnergyCell(
                     sample: maintenance.dietaryEnergy.samples[$0],
-                    date: date.moveDayBy(-$0)
+                    date: DietaryEnergy.dateForSample(at: $0, for: date)
                 )
             }
         }

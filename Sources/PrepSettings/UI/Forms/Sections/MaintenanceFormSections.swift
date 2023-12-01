@@ -70,7 +70,7 @@ public struct MaintenanceFormSections: View {
             
             var toggleRow: some View {
                 HStack {
-                    Text("Calculate Adaptive Maintenance")
+                    Text("Adaptive Maintenance")
 //                    Text("Use Adaptive Calculation")
                         .layoutPriority(1)
                     Spacer()

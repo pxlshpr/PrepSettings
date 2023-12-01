@@ -12,6 +12,11 @@ public struct DietaryEnergy: Hashable, Codable {
     ) {
         self.samples = samples
     }
+    
+    static func dateForSample(at index: Int, for date: Date) -> Date {
+        /// We're starting from the day before the `date` and going backwards (not including the current day—as we more likely to not have completely logged the day)
+        date.moveDayBy(-index-1)
+    }
 }
 
 extension DietaryEnergy {
@@ -28,7 +33,7 @@ extension DietaryEnergy {
             count: numberOfDays
         )
         for i in 0..<numberOfDays {
-            let date = date.moveDayBy(-i)
+            let date = DietaryEnergy.dateForSample(at: i, for: date)
             samples[i].value = values.dietaryEnergyInKcal(for: date)
             if let type = values.dietaryEnergyType(for: date) {
                 samples[i].type = type
@@ -93,8 +98,8 @@ extension DietaryEnergy {
         else { return nil }
 
         /// Older date would be further down the list since indexes are number of days **prior** to the date provided
-        let older = date.moveDayBy(-lastIndex)
-        let newer = date.moveDayBy(-firstIndex)
+        let older = DietaryEnergy.dateForSample(at: lastIndex, for: date)
+        let newer = DietaryEnergy.dateForSample(at: firstIndex, for: date)
         return older...newer
     }
 }

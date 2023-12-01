@@ -65,34 +65,34 @@ extension HealthStore {
 extension HealthStore {
     
     /// Returns a dict where the key is the number of days from the start date (lowerBound) of dateRange, and the value is the daily total for the dietary energy on that day
-    static func dailyDietaryEnergyValues(
-        dateRange: ClosedRange<Date>,
-        energyUnit: EnergyUnit
-    ) async throws -> [Int: Double] {
-        
-        let statisticsCollection = try await HealthStore.dailyStatistics(
-            for: .dietaryEnergyConsumed,
-            from: dateRange.lowerBound,
-            to: dateRange.upperBound
-        )
-
-        var samplesDict: [Int: Double] = [:]
-        
-        let numberOfDays = dateRange.upperBound.numberOfDaysFrom(dateRange.lowerBound)
-        
-        for i in 0...numberOfDays {
-            let date = dateRange.lowerBound.moveDayBy(i)
-            guard let statistics = statisticsCollection.statistics(for: date),
-                  let sumQuantity = statistics.sumQuantity()
-            else {
-                continue
-            }
-            let value = sumQuantity.doubleValue(for: energyUnit.healthKitUnit)
-            samplesDict[i] = value
-        }
-        
-        return samplesDict
-    }
+//    static func dailyDietaryEnergyValues(
+//        dateRange: ClosedRange<Date>,
+//        energyUnit: EnergyUnit
+//    ) async throws -> [Int: Double] {
+//        
+//        let statisticsCollection = try await HealthStore.dailyStatistics(
+//            for: .dietaryEnergyConsumed,
+//            from: dateRange.lowerBound,
+//            to: dateRange.upperBound
+//        )
+//
+//        var samplesDict: [Int: Double] = [:]
+//        
+//        let numberOfDays = dateRange.upperBound.numberOfDaysFrom(dateRange.lowerBound)
+//        
+//        for i in 0...numberOfDays {
+//            let date = dateRange.lowerBound.moveDayBy(i)
+//            guard let statistics = statisticsCollection.statistics(for: date),
+//                  let sumQuantity = statistics.sumQuantity()
+//            else {
+//                continue
+//            }
+//            let value = sumQuantity.doubleValue(for: energyUnit.healthKitUnit)
+//            samplesDict[i] = value
+//        }
+//        
+//        return samplesDict
+//    }
 }
 
 

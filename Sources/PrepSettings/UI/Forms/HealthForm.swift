@@ -22,29 +22,70 @@ public struct HealthForm: View {
     public var body: some View {
         Form {
             ForEach(types, id: \.self) {
-                section(for: $0)
+                content(for: $0)
             }
         }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .scrollDismissesKeyboard(.interactively)
     }
-    
-    @ViewBuilder
-    func section(for param: HealthType) -> some View {
-        switch param {
-        case .sex:
-            HealthSexSection(model)
-        case .age:
-            HealthAgeSection(model)
-        case .weight:
-            HealthWeightSection(model, settingsStore)
-        case .leanBodyMass:
-            HealthLeanBodyMassSection(model, settingsStore)
-        case .height:
-            HealthHeightSection(model, settingsStore)
-        default:
-            EmptyView()
+
+    func content(for type: HealthType) -> some View {
+        var addSection: some View {
+            @ViewBuilder
+            var footer: some View {
+                if let reason = type.reason {
+                    Text(reason)
+                }
+            }
+
+            return Section(footer: footer) {
+                addButton
+            }
         }
+        
+        var addButton: some View {
+            Button("Set \(type.nameWhenSetting)") {
+                withAnimation {
+                    model.add(type)
+                }
+            }
+        }
+
+        @ViewBuilder
+        var section: some View {
+            switch type {
+            case .sex:
+                HealthSexSection(model)
+            case .age:
+                HealthAgeSection(model)
+            case .weight:
+                HealthWeightSection(model, settingsStore)
+            case .leanBodyMass:
+                HealthLeanBodyMassSection(model, settingsStore)
+            case .height:
+                HealthHeightSection(model, settingsStore)
+            default:
+                EmptyView()
+            }
+        }
+
+        return Group {
+            if model.health.hasType(type) {
+                section
+            } else {
+                addSection
+            }
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        HealthForm(MockHealthModel, [.leanBodyMass])
+            .environment(SettingsStore.shared)
+            .onAppear {
+                SettingsStore.configureAsMock()
+            }
     }
 }
