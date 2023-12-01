@@ -20,7 +20,8 @@ public struct MaintenanceEstimateView: View {
             }
         }
         .onAppear(perform: appeared)
-        .navigationTitle("Maintenance Energy")
+//        .navigationTitle("Maintenance Energy")
+        .navigationTitle("Estimated Maintenance")
         .navigationBarTitleDisplayMode(.large)
     }
     
@@ -63,13 +64,19 @@ public struct MaintenanceEstimateView: View {
     var estimateSection: some View {
         Section {
             VStack {
+//                HStack {
+//                    Text("Estimated")
+//                        .fontWeight(.semibold)
+//                    Spacer()
+//                }
                 HStack {
-                    Text("Estimated")
-                        .fontWeight(.semibold)
-                    Spacer()
-//                    MaintenanceEstimateText(model, settingsStore)
-                }
-                HStack {
+                    if model.health.tdeeRequiredString == nil, model.health.estimatedMaintenanceInKcal != nil 
+                    {
+                        Image(systemName: "equal")
+                            .foregroundStyle(.secondary)
+                            .font(.title2)
+                            .fontWeight(.heavy)
+                    }
                     Spacer()
                     if let string = model.health.tdeeRequiredString {
                         Text(string)
@@ -80,7 +87,7 @@ public struct MaintenanceEstimateView: View {
                                 .animation(.default, value: value)
                                 .contentTransition(.numericText(value: value))
                                 .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                            Text(settingsStore.energyUnit.abbreviation)
+                            Text("\(settingsStore.energyUnit.abbreviation) / day")
                                 .foregroundStyle(.secondary)
                                 .font(.system(.body, design: .default, weight: .semibold))
                         }

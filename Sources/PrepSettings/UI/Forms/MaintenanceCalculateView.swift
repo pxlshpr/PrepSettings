@@ -219,12 +219,9 @@ struct MaintenanceCalculateView: View {
             HStack {
                 if maintenance.adaptiveValue != nil {
                     Image(systemName: "equal")
-//                    Text("=")
                         .foregroundStyle(.secondary)
                         .font(.title2)
                         .fontWeight(.heavy)
-//                        .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-//                        .font(.system(.body, design: .default, weight: .semibold))
                 }
                 Spacer()
                 if let value = maintenance.adaptiveValue {
@@ -237,8 +234,6 @@ struct MaintenanceCalculateView: View {
                             .foregroundStyle(.secondary)
                             .font(.system(.body, design: .default, weight: .semibold))
                     }
-//                    Text("\(value.formattedEnergy) kcal")
-//                        .foregroundStyle(.secondary)
                     .multilineTextAlignment(.trailing)
                 } else {
                     Text("Not enough data")

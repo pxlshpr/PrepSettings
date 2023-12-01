@@ -29,15 +29,15 @@ struct MaintenanceEnergyRow: View {
                     EmptyView()
                 }
             }
-            viewDataRow
-            errorRow
+//            viewDataRow
+//            errorRow
         }
     }
     
     @ViewBuilder
     var errorRow: some View {
         if let error = model.health.maintenanceEnergy?.error {
-            AdaptiveCalculationErrorCell(error)
+            MaintenanceCalculationErrorCell(error)
         }
     }
     
@@ -68,6 +68,7 @@ struct MaintenanceEnergyRow: View {
         if model.maintenanceEnergyIsAdaptive {
             NavigationLink(value: Route.adaptiveCalculation) {
 //                Text("Show Adaptive Calculation")
+//                Text("Show Calculation")
                 Text("Show Calculation")
             }
             .navigationDestination(for: Route.self) { route in
@@ -236,7 +237,7 @@ public enum AdaptiveMaintenanceError: Int, Error, Codable {
 /// [ ] If there is no weight data—show "
 /// [ ] When this is the first time user is using this, let them
 /// [ ] Always give the user
-struct AdaptiveCalculationErrorCell: View {
+struct MaintenanceCalculationErrorCell: View {
     
     let error: AdaptiveMaintenanceError
     

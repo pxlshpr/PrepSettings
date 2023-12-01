@@ -5,6 +5,7 @@ public struct MaintenanceFormSections: View {
     
     enum Route {
         case maintenance
+        case calculation
     }
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
@@ -51,6 +52,9 @@ public struct MaintenanceFormSections: View {
                 case .maintenance:
                     MaintenanceEstimateView(model)
                         .environment(settingsStore)
+                case .calculation:
+                    MaintenanceCalculateView(model)
+                        .environment(settingsStore)
                 }
             }
         }
@@ -63,8 +67,8 @@ public struct MaintenanceFormSections: View {
 //                Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
                 Text("Your weight change is comapred to the dietary energy you consumed to determine your true maintenance. [Learn More.](https://example.com)")
             }
-
-            return Section(footer: footer) {
+            
+            var toggleRow: some View {
                 HStack {
                     Text("Calculate True Maintenance")
 //                    Text("Use Adaptive Calculation")
@@ -72,6 +76,36 @@ public struct MaintenanceFormSections: View {
                     Spacer()
                     Toggle("", isOn: $model.maintenanceEnergyIsAdaptive)
                 }
+            }
+
+            @ViewBuilder
+            var showCalculationRow: some View {
+                if model.maintenanceEnergyIsAdaptive {
+                    NavigationLink(value: Route.calculation) {
+//                        Text("Show Adaptive Calculation")
+                        Text("Show Calculation")
+                    }
+//                    .navigationDestination(for: Route.self) { route in
+//                        switch route {
+//                        case .adaptiveCalculation:
+//                            MaintenanceCalculateView(model)
+//                                .environment(settingsStore)
+//                        }
+//                    }
+                }
+            }
+            
+            @ViewBuilder
+            var errorRow: some View {
+                if let error = model.health.maintenanceEnergy?.error {
+                    MaintenanceCalculationErrorCell(error)
+                }
+            }
+
+            return Section(footer: footer) {
+                toggleRow
+                showCalculationRow
+                errorRow
             }
         }
         
