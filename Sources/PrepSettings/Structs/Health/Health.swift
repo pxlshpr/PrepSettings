@@ -88,6 +88,7 @@ public extension Health {
         && fatPercentage == other.fatPercentage
         && pregnancyStatus == other.pregnancyStatus
         && isSmoker == other.isSmoker
+        && skipSyncAll == other.skipSyncAll
     }
 
     mutating func cleanup() {
