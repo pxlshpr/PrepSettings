@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-struct MaintenanceCalculationView: View {
+struct MaintenanceCalculateView: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
 
@@ -16,8 +16,10 @@ struct MaintenanceCalculationView: View {
     
     var body: some View {
         list
-            .navigationTitle("Adaptive Calculation")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Maintenance Energy")
+//            .navigationTitle("Calculation")
+//            .navigationTitle("Adaptive Calculation")
+            .navigationBarTitleDisplayMode(.large)
 //            .toolbar { toolbarContent }
 //            .navigationBarBackButtonHidden(isEditing)
     }
@@ -45,7 +47,7 @@ struct MaintenanceCalculationView: View {
         daysSection
         weightSection
         dietaryEnergySection
-        calculationSections
+        calculatedSection
     }
     
     var maintenance: Health.MaintenanceEnergy {
@@ -92,7 +94,7 @@ struct MaintenanceCalculationView: View {
         }
         
         var header: some View {
-            Text("Weight")
+            Text("Weight Change")
                 .font(.system(.title3, design: .rounded, weight: .bold))
                 .foregroundStyle(Color(.label))
                 .textCase(.none)
@@ -183,28 +185,36 @@ struct MaintenanceCalculationView: View {
         }
     }
     
-    @ViewBuilder
-    var calculationSections: some View {
-//        Section(footer: Text("Total energy consumption that would have resulted in no change in weight.")) {
-//            HStack {
-//                Text("Total Maintenance")
-//                Spacer()
-//                Text("27,437 kcal")
-//                    .foregroundStyle(.secondary)
-//            }
-//        }
-//        Section(footer: Text("Daily energy consumption that would have resulted in no change in weight, ie. your maintenance.")) {
-        Section(footer: Text("The energy you would have to consume daily to maintain your weight.")) {
-//        Section {
-            HStack {
-                Text("Maintenance Energy")
-                Spacer()
-                if let value = maintenance.adaptiveValue {
-                    Text("\(value.formattedEnergy) kcal")
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Not enough data")
-                        .foregroundStyle(.tertiary)
+    var calculatedSection: some View {
+        var footer: some View {
+            Text("The energy you would have to consume daily to maintain your weight.")
+        }
+        return Section(footer: footer) {
+            VStack {
+                HStack {
+                    Text("Calculated")
+                        .fontWeight(.semibold)
+                    Spacer()
+                }
+                HStack {
+                    Spacer()
+                    if let value = maintenance.adaptiveValue {
+                        HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
+                            Text(value.formattedEnergy)
+                                .animation(.default, value: value)
+                                .contentTransition(.numericText(value: value))
+                                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+                            Text(settingsStore.energyUnit.abbreviation)
+                                .foregroundStyle(.secondary)
+                                .font(.system(.body, design: .default, weight: .semibold))
+                        }
+//                        Text("\(value.formattedEnergy) kcal")
+//                            .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.trailing)
+                    } else {
+                        Text("Not enough data")
+                            .foregroundStyle(.tertiary)
+                    }
                 }
             }
         }
@@ -239,11 +249,11 @@ let MockMaintenanceSamples: [MaintenanceSample] = [
     Text("Health Details")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                MaintenanceCalculationView(MockHealthModel)
+                MaintenanceCalculateView(MockHealthModel)
                     .environment(SettingsStore.shared)
                     .onAppear {
                         SettingsStore.configureAsMock()
                     }
             }
-        }        
+        }
 }

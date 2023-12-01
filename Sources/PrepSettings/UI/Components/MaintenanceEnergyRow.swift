@@ -67,12 +67,13 @@ struct MaintenanceEnergyRow: View {
     var viewDataRow: some View {
         if model.maintenanceEnergyIsAdaptive {
             NavigationLink(value: Route.adaptiveCalculation) {
-                Text("Show Adaptive Calculation")
+//                Text("Show Adaptive Calculation")
+                Text("Show Calculation")
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .adaptiveCalculation:
-                    MaintenanceCalculationView(model)
+                    MaintenanceCalculateView(model)
                         .environment(settingsStore)
                 }
             }
@@ -87,7 +88,8 @@ struct MaintenanceEnergyRow: View {
     var calculatedTag: some View {
         
         var string: String {
-            showAdaptive ? "Adaptive" : "Estimated"
+//            showAdaptive ? "Adaptive" : "Estimated"
+            showAdaptive ? "Calculated" : "Estimated"
         }
         
         var foregroundColor: Color {

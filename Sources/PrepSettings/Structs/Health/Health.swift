@@ -31,6 +31,7 @@ public struct Health: Hashable, Codable {
     public var isSmoker: Bool?
 
     public var updatedAt: Date
+    public var skipSyncAll: Bool = false
     
     public init(
         date: Date = Date.now,

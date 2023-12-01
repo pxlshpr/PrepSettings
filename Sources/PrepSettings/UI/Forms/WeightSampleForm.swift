@@ -146,7 +146,7 @@ struct WeightSampleForm: View {
                 } else {
                     Button("Set weight") {
                         withAnimation {
-//                            model.value = 0
+                            model.sample.value = 0
                             model.displayedValue = 0
                         }
                     }

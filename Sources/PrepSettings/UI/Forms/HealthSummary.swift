@@ -90,43 +90,79 @@ public struct HealthSummary: View {
 //            }
         var section: some View {
             
-            Section {
-                HStack(alignment: .top) {
-                    VStack {
-                        Image(packageResource: "AppleHealthIcon", ofType: "png")
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                        Spacer()
+            var syncButton: some View {
+                Button("Sync Health Details") {
+                    Task(priority: .high) {
+                        try await model.setAllFromHealthKit()
                     }
-                    VStack(alignment: .leading) {
-                        Text("Apple Health")
-                            .foregroundStyle(.white)
-                            .fontWeight(.semibold)
-//                        Text("Automatically sync your health details with Apple Health. Any goals based on them will automatically update to changes.")
-                        Text("Enable seamless syncing of your health data with Apple Health. Your personalized health goals will automatically adjust to reflect any changes in your health data.")
+                }
+                .foregroundStyle(.white)
+                .fontWeight(.bold)
+                .padding(.top, 5)
+                .buttonStyle(.plain)
+            }
+            
+            var skipButton: some View {
+                Button("Not now") {
+                    withAnimation {
+                        model.health.skipSyncAll = true
+                    }
+                }
+                .foregroundStyle(.white)
+                .padding(.top, 5)
+                .buttonStyle(.plain)
+            }
+            
+            var appleHealthImage: some View {
+                Image(packageResource: "AppleHealthIcon", ofType: "png")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+            }
+            
+            var title: some View {
+                Text("Apple Health")
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            
+            var message: some View {
+//                Text("Automatically sync your health details with Apple Health. Any goals based on them will automatically update to changes.")
+                Text("Enable seamless syncing of your health data with Apple Health. Your personalized health goals will automatically adjust to reflect any changes in your health data.")
                             .font(.system(.callout))
                             .foregroundStyle(.white)
                             .opacity(0.8)
-                        Divider()
-                            .overlay(Color.white)
-                            .opacity(0.6)
-                        Button("Sync Health Details") {
-                            Task(priority: .high) {
-                                try await model.setAllFromHealthKit()
-                            }
-                        }
-                        .foregroundStyle(.white)
-                        .fontWeight(.bold)
-                        .padding(.top, 5)
+            }
+            
+            var divider: some View {
+                Divider()
+                    .overlay(Color.white)
+                    .opacity(0.6)
+            }
+            
+            var background: some View {
+                Rectangle().fill(Color.accentColor.gradient)
+            }
+            
+            return Section {
+                HStack(alignment: .top) {
+                    VStack {
+                        appleHealthImage
+                        Spacer()
+                    }
+                    VStack(alignment: .leading) {
+                        message
+                        divider
+                        syncButton
+                        skipButton
                     }
                 }
                 .padding(.top)
             }
-            .listRowBackground(Rectangle().fill(Color.accentColor.gradient))
+            .listRowBackground(background)
         }
         
         return Group {
-            if model.health.doesNotHaveAnyHealthKitBasedTypesSet {
+            if model.health.shouldShowSyncAllTip {
                 section
             }
         }

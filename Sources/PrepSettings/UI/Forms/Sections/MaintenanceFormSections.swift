@@ -49,7 +49,7 @@ public struct MaintenanceFormSections: View {
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .maintenance:
-                    MaintenanceEstimateForm(model)
+                    MaintenanceEstimateView(model)
                         .environment(settingsStore)
                 }
             }
@@ -57,51 +57,38 @@ public struct MaintenanceFormSections: View {
     }
 
     var maintenanceSection: some View {
-        func emptyContent(_ message: String) -> some View {
-            Text(message)
-                .foregroundStyle(.tertiary)
-        }
         
-        func valueContent(_ value: Double) -> some View {
-            HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                Text(value.formattedEnergy)
-                    .animation(.default, value: value)
-                    .contentTransition(.numericText(value: value))
-                    .font(NumberFont)
-                    .foregroundStyle(.secondary)
-                Text(settingsStore.energyUnit.abbreviation)
-                    .foregroundStyle(.secondary)
-                    .font(.system(.body, design: .default, weight: .semibold))
+        var calculateSection: some View {
+            var footer: some View {
+//                Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
+                Text("Your weight change is comapred to the dietary energy you consumed to determine your true maintenance. [Learn More.](https://example.com)")
             }
-//            .frame(maxWidth: .infinity, alignment: .trailing)
-        }
-        
-        var adaptiveRow: some View {
-            HStack {
-                Text("Use Adaptive Calculation")
-                    .layoutPriority(1)
-                Spacer()
-                Toggle("", isOn: $model.maintenanceEnergyIsAdaptive)
+
+            return Section(footer: footer) {
+                HStack {
+                    Text("Calculate True Maintenance")
+//                    Text("Use Adaptive Calculation")
+                        .layoutPriority(1)
+                    Spacer()
+                    Toggle("", isOn: $model.maintenanceEnergyIsAdaptive)
+                }
             }
         }
         
-        var footer: some View {
-//            Text("Your \(HealthType.maintenanceEnergy.abbreviation) is used in energy goals, when targeting a desired weight change.")
-            Text(HealthType.maintenanceEnergy.reason!)
-        }
-
-        var adaptiveFooter: some View {
-            Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
-        }
-
-        return Group {
-            Section(footer: footer) {
+        var maintenanceSection: some View {
+            var footer: some View {
+//                Text("Your \(HealthType.maintenanceEnergy.abbreviation) is used in energy goals, when targeting a desired weight change.")
+                Text(HealthType.maintenanceEnergy.reason!)
+            }
+            return Section(footer: footer) {
                 MaintenanceEnergyRow(model)
                     .environment(settingsStore)
             }
-            Section(footer: adaptiveFooter) {
-                adaptiveRow
-            }
+        }
+
+        return Group {
+            maintenanceSection
+            calculateSection
         }
     }
     

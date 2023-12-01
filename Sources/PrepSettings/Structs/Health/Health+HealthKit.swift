@@ -109,6 +109,11 @@ public extension Health {
     }
 }
 public extension Health {
+    var shouldShowSyncAllTip: Bool {
+        doesNotHaveAnyHealthKitBasedTypesSet
+        && skipSyncAll == false
+    }
+    
     var doesNotHaveAnyHealthKitBasedTypesSet: Bool {
         restingEnergy == nil
         && activeEnergy == nil
