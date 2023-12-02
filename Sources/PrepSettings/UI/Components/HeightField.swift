@@ -5,13 +5,16 @@ struct HeightField: View {
     
     @Binding var unit: HeightUnit
     @Binding var valueInCm: Double?
-    
+    var focusedType: FocusState<HealthType?>.Binding
+
     var body: some View {
         HealthNumberField(
             unitBinding: $unit,
             valueBinding: valueInDisplayedUnit,
             firstComponentBinding: feetComponent,
-            secondComponentBinding: centimetersComponent
+            secondComponentBinding: centimetersComponent,
+            focusedType: focusedType,
+            healthType: .height
         )
     }
     

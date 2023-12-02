@@ -7,20 +7,23 @@ struct HealthNumberField<Unit: HealthUnit>: View {
     let valueBinding: Binding<Double?>
     let firstComponentBinding: Binding<Int?>
     let secondComponentBinding: Binding<Double?>
-    let isFocusedBinding: Binding<Bool>?
-
+    let focusedType: FocusState<HealthType?>.Binding
+    let healthType: HealthType
+    
     init(
         unitBinding: Binding<Unit>,
         valueBinding: Binding<Double?>,
         firstComponentBinding: Binding<Int?> = .constant(0),
         secondComponentBinding: Binding<Double?> = .constant(0),
-        isFocusedBinding: Binding<Bool>? = nil
+        focusedType: FocusState<HealthType?>.Binding,
+        healthType: HealthType
     ) {
         self.unitBinding = unitBinding
         self.valueBinding = valueBinding
         self.firstComponentBinding = firstComponentBinding
         self.secondComponentBinding = secondComponentBinding
-        self.isFocusedBinding = isFocusedBinding
+        self.focusedType = focusedType
+        self.healthType = healthType
     }
     
     var body: some View {
@@ -29,15 +32,15 @@ struct HealthNumberField<Unit: HealthUnit>: View {
             case true:
                 NumberField(
                     placeholder: "Required",
-                    binding: firstComponentBinding,
-                    isFocused: isFocusedBinding
+                    binding: firstComponentBinding
                 )
+                .focused(focusedType, equals: healthType)
                 unitView
                 NumberField(
                     placeholder: "",
                     binding: secondComponentBinding
-                    /// only pass the isFocusedBinding to first component
                 )
+                /// only pass the isFocusedBinding to first component
                 if let string = Unit.secondaryUnit {
                     Text(string)
                         .foregroundStyle(.secondary)
@@ -45,9 +48,9 @@ struct HealthNumberField<Unit: HealthUnit>: View {
             case false:
                 NumberField(
                     placeholder: "Required",
-                    binding: valueBinding,
-                    isFocused: isFocusedBinding
+                    binding: valueBinding
                 )
+                .focused(focusedType, equals: healthType)
                 unitView
             }
         }

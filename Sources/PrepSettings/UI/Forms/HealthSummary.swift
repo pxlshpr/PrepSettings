@@ -6,8 +6,9 @@ public struct HealthSummary: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
     @Bindable var model: HealthModel
+    @FocusState var focusedType: HealthType?
     @State var hasAppeared = false
-    
+
     public init(model: HealthModel) {
         self.model = model
     }
@@ -24,8 +25,9 @@ public struct HealthSummary: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar { toolbarContent }
         .onAppear(perform: appeared)
+        .onChange(of: focusedType, model.focusedTypeChanged)
     }
-    
+        
     var form: some View {
         Form {
             dateSection
@@ -189,15 +191,15 @@ public struct HealthSummary: View {
         var section: some View {
             switch type {
             case .age:
-                HealthAgeSection(model)
+                HealthAgeSection(model, $focusedType)
             case .weight:
-                HealthWeightSection(model, settingsStore)
+                HealthWeightSection(model, settingsStore, $focusedType)
             case .height:
-                HealthHeightSection(model, settingsStore)
+                HealthHeightSection(model, settingsStore, $focusedType)
             case .sex:
                 HealthSexSection(model)
             case .leanBodyMass:
-                HealthLeanBodyMassSection(model, settingsStore)
+                HealthLeanBodyMassSection(model, settingsStore, $focusedType)
             case .pregnancyStatus:
                 HealthTopRow(type: .pregnancyStatus, model: model)
             case .isSmoker:

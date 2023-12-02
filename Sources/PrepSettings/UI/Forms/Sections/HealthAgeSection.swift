@@ -4,9 +4,14 @@ import PrepShared
 struct HealthAgeSection: View {
     
     @Bindable var model: HealthModel
+    var focusedType: FocusState<HealthType?>.Binding
 
-    init(_ model: HealthModel) {
+    init(
+        _ model: HealthModel,
+        _ focusedType: FocusState<HealthType?>.Binding
+    ) {
         self.model = model
+        self.focusedType = focusedType
     }
     
     var body: some View {
@@ -37,6 +42,14 @@ struct HealthAgeSection: View {
         }
     }
     
+    var numberField: some View {
+        NumberField(
+            placeholder: "Required",
+            binding: $model.ageValue
+        )
+        .focused(focusedType, equals: .age)
+    }
+    
     var valueRow: some View {
         HStack {
             Spacer()
@@ -47,10 +60,7 @@ struct HealthAgeSection: View {
                 case .healthKit, .userEnteredDateOfBirth:
                     computedContent
                 case .userEnteredAge:
-                    NumberField(
-                        placeholder: "Required",
-                        binding: $model.ageValue
-                    )
+                    numberField
                 }
                 if model.health.age?.value != nil {
                     Text("years")
@@ -104,14 +114,6 @@ struct HealthAgeSection: View {
                     )
                 }
             }
-        }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        Form {
-            HealthAgeSection(MockHealthModel)
         }
     }
 }

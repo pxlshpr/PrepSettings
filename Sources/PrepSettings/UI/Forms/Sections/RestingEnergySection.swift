@@ -6,6 +6,8 @@ struct RestingEnergySection: View {
     @Bindable var model: HealthModel
     @Bindable var settingsStore: SettingsStore
 
+    var focusedType: FocusState<HealthType?>.Binding
+    
     var body: some View {
         Section(footer: footer) {
             HealthTopRow(type: .restingEnergy, model: model)
@@ -106,18 +108,14 @@ struct RestingEnergySection: View {
         }
         
         var manualValue: some View {
-            let binding = Binding<Double>(
-                get: { model.health.restingEnergyValue ?? 0 },
-                set: { model.health.restingEnergyValue = $0 }
-            )
-
-            return HStack(spacing: UnitSpacing) {
+            HStack(spacing: UnitSpacing) {
                 Spacer()
                 NumberField(
                     placeholder: "Required",
                     roundUp: true,
                     binding: $model.health.restingEnergyValue
                 )
+                .focused(focusedType, equals: HealthType.restingEnergy)
                 Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(.secondary)
             }

@@ -17,6 +17,8 @@ struct WeightSampleForm: View {
 
     let didSaveWeight: DidSaveWeightSampleHandler
 
+    @FocusState var focusedType: HealthType?
+    
     init(
         sample: WeightSample,
         date: Date,
@@ -47,6 +49,7 @@ struct WeightSampleForm: View {
         .task(loadRequiresSaveConfirmation)
         .confirmationDialog("", isPresented: $showingSaveConfirmation, actions: saveConfirmationActions, message: saveConfirmationMessage)
         .onChange(of: settingsStore.bodyMassUnit, model.bodyMassUnitChanged)
+        .onChange(of: focusedType, healthModel.focusedTypeChanged)
     }
     
     func saveConfirmationActions() -> some View {
@@ -118,9 +121,9 @@ struct WeightSampleForm: View {
             
             return BodyMassField(
                 unit: $settingsStore.bodyMassUnit,
-                valueInKg: valueBinding
-//                firstComponentBinding: $model.weightStonesComponent,
-//                secondComponentBinding: $model.weightPoundsComponent
+                valueInKg: valueBinding,
+                focusedType: $focusedType,
+                healthType: .weight
             )
         }
         

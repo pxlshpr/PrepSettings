@@ -234,6 +234,22 @@ public extension Health {
 
 //MARK: Values
 
+extension Health {
+    mutating func handleFocusLoss(for type: HealthType) {
+        switch type {
+        case .activeEnergy:     if activeEnergyValue == nil { activeEnergyValue = 0 }
+        case .restingEnergy:    if restingEnergyValue == nil { restingEnergyValue = 0 }
+        case .weight:           if weightValue == nil { remove(.weight) }
+        case .height:           if heightValue == nil { remove(.height) }
+        case .leanBodyMass:     if leanBodyMassValue == nil { remove(.leanBodyMass) }
+        case .age:              if ageValue == nil { remove(.age) }
+        case .fatPercentage:    if fatPercentage == nil { fatPercentage = 0 }
+        default:
+            break
+        }
+    }
+}
+
 public extension Health {
     
 //    var maintenanceEnergyAdaptiveValue: Double? {

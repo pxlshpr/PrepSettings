@@ -5,6 +5,7 @@ public struct HealthForm: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
     @Bindable var model: HealthModel
+    @FocusState var focusedType: HealthType?
 
     let types: [HealthType]
     let title: String
@@ -28,6 +29,7 @@ public struct HealthForm: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .scrollDismissesKeyboard(.interactively)
+        .onChange(of: focusedType, model.focusedTypeChanged)
     }
 
     func content(for type: HealthType) -> some View {
@@ -58,13 +60,13 @@ public struct HealthForm: View {
             case .sex:
                 HealthSexSection(model)
             case .age:
-                HealthAgeSection(model)
+                HealthAgeSection(model, $focusedType)
             case .weight:
-                HealthWeightSection(model, settingsStore)
+                HealthWeightSection(model, settingsStore, $focusedType)
             case .leanBodyMass:
-                HealthLeanBodyMassSection(model, settingsStore)
+                HealthLeanBodyMassSection(model, settingsStore, $focusedType)
             case .height:
-                HealthHeightSection(model, settingsStore)
+                HealthHeightSection(model, settingsStore, $focusedType)
             default:
                 EmptyView()
             }

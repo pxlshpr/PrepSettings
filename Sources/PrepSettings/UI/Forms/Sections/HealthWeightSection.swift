@@ -5,10 +5,16 @@ struct HealthWeightSection: View {
     
     @Bindable var settingsStore: SettingsStore
     @Bindable var model: HealthModel
+    var focusedType: FocusState<HealthType?>.Binding
     
-    init(_ model: HealthModel, _ settingsStore: SettingsStore) {
+    init(
+        _ model: HealthModel,
+        _ settingsStore: SettingsStore,
+        _ focusedType: FocusState<HealthType?>.Binding
+    ) {
         self.model = model
         self.settingsStore = settingsStore
+        self.focusedType = focusedType
     }
     
     var body: some View {
@@ -64,15 +70,9 @@ struct HealthWeightSection: View {
     var manualValue: some View {
         BodyMassField(
             unit: $settingsStore.bodyMassUnit,
-            valueInKg: $model.weightValue
+            valueInKg: $model.weightValue,
+            focusedType: focusedType,
+            healthType: .weight
         )
-    }
-}
-
-#Preview {
-    NavigationStack {
-        Form {
-            HealthWeightSection(MockHealthModel, SettingsStore.shared)
-        }
     }
 }

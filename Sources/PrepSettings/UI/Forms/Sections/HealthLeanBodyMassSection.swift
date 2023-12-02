@@ -6,9 +6,16 @@ struct HealthLeanBodyMassSection: View {
     @Bindable var settingsStore: SettingsStore
     @Bindable var model: HealthModel
     
-    init(_ model: HealthModel, _ settingsStore: SettingsStore) {
+    var focusedType: FocusState<HealthType?>.Binding
+
+    init(
+        _ model: HealthModel,
+        _ settingsStore: SettingsStore,
+        _ focusedType: FocusState<HealthType?>.Binding
+    ) {
         self.model = model
         self.settingsStore = settingsStore
+        self.focusedType = focusedType
     }
     
     var body: some View {
@@ -39,7 +46,9 @@ struct HealthLeanBodyMassSection: View {
     var manualValue: some View {
         BodyMassField(
             unit: $settingsStore.bodyMassUnit,
-            valueInKg: $model.leanBodyMassValue
+            valueInKg: $model.leanBodyMassValue,
+            focusedType: focusedType,
+            healthType: .leanBodyMass
         )
     }
     
@@ -73,6 +82,7 @@ struct HealthLeanBodyMassSection: View {
                     roundUp: true,
                     binding: $model.fatPercentageValue
                 )
+                .focused(focusedType, equals: HealthType.fatPercentage)
                 Text("%")
                     .foregroundStyle(Color(.tertiaryLabel))
             }

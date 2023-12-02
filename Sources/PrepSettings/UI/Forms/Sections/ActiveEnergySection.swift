@@ -6,6 +6,9 @@ struct ActiveEnergySection: View {
     @Bindable var model: HealthModel
     @Bindable var settingsStore: SettingsStore
 
+//    @FocusState var focusedType: HealthType?
+    var focusedType: FocusState<HealthType?>.Binding
+
     var body: some View {
         Section(footer: footer) {
             HealthTopRow(type: .activeEnergy, model: model)
@@ -63,7 +66,6 @@ struct ActiveEnergySection: View {
         var calculatedValue: some View {
             CalculatedEnergyView(
                 valueBinding: $model.health.activeEnergyValue,
-//                unitBinding: $model.health.energyUnit,
                 unitBinding: $settingsStore.energyUnit,
                 intervalBinding: $model.activeEnergyInterval,
                 date: model.health.date,
@@ -72,19 +74,14 @@ struct ActiveEnergySection: View {
         }
         
         var manualValue: some View {
-//            let binding = Binding<Double>(
-//                get: { model.health.activeEnergyValue ?? 0 },
-//                set: { model.health.activeEnergyValue = $0 }
-//            )
-
-            return HStack(spacing: UnitSpacing) {
+            HStack(spacing: UnitSpacing) {
                 Spacer()
-//                NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
                 NumberField(
                     placeholder: "Required",
                     roundUp: true,
                     binding: $model.health.activeEnergyValue
                 )
+                .focused(focusedType, equals: HealthType.activeEnergy)
                 Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(.secondary)
             }

@@ -5,10 +5,16 @@ struct HealthHeightSection: View {
     
     @Bindable var settingsStore: SettingsStore
     @Bindable var model: HealthModel
+    var focusedType: FocusState<HealthType?>.Binding
     
-    init(_ model: HealthModel, _ settingsStore: SettingsStore) {
+    init(
+        _ model: HealthModel,
+        _ settingsStore: SettingsStore,
+        _ focusedType: FocusState<HealthType?>.Binding
+    ) {
         self.model = model
         self.settingsStore = settingsStore
+        self.focusedType = focusedType
     }
 
     var body: some View {
@@ -64,7 +70,8 @@ struct HealthHeightSection: View {
     var manualValue: some View {
         HeightField(
             unit: $settingsStore.heightUnit,
-            valueInCm: $model.heightValue
+            valueInCm: $model.heightValue,
+            focusedType: focusedType
         )
     }
 }

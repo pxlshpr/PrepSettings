@@ -6,7 +6,8 @@ public struct MaintenanceEstimateView: View {
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
     @Bindable var model: HealthModel
     @State var hasAppeared = false
-
+    @FocusState var focusedType: HealthType?
+    
     public init(_ model: HealthModel) {
         self.model = model
     }
@@ -23,6 +24,7 @@ public struct MaintenanceEstimateView: View {
 //        .navigationTitle("Maintenance Energy")
         .navigationTitle("Estimate")
         .navigationBarTitleDisplayMode(.large)
+        .onChange(of: focusedType, model.focusedTypeChanged)
     }
     
     func appeared() {
@@ -35,7 +37,8 @@ public struct MaintenanceEstimateView: View {
         Form {
             RestingEnergySection(
                 model: model,
-                settingsStore: settingsStore
+                settingsStore: settingsStore,
+                focusedType: $focusedType
             )
             Section {
                 symbol("+")
@@ -43,13 +46,27 @@ public struct MaintenanceEstimateView: View {
             .listSectionSpacing(0)
             ActiveEnergySection(
                 model: model,
-                settingsStore: settingsStore
+                settingsStore: settingsStore,
+                focusedType: $focusedType
             )
 //            Section {
 //                symbol("=")
 //            }
 //            .listSectionSpacing(0)
             estimateSection
+        }
+        .toolbar { keyboardToolbarContent }
+    }
+    
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
+            }
         }
     }
     

@@ -10,6 +10,8 @@ struct WeightChangeForm: View {
     @State var isFocused: Bool = false
     @State var isNegative = false
     
+    @FocusState var focusedType: HealthType?
+
     var body: some View {
         Form {
             weightChangeSection
@@ -18,6 +20,7 @@ struct WeightChangeForm: View {
         }
         .navigationTitle("Weight Change")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: focusedType, healthModel.focusedTypeChanged)
     }
     
     var type: WeightChangeType {
@@ -79,41 +82,14 @@ struct WeightChangeForm: View {
                     }
                 }
             )
-//            return ManualHealthField(
+            
             return HealthNumberField(
                 unitBinding: unitBinding,
                 valueBinding: valueBinding,
-                isFocusedBinding: $isFocused
+                focusedType: $focusedType,
+                healthType: .maintenanceEnergy /// using this as we don't have a case for dietary energy, but it is redundant as there is only one type
             )
         }
-        
-//        var textField2: some View {
-//            let textBinding = Binding<String>(
-//                get: { delta?.cleanAmount ?? "" },
-//                set: { delta = $0.double }
-//            )
-//            
-//            return HStack {
-//                TextField("", text: textBinding)
-//                    .keyboardType(.numberPad)
-//                    .multilineTextAlignment(.trailing)
-//                    .simultaneousGesture(textSelectionTapGesture)
-//                    .focused($isFocused)
-//                    .toolbar {
-//                        ToolbarItemGroup(placement: .keyboard) {
-//                            HStack {
-//                                Spacer()
-//                                Button("Done") {
-//                                    isFocused = false
-//                                }
-//                                .fontWeight(.semibold)
-//                            }
-//                        }
-//                    }
-//                Text(settingsStore.bodyMassUnit.abbreviation)
-//                    .foregroundStyle(.secondary)
-//            }
-//        }
         
         var footer: some View {
             var string: String {
@@ -277,22 +253,6 @@ struct WeightChangeForm: View {
     }
 }
 
-struct HealthFieldTest: View {
-    
-    @State var value: Double? = 0
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                HealthNumberField(
-                    unitBinding: .constant(EnergyUnit.kcal),
-                    valueBinding: $value
-                )
-            }
-        }
-    }
-}
-
 #Preview {
     NavigationStack {
         WeightChangeForm()
@@ -301,8 +261,6 @@ struct HealthFieldTest: View {
             .onAppear {
                 SettingsStore.configureAsMock()
             }
-        
-//        HealthFieldTest()
     }
 }
 

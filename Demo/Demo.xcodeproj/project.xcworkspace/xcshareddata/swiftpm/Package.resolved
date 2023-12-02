@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pxlshpr/PrepShared",
       "state" : {
-        "revision" : "dc232f31c13dbd174e480aa0c6b5a3e8e2ae600c",
-        "version" : "0.0.188"
+        "revision" : "ef3ce532dc1d71ca69c901048527c180c929697c",
+        "version" : "0.0.190"
       }
     },
     {

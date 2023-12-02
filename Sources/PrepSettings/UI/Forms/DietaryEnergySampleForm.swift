@@ -23,6 +23,8 @@ struct DietaryEnergySampleForm: View {
 
     let didSave: DidSaveDietaryEnergySampleHandler
 
+    @FocusState var focusedType: HealthType?
+    
     init(
         sample: DietaryEnergySample,
         date: Date,
@@ -50,6 +52,7 @@ struct DietaryEnergySampleForm: View {
         .navigationBarTitleDisplayMode(.inline)
         .task(model.loadValues)
         .toolbar { toolbarContent }
+        .onChange(of: focusedType, healthModel.focusedTypeChanged)
     }
     
     var toolbarContent: some ToolbarContent {
@@ -126,10 +129,12 @@ struct DietaryEnergySampleForm: View {
                     model.sample.value = settingsStore.energyUnit.convert(newValue, to: .kcal)
                 }
             )
+            
             return HealthNumberField(
                 unitBinding: unitBinding,
                 valueBinding: binding,
-                isFocusedBinding: $isFocused
+                focusedType: $focusedType,
+                healthType: .maintenanceEnergy /// using this as we don't have a case for dietary energy, but it is redundant as there is only one type
             )
         }
         

@@ -53,6 +53,16 @@ extension HealthModel {
     }
 }
 
+extension HealthModel {
+    func focusedTypeChanged(old: HealthType?, new: HealthType?) {
+        for type in HealthType.allCases {
+            if old == type, new != type {
+                health.handleFocusLoss(for: type)
+            }
+        }
+    }
+}
+
 extension MaintenanceValues {
     
     var sortedDates: [Date] {
