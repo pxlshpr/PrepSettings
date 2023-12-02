@@ -243,7 +243,7 @@ extension Health {
         case .height:           if heightValue == nil { remove(.height) }
         case .leanBodyMass:     if leanBodyMassValue == nil { remove(.leanBodyMass) }
         case .age:              if ageValue == nil { remove(.age) }
-        case .fatPercentage:    if fatPercentage == nil { fatPercentage = 0 }
+//        case .fatPercentage:    if fatPercentage == nil { fatPercentage = 0 }
         default:
             break
         }
