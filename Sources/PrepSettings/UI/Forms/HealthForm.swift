@@ -30,6 +30,19 @@ public struct HealthForm: View {
         .navigationBarTitleDisplayMode(.inline)
         .scrollDismissesKeyboard(.interactively)
         .onChange(of: focusedType, model.focusedTypeChanged)
+        .toolbar { keyboardToolbarContent }
+    }
+    
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
+            }
+        }
     }
 
     func content(for type: HealthType) -> some View {

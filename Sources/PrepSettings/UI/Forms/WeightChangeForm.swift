@@ -21,8 +21,21 @@ struct WeightChangeForm: View {
         .navigationTitle("Weight Change")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: focusedType, healthModel.focusedTypeChanged)
+        .toolbar { keyboardToolbarContent }
     }
     
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
+            }
+        }
+    }
+
     var type: WeightChangeType {
         healthModel.maintenanceWeightChangeType
     }

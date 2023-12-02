@@ -53,8 +53,21 @@ struct DietaryEnergySampleForm: View {
         .task(model.loadValues)
         .toolbar { toolbarContent }
         .onChange(of: focusedType, healthModel.focusedTypeChanged)
+        .toolbar { keyboardToolbarContent }
     }
     
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
+            }
+        }
+    }
+
     var toolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
             Button("Update") {

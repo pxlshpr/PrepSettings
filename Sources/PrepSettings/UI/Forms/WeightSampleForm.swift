@@ -50,8 +50,21 @@ struct WeightSampleForm: View {
         .confirmationDialog("", isPresented: $showingSaveConfirmation, actions: saveConfirmationActions, message: saveConfirmationMessage)
         .onChange(of: settingsStore.bodyMassUnit, model.bodyMassUnitChanged)
         .onChange(of: focusedType, healthModel.focusedTypeChanged)
+        .toolbar { keyboardToolbarContent }
     }
     
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
+            }
+        }
+    }
+
     func saveConfirmationActions() -> some View {
         let primaryAction = isRemoving ? "Remove" : "Save"
         let secondaryAction = isRemoving ? "disable" : "modify"

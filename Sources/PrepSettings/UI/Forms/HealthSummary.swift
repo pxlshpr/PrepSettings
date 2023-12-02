@@ -40,8 +40,21 @@ public struct HealthSummary: View {
             content(for: .leanBodyMass)
             dailyValuesSection
         }
+        .toolbar { keyboardToolbarContent }
     }
     
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
+            }
+        }
+    }
+
     func appeared() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             hasAppeared = true
