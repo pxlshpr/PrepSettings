@@ -27,10 +27,8 @@ struct WeightChangeForm: View {
     @ViewBuilder
     var weightsSections: some View {
         if type == .usingWeights {
-            Section("Current") {
+            Section("Weights") {
                 weightCell(sample: maintenance.weightChange.current, isPrevious: false)
-            }
-            Section("Previous") {
                 weightCell(sample: maintenance.weightChange.previous, isPrevious: true)
             }
         }
