@@ -58,7 +58,7 @@ struct WeightChangeForm: View {
         }
     }
     
-    @State var isFocused = false
+    @State var isFocused: Bool = false
     @State var isNegative = false
     
     var weightChangeSection: some View {
@@ -98,6 +98,34 @@ struct WeightChangeForm: View {
             )
         }
         
+//        var textField2: some View {
+//            let textBinding = Binding<String>(
+//                get: { delta?.cleanAmount ?? "" },
+//                set: { delta = $0.double }
+//            )
+//            
+//            return HStack {
+//                TextField("", text: textBinding)
+//                    .keyboardType(.numberPad)
+//                    .multilineTextAlignment(.trailing)
+//                    .simultaneousGesture(textSelectionTapGesture)
+//                    .focused($isFocused)
+//                    .toolbar {
+//                        ToolbarItemGroup(placement: .keyboard) {
+//                            HStack {
+//                                Spacer()
+//                                Button("Done") {
+//                                    isFocused = false
+//                                }
+//                                .fontWeight(.semibold)
+//                            }
+//                        }
+//                    }
+//                Text(settingsStore.bodyMassUnit.abbreviation)
+//                    .foregroundStyle(.secondary)
+//            }
+//        }
+        
         var footer: some View {
             var string: String {
                 switch type {
@@ -126,9 +154,13 @@ struct WeightChangeForm: View {
 //                    healthModel.maintenanceWeightChangeDeltaIsNegative
                 },
                 set: { newValue in
+                    
                     isNegative = newValue
+                    
+//                    guard let delta = healthModel.maintenanceWeightChangeDelta else { return }
                     let delta = healthModel.maintenanceWeightChangeDelta
                     guard delta != 0 else { return }
+                    
                     healthModel.maintenanceWeightChangeDelta = switch newValue {
                     case true:  abs(delta) * -1
                     case false: abs(delta)
@@ -256,6 +288,20 @@ struct WeightChangeForm: View {
     }
 }
 
+struct HealthFieldTest: View {
+    @State var value: Double = 0
+    var body: some View {
+        NavigationStack {
+            Form {
+                ManualHealthField(
+                    unitBinding: .constant(EnergyUnit.kcal),
+                    valueBinding: $value
+                )
+            }
+        }
+    }
+}
+
 #Preview {
     NavigationStack {
         WeightChangeForm(MockHealthModel)
@@ -263,5 +309,13 @@ struct WeightChangeForm: View {
             .onAppear {
                 SettingsStore.configureAsMock()
             }
+        
+//        HealthFieldTest()
+    }
+}
+
+extension String {
+    var double: Double? {
+        Double(self)
     }
 }

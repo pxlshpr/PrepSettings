@@ -61,3 +61,4 @@ struct ManualHealthField<Unit: HealthUnit>: View {
             .foregroundStyle(.secondary)
     }
 }
+

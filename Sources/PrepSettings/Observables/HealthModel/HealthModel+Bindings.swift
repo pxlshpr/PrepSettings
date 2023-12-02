@@ -27,7 +27,8 @@ public extension HealthModel {
     }
 
     var maintenanceWeightChangeDeltaIsNegative: Bool {
-        maintenanceWeightChangeDelta < 0
+//        guard let maintenanceWeightChangeDelta else { return false }
+        return maintenanceWeightChangeDelta < 0
     }
     
     var maintenanceWeightChangeDelta: Double {
