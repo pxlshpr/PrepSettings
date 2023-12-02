@@ -27,12 +27,12 @@ public extension HealthModel {
     }
 
     var maintenanceWeightChangeDeltaIsNegative: Bool {
-//        guard let maintenanceWeightChangeDelta else { return false }
+        guard let maintenanceWeightChangeDelta else { return false }
         return maintenanceWeightChangeDelta < 0
     }
     
-    var maintenanceWeightChangeDelta: Double {
-        get { health.maintenanceEnergy?.weightChange.delta ?? 0 }
+    var maintenanceWeightChangeDelta: Double? {
+        get { health.maintenanceEnergy?.weightChange.delta }
         set {
             Task {
                 await MainActor.run {

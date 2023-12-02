@@ -79,7 +79,7 @@ struct WeightChangeForm: View {
         }
         
         var textField: some View {
-            let valueBinding = Binding<Double>(
+            let valueBinding = Binding<Double?>(
                 get: { delta },
                 set: { delta = $0 }
             )
@@ -91,7 +91,8 @@ struct WeightChangeForm: View {
                     }
                 }
             )
-            return ManualHealthField(
+//            return ManualHealthField(
+            return HealthTextField(
                 unitBinding: unitBinding,
                 valueBinding: valueBinding,
                 isFocusedBinding: $isFocused
@@ -138,7 +139,7 @@ struct WeightChangeForm: View {
             return Text(string)
         }
         
-        var delta: Double {
+        var delta: Double? {
             get {
                 healthModel.maintenanceWeightChangeDelta
             }
@@ -157,9 +158,9 @@ struct WeightChangeForm: View {
                     
                     isNegative = newValue
                     
-//                    guard let delta = healthModel.maintenanceWeightChangeDelta else { return }
-                    let delta = healthModel.maintenanceWeightChangeDelta
-                    guard delta != 0 else { return }
+                    guard let delta = healthModel.maintenanceWeightChangeDelta,
+                          delta != 0
+                    else { return }
                     
                     healthModel.maintenanceWeightChangeDelta = switch newValue {
                     case true:  abs(delta) * -1
