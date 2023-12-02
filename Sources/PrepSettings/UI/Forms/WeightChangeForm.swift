@@ -78,7 +78,7 @@ struct WeightChangeForm: View {
                 },
                 set: { newValue in
                     guard let newValue else {
-                        delta = nil
+                        delta = 0
                         return
                     }
                     delta = switch isNegative {
@@ -100,7 +100,7 @@ struct WeightChangeForm: View {
                 unitBinding: unitBinding,
                 valueBinding: valueBinding,
                 focusedType: $focusedType,
-                healthType: .maintenanceEnergy /// using this as we don't have a case for dietary energy, but it is redundant as there is only one type
+                healthType: .maintenanceEnergy
             )
         }
         

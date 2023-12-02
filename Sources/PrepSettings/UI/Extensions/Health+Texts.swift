@@ -72,6 +72,7 @@ struct HealthTexts {
         case .maintenanceEnergy:    maintenanceText
         case .pregnancyStatus:      pregnancyStatusText
         case .isSmoker:             isSmokerText
+        default:                    EmptyView()
         }
     }
     

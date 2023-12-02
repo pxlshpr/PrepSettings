@@ -50,9 +50,6 @@ struct HealthTopRow: View {
     @ViewBuilder
     var detailContent: some View {
         switch type {
-        case .maintenanceEnergy:
-            EmptyView()
-//            maintenanceContent
         case .restingEnergy:
             MenuPicker($model.restingEnergySource)
         case .activeEnergy:
@@ -71,7 +68,7 @@ struct HealthTopRow: View {
             MenuPicker([.pregnant, .lactating], $model.pregnancyStatus)
         case .isSmoker:
             Toggle("", isOn: $model.isSmoker)
-        case .fatPercentage:
+        default:
             EmptyView()
         }
     }

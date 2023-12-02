@@ -16,6 +16,17 @@ public enum HealthKitValue {
     case age(DateComponents?)
 }
 
+extension HealthKitValue {
+    static func zeroValue(for type: HealthType) -> HealthKitValue? {
+        switch type {
+        case .restingEnergy:    .restingEnergy(0)
+        case .activeEnergy:     .activeEnergy(0)
+        default:
+            nil
+        }
+    }
+}
+
 public extension HealthKitValue {
     var quantity: Quantity? {
         switch self {
@@ -42,9 +53,9 @@ public extension HealthKitValue {
 
     var double: Double? {
         switch self {
-        case .maintenanceEnergy(let maintenanceEnergy):  maintenanceEnergy.adaptiveValue
-        case .activeEnergy(let double):                     double
-        case .restingEnergy(let double):                    double
+        case .maintenanceEnergy(let maintenanceEnergy): maintenanceEnergy.adaptiveValue
+        case .activeEnergy(let double):                 double
+        case .restingEnergy(let double):                double
         default: nil
         }
     }

@@ -147,7 +147,7 @@ struct DietaryEnergySampleForm: View {
                 unitBinding: unitBinding,
                 valueBinding: binding,
                 focusedType: $focusedType,
-                healthType: .maintenanceEnergy /// using this as we don't have a case for dietary energy, but it is redundant as there is only one type
+                healthType: .maintenanceEnergy /// placeholder that's not really needed for any function
             )
         }
         

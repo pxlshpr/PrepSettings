@@ -236,17 +236,33 @@ public extension Health {
 
 extension Health {
     mutating func handleFocusLoss(for type: HealthType) {
-        switch type {
-        case .activeEnergy:     if activeEnergyValue == nil { activeEnergyValue = 0 }
-        case .restingEnergy:    if restingEnergyValue == nil { restingEnergyValue = 0 }
-        case .weight:           if weightValue == nil { remove(.weight) }
-        case .height:           if heightValue == nil { remove(.height) }
-        case .leanBodyMass:     if leanBodyMassValue == nil { remove(.leanBodyMass) }
-        case .age:              if ageValue == nil { remove(.age) }
-//        case .fatPercentage:    if fatPercentage == nil { fatPercentage = 0 }
-        default:
-            break
+        
+        let typesToRemoveIfNil: [HealthType] = [.weight, .height, .leanBodyMass, .age]
+        for type in typesToRemoveIfNil {
+            if valueIsNil(for: type) {
+                remove(type)
+            }
         }
+        
+        let typesToSetToZeroIfNil: [HealthType] = [.activeEnergy, .restingEnergy]
+        for type in typesToSetToZeroIfNil {
+            if valueIsNil(for: type) {
+                guard let zeroValue = HealthKitValue.zeroValue(for: type) else { continue }
+                setHealthKitValue(zeroValue, for: type)
+            }
+        }
+        
+//        switch type {
+//        case .activeEnergy:     if activeEnergyValue == nil { activeEnergyValue = 0 }
+//        case .restingEnergy:    if restingEnergyValue == nil { restingEnergyValue = 0 }
+//        case .weight:           if weightValue == nil { remove(.weight) }
+//        case .height:           if heightValue == nil { remove(.height) }
+//        case .leanBodyMass:     if leanBodyMassValue == nil { remove(.leanBodyMass) }
+//        case .age:              if ageValue == nil { remove(.age) }
+//        case .fatPercentage:    if fatPercentage == nil { fatPercentage = 0 }
+//        default:
+//            break
+//        }
     }
 }
 
