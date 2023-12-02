@@ -62,7 +62,7 @@ struct HealthWeightSection: View {
     }
      
     var manualValue: some View {
-        ManualBodyMassField(
+        BodyMassField(
             unit: $settingsStore.bodyMassUnit,
             valueInKg: $model.weightValue
         )

@@ -113,9 +113,11 @@ struct RestingEnergySection: View {
 
             return HStack(spacing: UnitSpacing) {
                 Spacer()
-                NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
-                /// Previously used a picker, but we've since removed it in favour of having unit changes in one place
-//                MenuPicker<EnergyUnit>($settingsStore.energyUnit)
+                NumberField(
+                    placeholder: "Required",
+                    roundUp: true,
+                    binding: $model.health.restingEnergyValue
+                )
                 Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(.secondary)
             }

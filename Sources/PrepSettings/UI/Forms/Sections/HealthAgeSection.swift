@@ -47,7 +47,10 @@ struct HealthAgeSection: View {
                 case .healthKit, .userEnteredDateOfBirth:
                     computedContent
                 case .userEnteredAge:
-                    NumberTextField(placeholder: "Required", binding: $model.ageValue)
+                    NumberField(
+                        placeholder: "Required",
+                        binding: $model.ageValue
+                    )
                 }
                 if model.health.age?.value != nil {
                     Text("years")

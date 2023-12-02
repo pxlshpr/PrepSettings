@@ -97,20 +97,29 @@ struct WeightAveragedSampleForm: View {
     var valueSection: some View {
         var textField: some View {
             
-            let binding = Binding<Double>(
+            let binding = Binding<Double?>(
                 get: { model.displayedValue },
                 set: { newValue in
                     model.displayedValue = newValue
+                    guard let newValue else {
+                        model.valueInKg = nil
+                        return
+                    }
                     model.valueInKg = settingsStore.bodyMassUnit.convert(newValue, to: .kg)
                 }
             )
             
-            return ManualHealthField(
-                unitBinding: $settingsStore.bodyMassUnit,
-                valueBinding: binding,
-                firstComponentBinding: $model.weightStonesComponent,
-                secondComponentBinding: $model.weightPoundsComponent
+            return BodyMassField(
+                unit: $settingsStore.bodyMassUnit,
+                valueInKg: binding
             )
+            
+//            return HealthNumberField(
+//                unitBinding: $settingsStore.bodyMassUnit,
+//                valueBinding: binding,
+//                firstComponentBinding: $model.weightStonesComponent,
+//                secondComponentBinding: $model.weightPoundsComponent
+//            )
         }
         
         return Section {

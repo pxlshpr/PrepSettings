@@ -243,9 +243,14 @@ public extension HealthModel {
         set { health.activeEnergyValue = newValue }
     }
 
-    var ageValue: Int {
-        get { health.ageValue ?? 0 }
+    var ageValue: Int? {
+        get { health.ageValue }
         set {
+            guard let newValue else {
+                health.ageValue = nil
+                health.age?.dateOfBirthComponents = nil
+                return
+            }
             health.ageValue = newValue
             health.age?.dateOfBirthComponents = newValue.dateOfBirthComponentsForAge
         }
@@ -261,23 +266,23 @@ public extension HealthModel {
         set { health.pregnancyStatus = newValue }
     }
     
-    var fatPercentageValue: Double {
-        get { health.fatPercentage ?? 0 }
+    var fatPercentageValue: Double? {
+        get { health.fatPercentage }
         set { health.fatPercentage = newValue }
     }
 
-    var weightValue: Double {
-        get { health.weightQuantity?.value ?? 0 }
+    var weightValue: Double? {
+        get { health.weightQuantity?.value }
         set { health.weightQuantity = .init(value: newValue) }
     }
     
-    var leanBodyMassValue: Double {
-        get { health.leanBodyMassQuantity?.value ?? 0 }
+    var leanBodyMassValue: Double? {
+        get { health.leanBodyMassQuantity?.value }
         set { health.leanBodyMassQuantity = .init(value: newValue) }
     }
     
-    var heightValue: Double {
-        get { health.heightQuantity?.value ?? 0 }
+    var heightValue: Double? {
+        get { health.heightQuantity?.value }
         set { health.heightQuantity = .init(value: newValue) }
     }
 }

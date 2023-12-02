@@ -115,14 +115,18 @@ struct DietaryEnergySampleForm: View {
         }
         
         var textField: some View {
-            let binding = Binding<Double>(
+            let binding = Binding<Double?>(
                 get: { model.displayedValue },
                 set: { newValue in
                     model.displayedValue = newValue
+                    guard let newValue else {
+                        model.sample.value = nil
+                        return
+                    }
                     model.sample.value = settingsStore.energyUnit.convert(newValue, to: .kcal)
                 }
             )
-            return ManualHealthField(
+            return HealthNumberField(
                 unitBinding: unitBinding,
                 valueBinding: binding,
                 isFocusedBinding: $isFocused
@@ -275,7 +279,7 @@ struct DietaryEnergySampleForm: View {
                                 sendSelectAllTextAction()
                             }
                         } else {
-                            /// This is required to ensure setting it to `true` later invokes a change to be reacted upon by the `NumberTextField`
+                            /// This is required to ensure setting it to `true` later invokes a change to be reacted upon by the `NumberField`
                             isFocused = false
                         }
                     }

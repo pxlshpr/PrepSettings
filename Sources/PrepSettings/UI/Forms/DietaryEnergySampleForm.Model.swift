@@ -7,7 +7,7 @@ extension DietaryEnergySampleForm {
         var sample: DietaryEnergySample
         
         let date: Date
-        var displayedValue: Double
+        var displayedValue: Double?
         
         var fetchedValuesInKcal: [DietaryEnergySampleType: Double] = [:]
 

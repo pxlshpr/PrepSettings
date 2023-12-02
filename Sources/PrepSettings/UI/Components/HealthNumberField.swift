@@ -1,19 +1,19 @@
 import SwiftUI
 import PrepShared
 
-struct ManualHealthField<Unit: HealthUnit>: View {
+struct HealthNumberField<Unit: HealthUnit>: View {
     
     let unitBinding: Binding<Unit>
-    let valueBinding: Binding<Double>
-    let firstComponentBinding: Binding<Int>
-    let secondComponentBinding: Binding<Double>
+    let valueBinding: Binding<Double?>
+    let firstComponentBinding: Binding<Int?>
+    let secondComponentBinding: Binding<Double?>
     let isFocusedBinding: Binding<Bool>?
 
     init(
         unitBinding: Binding<Unit>,
-        valueBinding: Binding<Double>,
-        firstComponentBinding: Binding<Int> = .constant(0),
-        secondComponentBinding: Binding<Double> = .constant(0),
+        valueBinding: Binding<Double?>,
+        firstComponentBinding: Binding<Int?> = .constant(0),
+        secondComponentBinding: Binding<Double?> = .constant(0),
         isFocusedBinding: Binding<Bool>? = nil
     ) {
         self.unitBinding = unitBinding
@@ -27,13 +27,13 @@ struct ManualHealthField<Unit: HealthUnit>: View {
         HStack {
             switch unitBinding.wrappedValue.hasTwoComponents {
             case true:
-                NumberTextField(
+                NumberField(
                     placeholder: "Required",
                     binding: firstComponentBinding,
                     isFocused: isFocusedBinding
                 )
                 unitView
-                NumberTextField(
+                NumberField(
                     placeholder: "",
                     binding: secondComponentBinding
                     /// only pass the isFocusedBinding to first component
@@ -43,7 +43,7 @@ struct ManualHealthField<Unit: HealthUnit>: View {
                         .foregroundStyle(.secondary)
                 }
             case false:
-                NumberTextField(
+                NumberField(
                     placeholder: "Required",
                     binding: valueBinding,
                     isFocused: isFocusedBinding

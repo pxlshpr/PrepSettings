@@ -80,7 +80,7 @@ struct WeightChangeForm: View {
                 }
             )
 //            return ManualHealthField(
-            return HealthTextField(
+            return HealthNumberField(
                 unitBinding: unitBinding,
                 valueBinding: valueBinding,
                 isFocusedBinding: $isFocused
@@ -278,11 +278,13 @@ struct WeightChangeForm: View {
 }
 
 struct HealthFieldTest: View {
-    @State var value: Double = 0
+    
+    @State var value: Double? = 0
+
     var body: some View {
         NavigationStack {
             Form {
-                ManualHealthField(
+                HealthNumberField(
                     unitBinding: .constant(EnergyUnit.kcal),
                     valueBinding: $value
                 )

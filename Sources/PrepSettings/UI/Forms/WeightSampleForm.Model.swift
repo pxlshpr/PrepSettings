@@ -8,7 +8,7 @@ extension WeightSampleForm {
         var sample: WeightSample
 
         let date: Date
-        var displayedValue: Double
+        var displayedValue: Double?
 
         let healthModel: HealthModel
         
@@ -60,6 +60,7 @@ extension WeightSampleForm.Model {
             }
         } else {
             /// Otherwise, if user is manually entering value—don't change it, but convert the `valueInKg` value stored internally to reflect the new unit
+            guard let displayedValue else { return }
             let converted = new.convert(displayedValue, to: .kg)
             self.sample.value = converted
         }
@@ -80,24 +81,24 @@ extension WeightSampleForm.Model {
 //        }
     }
     
-    var weightStonesComponent: Int {
-        get { Int(displayedValue.whole) }
-        set {
-            let value = Double(newValue) + (weightPoundsComponent / PoundsPerStone)
-//            self.value = value
-            displayedValue = value
-        }
-    }
-    
-    var weightPoundsComponent: Double {
-        get { displayedValue.fraction * PoundsPerStone }
-        set {
-            let newValue = min(newValue, PoundsPerStone-1)
-            let value = Double(weightStonesComponent) + (newValue / PoundsPerStone)
-//            self.value = value
-            displayedValue = value
-        }
-    }
+//    var weightStonesComponent: Int {
+//        get { Int(displayedValue.whole) }
+//        set {
+//            let value = Double(newValue) + (weightPoundsComponent / PoundsPerStone)
+////            self.value = value
+//            displayedValue = value
+//        }
+//    }
+//    
+//    var weightPoundsComponent: Double {
+//        get { displayedValue.fraction * PoundsPerStone }
+//        set {
+//            let newValue = min(newValue, PoundsPerStone-1)
+//            let value = Double(weightStonesComponent) + (newValue / PoundsPerStone)
+////            self.value = value
+//            displayedValue = value
+//        }
+//    }
 }
 
 extension WeightSampleForm.Model {
@@ -173,7 +174,7 @@ extension WeightSampleForm.Model {
                 switch newValue {
                 case false:
                     /// When turning the calculated moving average off—round the value to 1 decimal place in case we had a more precise value stored
-                    self.displayedValue = self.displayedValue.rounded(toPlaces: 1)
+                    self.displayedValue = self.displayedValue?.rounded(toPlaces: 1)
                     withAnimation {
                         self.sample.movingAverageValues = nil
                     }

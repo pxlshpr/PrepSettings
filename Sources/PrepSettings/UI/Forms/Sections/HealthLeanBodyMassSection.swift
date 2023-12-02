@@ -37,7 +37,7 @@ struct HealthLeanBodyMassSection: View {
     }
 
     var manualValue: some View {
-        ManualBodyMassField(
+        BodyMassField(
             unit: $settingsStore.bodyMassUnit,
             valueInKg: $model.leanBodyMassValue
         )
@@ -68,7 +68,7 @@ struct HealthLeanBodyMassSection: View {
             HStack {
                 Text("Fat Percentage")
                 Spacer()
-                NumberTextField(
+                NumberField(
                     placeholder: "Required",
                     roundUp: true,
                     binding: $model.fatPercentageValue

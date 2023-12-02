@@ -72,16 +72,19 @@ struct ActiveEnergySection: View {
         }
         
         var manualValue: some View {
-            let binding = Binding<Double>(
-                get: { model.health.activeEnergyValue ?? 0 },
-                set: { model.health.activeEnergyValue = $0 }
-            )
+//            let binding = Binding<Double>(
+//                get: { model.health.activeEnergyValue ?? 0 },
+//                set: { model.health.activeEnergyValue = $0 }
+//            )
 
             return HStack(spacing: UnitSpacing) {
                 Spacer()
-                NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
-                /// Previously used a picker, but we've since removed it in favour of having unit changes in one place
-//                MenuPicker<EnergyUnit>($settingsStore.energyUnit)
+//                NumberTextField(placeholder: "Required", roundUp: true, binding: binding)
+                NumberField(
+                    placeholder: "Required",
+                    roundUp: true,
+                    binding: $model.health.activeEnergyValue
+                )
                 Text(settingsStore.energyUnit.abbreviation)
                     .foregroundStyle(.secondary)
             }

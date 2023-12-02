@@ -62,7 +62,7 @@ struct HealthHeightSection: View {
     }
 
     var manualValue: some View {
-        ManualHeightField(
+        HeightField(
             unit: $settingsStore.heightUnit,
             valueInCm: $model.heightValue
         )
