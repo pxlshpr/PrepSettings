@@ -46,7 +46,8 @@ struct MaintenanceCalculateView: View {
         .navigationDestination(for: Route.self) { route in
             switch route {
             case .weightSamples:
-                WeightChangeForm(healthModel)
+                WeightChangeForm()
+                    .environment(healthModel)
                     .environment(settingsStore)
             case .dietaryEnergySamples:
                 DietaryEnergySamplesList()

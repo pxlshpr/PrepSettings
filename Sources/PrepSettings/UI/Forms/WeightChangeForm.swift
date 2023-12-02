@@ -1,36 +1,14 @@
 import SwiftUI
 import PrepShared
 
-extension WeightChangeForm {
-    @Observable class Model {
-        
-        var type: WeightChangeType
-        
-        
-        init(_ healthModel: HealthModel) {
-            self.type = healthModel.maintenanceWeightChangeType
-        }
-    }
-}
-
-extension WeightChangeForm.Model {
-    
-}
-
 struct WeightChangeForm: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
-    @Bindable var healthModel: HealthModel
+    @Environment(HealthModel.self) var healthModel: HealthModel
     @Environment(\.dismiss) var dismiss
     
-//    @State var type: WeightChangeType = .usingWeights
-    
-//    @State var model: Model
-    
-    init(_ healthModel: HealthModel) {
-//        _model = State(initialValue: Model(healthModel))
-        self.healthModel = healthModel
-    }
+    @State var isFocused: Bool = false
+    @State var isNegative = false
     
     var body: some View {
         Form {
@@ -58,9 +36,6 @@ struct WeightChangeForm: View {
         }
     }
     
-    @State var isFocused: Bool = false
-    @State var isNegative = false
-    
     var weightChangeSection: some View {
         
         @ViewBuilder
@@ -80,8 +55,23 @@ struct WeightChangeForm: View {
         
         var textField: some View {
             let valueBinding = Binding<Double?>(
-                get: { delta },
-                set: { delta = $0 }
+                get: { 
+                    guard let delta else { return nil }
+                    return switch isNegative {
+                    case true:  abs(delta) * -1
+                    case false: abs(delta)
+                    }
+                },
+                set: { newValue in
+                    guard let newValue else {
+                        delta = nil
+                        return
+                    }
+                    delta = switch isNegative {
+                    case true:  abs(newValue) * -1
+                    case false: abs(newValue)
+                    }
+                }
             )
             let unitBinding = Binding<BodyMassUnit>(
                 get: { settingsStore.bodyMassUnit },
@@ -305,8 +295,9 @@ struct HealthFieldTest: View {
 
 #Preview {
     NavigationStack {
-        WeightChangeForm(MockHealthModel)
+        WeightChangeForm()
             .environment(SettingsStore.shared)
+            .environment(MockHealthModel)
             .onAppear {
                 SettingsStore.configureAsMock()
             }
