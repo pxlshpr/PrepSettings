@@ -22,8 +22,10 @@ public struct MaintenanceEstimateView: View {
         }
         .onAppear(perform: appeared)
 //        .navigationTitle("Maintenance Energy")
-        .navigationTitle("Estimate")
-        .navigationBarTitleDisplayMode(.large)
+//        .navigationTitle("Estimate")
+        .navigationTitle("Estimated Maintenance")
+//        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .onChange(of: focusedType, model.focusedTypeChanged)
     }
     

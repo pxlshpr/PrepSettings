@@ -13,6 +13,8 @@ public typealias SettingsSaveHandler = ((Settings) async throws -> ())
     
     public static let shared = SettingsStore()
     public static var energyUnit: EnergyUnit { shared.energyUnit }
+    public static var bodyMassUnit: BodyMassUnit { shared.bodyMassUnit }
+    public static var heightUnit: HeightUnit { shared.heightUnit }
 
     public var settings: Settings = .default {
         didSet {

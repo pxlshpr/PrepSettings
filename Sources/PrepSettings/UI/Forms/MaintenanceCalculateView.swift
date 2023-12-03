@@ -18,16 +18,18 @@ struct MaintenanceCalculateView: View {
     var body: some View {
         Group {
             if hasAppeared {
-                list
+                content
             } else {
                 Color.clear
             }
         }
-        .navigationTitle("Adaptive")
+//        .navigationTitle("Adaptive")
 //        .navigationTitle("Maintenance Energy")
+        .navigationTitle("Calculated Maintenance")
 //        .navigationTitle("Calculation")
 //        .navigationTitle("Adaptive Calculation")
-        .navigationBarTitleDisplayMode(.large)
+//        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
 //        .toolbar { toolbarContent }
 //        .navigationBarBackButtonHidden(isEditing)
         .onAppear(perform: appeared)
@@ -39,9 +41,13 @@ struct MaintenanceCalculateView: View {
         }
     }
     
-    var list: some View {
+    var content: some View {
         List {
-            content
+            section
+//            daysSection
+//            weightSection
+//            dietaryEnergySection
+            calculatedSection
         }
         .navigationDestination(for: Route.self) { route in
             switch route {
@@ -56,12 +62,15 @@ struct MaintenanceCalculateView: View {
         }
     }
     
-    @ViewBuilder
-    var content: some View {
-        daysSection
-        weightSection
-        dietaryEnergySection
-        calculatedSection
+    var section: some View {
+        var footer: some View {
+            Text("Your weight change will be compared to the total dietary energy you consumed over the specified period to determine your maintenance energy.")
+        }
+        return Section(footer: footer) {
+            periodRow
+            weightChangeRow
+            dietaryEnergyRow
+        }
     }
     
     var maintenance: Health.MaintenanceEnergy {
@@ -71,8 +80,36 @@ struct MaintenanceCalculateView: View {
     var date: Date {
         healthModel.health.date
     }
-    
+
     var weightSection: some View {
+        Section {
+            weightChangeRow
+        }
+    }
+    
+    var dietaryEnergyRow: some View {
+        NavigationLink(value: Route.dietaryEnergySamples) {
+            HStack {
+                Text("Dietary Energy")
+                Spacer()
+                if let total = maintenance.dietaryEnergy.total {
+                    Text("\(total.formattedEnergy) kcal")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Not enough data")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+    }
+
+    var dietaryEnergySection: some View {
+        Section {
+            dietaryEnergyRow
+        }
+    }
+
+    var weightSection_: some View {
         var footer: some View {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Change in your weight over the prior 7 days, converted to energy.")
@@ -145,23 +182,37 @@ struct MaintenanceCalculateView: View {
         }
         
         return Section(footer: footer) {
-            HStack {
-                Text("Period")
-                Spacer()
-                Stepper("", value: healthModel.intervalValueBinding, in: healthModel.intervalPeriod.range)
-                    .fixedSize()
-                HStack(spacing: UnitSpacing) {
-                    Text("\(healthModel.intervalValue)")
-                        .font(NumberFont)
-                        .contentTransition(.numericText(value: Double(healthModel.intervalValue)))
-                        .foregroundStyle(.secondary)
-                    MenuPicker<HealthPeriod>([.day, .week], healthModel.intervalPeriodBinding)
-                }
+            periodRow
+        }
+    }
+    
+    var periodRow: some View {
+        HStack {
+            Text("Period")
+            Spacer()
+            Stepper("", value: healthModel.intervalValueBinding, in: healthModel.intervalPeriod.range)
+                .fixedSize()
+            HStack(spacing: UnitSpacing) {
+                Text("\(healthModel.intervalValue)")
+                    .font(NumberFont)
+                    .contentTransition(.numericText(value: Double(healthModel.intervalValue)))
+                    .foregroundStyle(.secondary)
+                MenuPicker<HealthPeriod>([.day, .week], healthModel.intervalPeriodBinding)
             }
         }
     }
     
-    var dietaryEnergySection: some View {
+    var weightChangeRow: some View {
+        NavigationLink(value: Route.weightSamples) {
+            HStack {
+                Text("Weight Change")
+                Spacer()
+                maintenance.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
+            }
+        }
+    }
+    
+    var dietaryEnergySection_: some View {
         
         var header: some View {
             Text("Dietary Energy")

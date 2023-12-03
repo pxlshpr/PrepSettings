@@ -80,6 +80,13 @@ public struct HealthForm: View {
                 HealthLeanBodyMassSection(model, settingsStore, $focusedType)
             case .height:
                 HealthHeightSection(model, settingsStore, $focusedType)
+            case .pregnancyStatus:
+                HealthTopRow(type: .pregnancyStatus, model: model)
+            case .isSmoker:
+                HealthTopRow(type: .isSmoker, model: model)
+            case .maintenanceEnergy:
+                MaintenanceFormSections(model)
+                    .environment(settingsStore)
             default:
                 EmptyView()
             }

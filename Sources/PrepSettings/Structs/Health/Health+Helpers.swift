@@ -92,6 +92,104 @@ extension Health {
         case .isSmoker:             isSmoker != nil
         }
     }
+    
+    
+    func hasValue(for type: HealthType) -> Bool {
+        switch type {
+        case .maintenanceEnergy:    hasMaintenanceValue
+        case .restingEnergy:        restingEnergy?.value != nil
+        case .activeEnergy:         activeEnergy?.value != nil
+        case .sex:                  sex?.value != nil
+        case .age:                  age?.value != nil
+        case .weight:               weight?.quantity?.value != nil
+        case .leanBodyMass:         leanBodyMass?.quantity?.value != nil
+        case .fatPercentage:        fatPercentage != nil
+        case .height:               height?.quantity?.value != nil
+        case .pregnancyStatus:      pregnancyStatus != nil
+        case .isSmoker:             isSmoker != nil
+        }
+    }
+    
+    var maintenanceValueInKcal: Double? {
+        if maintenanceEnergyIsAdaptive,
+           let value = maintenanceEnergy?.adaptiveValue,
+            maintenanceEnergy?.error == nil
+        {
+            value
+        } else if let value = estimatedMaintenanceInKcal {
+            value
+        } else {
+            nil
+        }
+    }
+    
+    func maintenanceValue(in unit: EnergyUnit) -> Double? {
+        guard let maintenanceValueInKcal else { return nil }
+        return EnergyUnit.kcal.convert(maintenanceValueInKcal, to: unit)
+    }
+    
+    func summaryDetail(for type: HealthType) -> String? {
+        
+        switch type {
+        case .maintenanceEnergy:
+            guard let value = maintenanceValue(in: SettingsStore.energyUnit) else { return nil }
+            return "\(value.formattedEnergy) \(SettingsStore.energyUnit.abbreviation)"
+
+        case .sex:
+            guard let sex = sex?.value else { return nil }
+            return sex.name
+
+        case .age:
+            guard let age = age?.value else { return nil }
+            return "\(age) years"
+
+        case .weight:
+            guard let kg = weight?.quantity?.value else { return nil }
+            let unit = SettingsStore.bodyMassUnit
+            let value = BodyMassUnit.kg.convert(kg, to: unit)
+            return "\(value.clean) \(unit.abbreviation)"
+
+        case .leanBodyMass:
+            guard let kg = leanBodyMass?.quantity?.value else { return nil }
+            let unit = SettingsStore.bodyMassUnit
+            let value = BodyMassUnit.kg.convert(kg, to: unit)
+            return "\(value.clean) \(unit.abbreviation)"
+
+        case .height:
+            guard let cm = height?.quantity?.value else { return nil }
+            let unit = SettingsStore.heightUnit
+            let value = HeightUnit.cm.convert(cm, to: unit)
+            return "\(value.clean) \(unit.abbreviation)"
+
+        case .pregnancyStatus:
+            guard let pregnancyStatus else { return nil }
+            return pregnancyStatus.name
+
+        case .isSmoker:
+            guard let isSmoker else { return nil }
+            return isSmoker ? "Yes" : "No"
+
+        default:
+            return nil
+        }
+    }
+    
+    var maintenance: Health.MaintenanceEnergy {
+        maintenanceEnergy ?? .init()
+    }
+    
+    var hasCalculatedMaintenance: Bool {
+        maintenance.adaptiveValue != nil
+    }
+    
+    var hasEstimatedMaintenance: Bool {
+        tdeeRequiredString == nil
+        && estimatedMaintenanceInKcal != nil
+    }
+    
+    var hasMaintenanceValue: Bool {
+        hasCalculatedMaintenance || hasEstimatedMaintenance
+    }
 }
 
 extension Health {

@@ -27,8 +27,19 @@ public struct HealthSummary: View {
         .onAppear(perform: appeared)
         .onChange(of: focusedType, model.focusedTypeChanged)
     }
-        
+
     var form: some View {
+        Form {
+            dateSection
+            syncAllSection
+            ForEach(HealthType.summaryTypes, id: \.self) {
+                content(for: $0)
+            }
+//            dailyValuesSection
+        }
+    }
+    
+    var form_: some View {
         Form {
             dateSection
             syncAllSection
@@ -182,8 +193,28 @@ public struct HealthSummary: View {
             }
         }
     }
-    
+
     func content(for type: HealthType) -> some View {
+        NavigationLink(value: type) {
+            HStack {
+                Text(type.name)
+                Spacer()
+                if let string = model.health.summaryDetail(for: type) {
+                    Text(string)
+                        .foregroundStyle(.secondary)
+//                        .foregroundStyle(Color.accentColor)
+                } else {
+                    Text("Not set")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .navigationDestination(for: HealthType.self) { type in
+            HealthForm(model, [type])
+                .environment(settingsStore)
+        }
+    }
+    func content_(for type: HealthType) -> some View {
         
         @ViewBuilder
         var footer: some View {
