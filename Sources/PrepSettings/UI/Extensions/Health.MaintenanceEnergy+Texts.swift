@@ -14,20 +14,21 @@ extension Health.MaintenanceEnergy {
             }
             .foregroundStyle(.secondary)
         } else {
-            switch (weightChange.previous.value == nil, weightChange.current.value == nil) {
-            case (true, true):
-                Text("Set weights")
+            Text("Set weights")
+//            switch (weightChange.previous.value == nil, weightChange.current.value == nil) {
+//            case (true, true):
+//                Text("Set weights")
                     .foregroundStyle(.tertiary)
-            case (false, true):
-                Text("Set current weight")
-                    .foregroundStyle(.tertiary)
-            case (true, false):
-                Text("Set previous weight")
-                    .foregroundStyle(.tertiary)
-            case (false, false):
-                Text("Not set")
-                    .foregroundStyle(.tertiary)
-            }
+//            case (false, true):
+//                Text("Set current weight")
+//                    .foregroundStyle(.tertiary)
+//            case (true, false):
+//                Text("Set previous weight")
+//                    .foregroundStyle(.tertiary)
+//            case (false, false):
+//                Text("Not set")
+//                    .foregroundStyle(.tertiary)
+//            }
         }
     }
     

@@ -3,7 +3,7 @@ import PrepShared
 
 public struct WeightChange: Hashable, Codable {
     public var type: WeightChangeType
-    public var delta: Double?
+    public var delta: Double?           /// in kg
     public var current: WeightSample
     public var previous: WeightSample
     
@@ -16,24 +16,27 @@ public struct WeightChange: Hashable, Codable {
 }
 
 public extension WeightChange {
-    var deltaInKg: Double? {
-        guard 
+    mutating func calculateDelta() {
+        guard
             let currentValue = current.value,
             let previousValue = previous.value
-        else { return nil }
-        return currentValue - previousValue
+        else {
+            delta = nil
+            return
+        }
+        delta = currentValue - previousValue
     }
     
     func delta(in bodyMassUnit: BodyMassUnit) -> Double? {
-        guard let deltaInKg else { return nil }
-        return BodyMassUnit.kg.convert(deltaInKg, to: bodyMassUnit)
+        guard let delta else { return nil }
+        return BodyMassUnit.kg.convert(delta, to: bodyMassUnit)
     }
     
     var deltaEnergyEquivalentInKcal: Double? {
-        guard let deltaInKg else { return nil }
+        guard let delta else { return nil }
 //        454 g : 3500 kcal
 //        delta : x kcal
-        return (3500 * deltaInKg) / BodyMassUnit.lb.convert(1, to: .kg)
+        return (3500 * delta) / BodyMassUnit.lb.convert(1, to: .kg)
     }
     
     func deltaEnergyEquivalent(in energyUnit: EnergyUnit) -> Double? {

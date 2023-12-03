@@ -25,18 +25,6 @@ struct DietaryEnergySamplesList: View {
         }
     }
     
-    var logMissingDaysAsEmptySection: some View {
-        var footer: some View {
-            Text("Days without dietary energy will automatically use the average. Tap this to explicitly mark those days as having consumed no dietary energy.")
-        }
-        
-        return Section(footer: footer) {
-            Button("Log missing days with 0 kcal") {
-                
-            }
-        }
-    }
-    
     enum Route: Hashable {
         case sample(DietaryEnergySample, Date)
     }

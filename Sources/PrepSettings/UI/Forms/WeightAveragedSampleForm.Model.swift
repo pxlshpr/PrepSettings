@@ -16,10 +16,12 @@ extension WeightAveragedSampleForm {
                 valueInKg = SettingsStore.shared.bodyMassUnit.convert(displayedValue, to: .kg)
             }
         }
+        var isRemoved: Bool
         var date: Date
         
         init(value: Double?, date: Date) {
             self.initialValue = value
+            self.isRemoved = value == nil
             self.valueInKg = if let value {
                 SettingsStore.shared.bodyMassUnit.convert(value, to: .kg)
             } else { nil }

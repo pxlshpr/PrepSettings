@@ -17,6 +17,10 @@ public struct DietaryEnergy: Hashable, Codable {
         /// We're starting from the day before the `date` and going backwards (not including the current day—as we more likely to not have completely logged the day)
         date.moveDayBy(-index-1)
     }
+    
+    static func indexForDate(_ date: Date, from startDate: Date) -> Int {
+        startDate.numberOfDaysFrom(date) - 1
+    }
 }
 
 extension DietaryEnergy {

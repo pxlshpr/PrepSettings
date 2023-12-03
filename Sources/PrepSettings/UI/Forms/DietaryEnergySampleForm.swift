@@ -185,8 +185,6 @@ struct DietaryEnergySampleForm: View {
         }
     }
     
-    @State var isFocused: Bool = false
-    
     var footer: some View {
         Text("Choose a value you would like to use for this day.\n\nIf the logged value is inaccurate or incomplete, you can choose to use the average of the days in the period you are calculating your maintenance energy for.")
     }
@@ -285,23 +283,27 @@ struct DietaryEnergySampleForm: View {
             }
         }
         
-        var button: some View {
-            Button {
-                withAnimation {
-                    model.selected(type)
-                    /// Give the text field some time to display before triggering the focus
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        if type == .userEntered {
-                            isFocused = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                sendSelectAllTextAction()
-                            }
-                        } else {
-                            /// This is required to ensure setting it to `true` later invokes a change to be reacted upon by the `NumberField`
-                            isFocused = false
+        func selected() {
+            withAnimation {
+                model.selected(type)
+                /// Give the text field some time to display before triggering the focus
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    if type == .userEntered {
+                        focusedType = .maintenanceEnergy
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            sendSelectAllTextAction()
                         }
+                    } else {
+                        /// This is required to ensure setting it to `true` later invokes a change to be reacted upon by the `NumberField`
+                        focusedType = nil
                     }
                 }
+            }
+        }
+        
+        var button: some View {
+            Button {
+                selected()
             } label: {
                 label
             }

@@ -83,67 +83,6 @@ func fetchSettingsFromDocuments() async throws -> Settings {
     }
 }
 
-public struct MaintenanceValues: Codable {
-    
-    public var values: [Date: Value]
-    
-    public struct Value: Codable {
-        public var weightInKg: Double?
-        public var dietaryEnergyInKcal: Double?
-        public var dietaryEnergyType: DietaryEnergySampleType
-        
-        public init(
-            weightInKg: Double? = nil,
-            dietaryEnergyInKcal: Double? = nil,
-            dietaryEnergyType: DietaryEnergySampleType
-        ) {
-            self.weightInKg = weightInKg
-            self.dietaryEnergyInKcal = dietaryEnergyInKcal
-            self.dietaryEnergyType = dietaryEnergyType
-        }
-    }
-    
-    public init(values: [Date : Value]) {
-        self.values = values
-    }
-    
-    public init(_ dict: [Date: (Double?, Double?)]) {
-        var values: [Date: Value] = [:]
-        for (date, (weight, energy)) in dict {
-            let value = Value(
-                weightInKg: weight,
-                dietaryEnergyInKcal: energy,
-                dietaryEnergyType: .logged
-            )
-            values[date] = value
-        }
-        self.values = values
-    }
-}
-
-public extension MaintenanceValues {
-    mutating func setWeightInKg(_ value: Double, for date: Date) {
-        values[date]?.weightInKg = value
-    }
-    
-    mutating func setDietaryEnergyInKcal(_ value: Double, for date: Date, type: DietaryEnergySampleType) {
-        values[date]?.dietaryEnergyInKcal = value
-        values[date]?.dietaryEnergyType = type
-    }
-    
-    func weightInKg(on date: Date) -> Double? {
-        values[date]?.weightInKg
-    }
-    
-    func dietaryEnergyInKcal(for date: Date) -> Double? {
-        values[date]?.dietaryEnergyInKcal
-    }
-    
-    func dietaryEnergyType(for date: Date) -> DietaryEnergySampleType? {
-        values[date]?.dietaryEnergyType
-    }
-}
-
 let MockMaintenanceValues = [
     Date(fromDateString: "2021_08_28")!: (nil, 1800.0),
     Date(fromDateString: "2021_08_27")!: (93, nil), /// weight

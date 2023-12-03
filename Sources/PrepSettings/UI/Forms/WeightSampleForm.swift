@@ -65,18 +65,18 @@ struct WeightSampleForm: View {
         }
     }
 
+    var isRemoving: Bool {
+        model.isRemoved || model.sample.value == nil
+    }
+    
     func saveConfirmationActions() -> some View {
-        let primaryAction = isRemoving ? "Remove" : "Save"
+        let primaryAction = isRemoving ? "Remove" : "Update"
         let secondaryAction = isRemoving ? "disable" : "modify"
         return Group {
             Button("\(primaryAction) weight and \(secondaryAction) goals") {
                 save()
             }
         }
-    }
-    
-    var isRemoving: Bool {
-        model.sample.value == nil
     }
     
     func save() {
@@ -87,7 +87,7 @@ struct WeightSampleForm: View {
     func saveConfirmationMessage() -> some View {
         let result = isRemoving
         ? "They will be disabled if you remove this."
-        : "They will also be modified if you save this change."
+        : "They will also be modified if you make this change."
         return Text("You have weight-based goals set on this day. \(result)")
     }
     
@@ -105,13 +105,14 @@ struct WeightSampleForm: View {
     
     @ViewBuilder
     var removeButton: some View {
-        if !(model.sample.value == nil && !model.isUsingMovingAverage) {
+        if !(model.isRemoved && !model.isUsingMovingAverage) {
             Section {
                 Button("Remove") {
                     withAnimation {
-//                        model.value = nil
                         model.sample.value = nil
+                        model.isRemoved = true
                     }
+                    focusedType = nil
                 }
             }
         }
@@ -157,13 +158,17 @@ struct WeightSampleForm: View {
                         Text("Not enough values")
                             .foregroundStyle(.tertiary)
                     }
-                } else if model.sample.value != nil {
+                } else if !model.isRemoved {
                     textField
                 } else {
                     Button("Set weight") {
                         withAnimation {
-                            model.sample.value = 0
-                            model.displayedValue = 0
+                            model.displayedValue = nil
+                            model.sample.value = nil
+                            model.isRemoved = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            focusedType = .weight
                         }
                     }
                 }
@@ -176,10 +181,22 @@ struct WeightSampleForm: View {
             Text("Using moving averages makes the calculation of your weight change less affected by fluctuations due to fluid loss, meal times, etc.")
         }
         
+        let isUsingMovingAverage = Binding<Bool>(
+            get: { model.isUsingMovingAverageBinding.wrappedValue },
+            set: {
+                model.isUsingMovingAverageBinding.wrappedValue = $0
+                if $0 == true {
+                    focusedType = nil
+                } else {
+                    focusedType = .weight
+                }
+            }
+        )
+        
         var section: some View {
             Section(footer: footer) {
                 HStack {
-                    Toggle("Use Moving Average", isOn: model.isUsingMovingAverageBinding)
+                    Toggle("Use Moving Average", isOn: isUsingMovingAverage)
                 }
                 if model.isUsingMovingAverage {
                     HStack {
@@ -202,7 +219,7 @@ struct WeightSampleForm: View {
         }
         
         return Group {
-            if !(model.sample.value == nil && !model.isUsingMovingAverage) {
+            if !(model.isRemoved && !model.isUsingMovingAverage) {
                 section
             }
         }
@@ -263,7 +280,7 @@ struct WeightSampleForm: View {
     
     var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Button("Save") {
+            Button("Update") {
                 if !model.isUsingMovingAverage, requiresSaveConfirmation {
                     showingSaveConfirmation = true
                 } else {

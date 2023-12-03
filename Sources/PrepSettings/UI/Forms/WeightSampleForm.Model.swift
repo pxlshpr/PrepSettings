@@ -9,11 +9,13 @@ extension WeightSampleForm {
 
         let date: Date
         var displayedValue: Double?
+        var isRemoved: Bool
 
         let healthModel: HealthModel
         
         init(sample: WeightSample, date: Date, healthModel: HealthModel) {
             self.initialSample = sample
+            self.isRemoved = sample.value == nil
             self.sample = sample
             self.date = date
             self.healthModel = healthModel
@@ -21,7 +23,7 @@ extension WeightSampleForm {
             if let value = sample.value {
                 self.displayedValue = BodyMassUnit.kg.convert(value, to: SettingsStore.shared.bodyMassUnit)
             } else {
-                self.displayedValue = 0
+                self.displayedValue = nil
             }
         }
     }

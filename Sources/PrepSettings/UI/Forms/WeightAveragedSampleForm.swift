@@ -60,7 +60,7 @@ struct WeightAveragedSampleForm: View {
     }
 
     func saveConfirmationActions() -> some View {
-        let primaryAction = isRemoving ? "Remove" : "Save"
+        let primaryAction = isRemoving ? "Remove" : "Update"
         let secondaryAction = isRemoving ? "disable" : "modify"
         return Group {
             Button("\(primaryAction) weight and \(secondaryAction) goals") {
@@ -70,13 +70,13 @@ struct WeightAveragedSampleForm: View {
     }
     
     var isRemoving: Bool {
-        model.valueInKg == nil
+        model.isRemoved || model.valueInKg == nil
     }
     
     func saveConfirmationMessage() -> some View {
         let result = isRemoving
         ? "They will be disabled if you remove this."
-        : "They will also be modified if you save this change."
+        : "They will also be modified if you update this change."
         return Text("You have weight-based goals set on this day. \(result)")
     }
     
@@ -94,7 +94,7 @@ struct WeightAveragedSampleForm: View {
     
     var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Button("Save") {
+            Button("Update") {
                 if requiresSaveConfirmation {
                     showingSaveConfirmation = true
                 } else {
@@ -144,12 +144,14 @@ struct WeightAveragedSampleForm: View {
             HStack {
                 Text(model.date.adaptiveMaintenanceDateString)
                 Spacer()
-                if model.valueInKg == nil {
+                if model.isRemoved {
                     Button("Set") {
                         withAnimation {
                             model.valueInKg = 0
                             model.displayedValue = 0
+                            model.isRemoved = true
                         }
+                        focusedType = .weight
                     }
                 } else {
                     textField
@@ -160,12 +162,14 @@ struct WeightAveragedSampleForm: View {
     
     @ViewBuilder
     var removeButton: some View {
-        if model.valueInKg != nil {
+        if !model.isRemoved {
             Section {
                 Button("Remove") {
                     withAnimation {
                         model.valueInKg = nil
+                        model.isRemoved = true
                     }
+                    focusedType = nil
                 }
             }
         }

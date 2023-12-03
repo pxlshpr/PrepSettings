@@ -4,14 +4,17 @@ import PrepShared
 struct WeightChangeForm: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
-    @Environment(HealthModel.self) var healthModel: HealthModel
+    @Bindable var healthModel: HealthModel
     @Environment(\.dismiss) var dismiss
     
-    @State var isFocused: Bool = false
-    @State var isNegative = false
-    
     @FocusState var focusedType: HealthType?
+    @State var deltaType: DeltaType
 
+    init(_ healthModel: HealthModel) {
+        self.healthModel = healthModel
+        _deltaType = State(initialValue: healthModel.maintenanceWeightChangeDeltaType)
+    }
+    
     var body: some View {
         Form {
             weightChangeSection
@@ -71,19 +74,23 @@ struct WeightChangeForm: View {
             let valueBinding = Binding<Double?>(
                 get: { 
                     guard let delta else { return nil }
-                    return switch isNegative {
-                    case true:  abs(delta) * -1
-                    case false: abs(delta)
+                    return switch deltaType {
+                    case .negative:  abs(delta) * -1
+                    default:         abs(delta)
                     }
                 },
                 set: { newValue in
-                    guard let newValue else {
+                    guard let newValue, newValue != 0 else {
                         delta = 0
+                        deltaType = .zero
                         return
                     }
-                    delta = switch isNegative {
-                    case true:  abs(newValue) * -1
-                    case false: abs(newValue)
+                    if deltaType == .zero {
+                        deltaType = newValue > 0 ? .positive : .negative
+                    }
+                    delta = switch deltaType {
+                    case .negative: abs(newValue) * -1
+                    default:        abs(newValue)
                     }
                 }
             )
@@ -125,30 +132,32 @@ struct WeightChangeForm: View {
             }
         }
         
-        var isNegativeRow: some View {
-            let binding = Binding<Bool>(
-                get: {
-                    isNegative
-//                    healthModel.maintenanceWeightChangeDeltaIsNegative
-                },
+        var deltaTypeRow: some View {
+            let binding = Binding<DeltaType>(
+                get: { deltaType },
                 set: { newValue in
                     
-                    isNegative = newValue
+                    deltaType = newValue
                     
-                    guard let delta = healthModel.maintenanceWeightChangeDelta,
-                          delta != 0
-                    else { return }
+                    var delta = healthModel.maintenanceWeightChangeDelta ?? 0
+                    /// If we've changed to a non-zero delta and the value is 0—change it to 1
+                    if delta == 0, newValue != .zero {
+                        delta = 1
+                    }
                     
                     healthModel.maintenanceWeightChangeDelta = switch newValue {
-                    case true:  abs(delta) * -1
-                    case false: abs(delta)
+                    case .negative: abs(delta) * -1
+                    case .positive: abs(delta)
+                    case .zero:     0
                     }
                 }
             )
             return HStack {
                 Picker("", selection: binding) {
-                    Text("Loss").tag(true)
-                    Text("Gain").tag(false)
+                    ForEach(DeltaType.allCases, id: \.self) {
+                        Text($0.nameForWeight).tag($0)
+                            .disabled(true)
+                    }
                 }
                 .pickerStyle(.segmented)
             }
@@ -157,47 +166,45 @@ struct WeightChangeForm: View {
         return Section(footer: footer) {
             valueRow
             if type == .userEntered {
-                isNegativeRow
+                deltaTypeRow
             }
         }
     }
     
     var sourceSection: some View {
-//        let selection = Binding<WeightChangeType>(
-//            get: { type },
-//            set: { newValue in
-//                withAnimation {
-//                    type = newValue
-//                }
-//            }
-//        )
-//
-//        return Picker("Source", selection: selection) {
-//            ForEach(WeightChangeType.allCases, id: \.self) {
-//                Text($0.name)
-//            }
-//        }
-//        .pickerStyle(.inline)
+        
+        func selectedWeightChangeType(_ type: WeightChangeType) {
+            if type == .usingWeights {
+                focusedType = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    healthModel.health.maintenanceEnergy?.weightChange.calculateDelta()
+                }
+            }
+            
+            if type == .userEntered {
+                deltaType = healthModel.maintenanceWeightChangeDeltaType
+            }
+            withAnimation {
+                healthModel.maintenanceWeightChangeType = type
+            }
+            
+            if type == .userEntered {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    /// Set focus to text field after a delay if we select "custom"
+                    focusedType = .maintenanceEnergy
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        sendSelectAllTextAction()
+                    }
+                }
+            }
+        }
         
         func button(for type: WeightChangeType) -> some View {
             var isSelected: Bool {
                 self.type == type
             }
             return Button {
-                withAnimation {
-                    healthModel.maintenanceWeightChangeType = type
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    isFocused = switch type {
-                    case .userEntered:  true
-                    case .usingWeights: false
-                    }
-                    if type == .userEntered {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            sendSelectAllTextAction()
-                        }
-                    }
-                }
+                selectedWeightChangeType(type)
             } label: {
                 HStack {
                     Image(systemName: "checkmark")
@@ -268,9 +275,8 @@ struct WeightChangeForm: View {
 
 #Preview {
     NavigationStack {
-        WeightChangeForm()
+        WeightChangeForm(MockHealthModel)
             .environment(SettingsStore.shared)
-            .environment(MockHealthModel)
             .onAppear {
                 SettingsStore.configureAsMock()
             }

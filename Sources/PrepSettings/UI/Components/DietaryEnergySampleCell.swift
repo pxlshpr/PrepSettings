@@ -18,13 +18,17 @@ struct DietaryEnergySampleCell: View {
             HStack {
                 Text(date.adaptiveMaintenanceDateString)
                 Spacer()
+                typeView
                 value
             }
         }
     }
     
+    @ViewBuilder
     var typeView: some View {
-        TagView(string: sample.type.name)
+        if sample.type == .healthKit || sample.type == .userEntered {
+            TagView(string: sample.type.name)
+        }
     }
     
     @ViewBuilder

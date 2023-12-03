@@ -30,7 +30,12 @@ public extension HealthModel {
         guard let maintenanceWeightChangeDelta else { return false }
         return maintenanceWeightChangeDelta < 0
     }
-    
+
+    var maintenanceWeightChangeDeltaType: DeltaType {
+        guard let delta = maintenanceWeightChangeDelta else { return .zero }
+        return delta < 0 ? .negative : .positive
+    }
+
     var maintenanceWeightChangeDelta: Double? {
         get { health.maintenanceEnergy?.weightChange.delta }
         set {

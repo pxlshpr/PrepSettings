@@ -1,10 +1,10 @@
 import SwiftUI
 import PrepShared
 
-public struct MaintenanceFormSections: View {
+
+public struct MaintenanceCalculationSection: View {
     
     enum Route {
-        case maintenance
         case calculation
     }
     
@@ -19,150 +19,138 @@ public struct MaintenanceFormSections: View {
     public var body: some View {
         Group {
             maintenanceSection
-            estimateSection
+            calculateSection
         }
     }
-    
+
     var health: Health {
         model.health
     }
     
-    var estimateSection: some View {
-        @ViewBuilder
+    var calculateSection: some View {
         var footer: some View {
-            if model.maintenanceEnergyIsAdaptive {
-                Text("This estimate is used when there isn't sufficient weight or nutrition data to make a calculation.")
-            }
+//                Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
+            Text("Compares your weight change to the dietary energy you consumed to determine your adaptive maintenance. [Learn More.](https://example.com)")
         }
         
-        var label: some View {
+        var toggleRow: some View {
             HStack {
-                Text("Estimated")
+                Text("Adaptive Maintenance")
+//                    Text("Use Adaptive Calculation")
+                    .layoutPriority(1)
                 Spacer()
-                MaintenanceEstimateText(model, settingsStore)
+                Toggle("", isOn: $model.maintenanceEnergyIsAdaptive)
+            }
+        }
+
+        @ViewBuilder
+        var showCalculationRow: some View {
+            if model.maintenanceEnergyIsAdaptive {
+                NavigationLink(value: Route.calculation) {
+                    Text("Show Calculation")
+                }
+                .navigationDestination(for: Route.self) { route in
+                    switch route {
+                    case .calculation:
+                        MaintenanceCalculateView(model)
+                            .environment(settingsStore)
+                    }
+                }
             }
         }
         
+        @ViewBuilder
+        var errorRow: some View {
+            if let error = model.health.maintenanceEnergy?.error {
+                MaintenanceCalculationErrorCell(error)
+            }
+        }
+
         return Section(footer: footer) {
-            NavigationLink(value: Route.maintenance) {
+            toggleRow
+            showCalculationRow
+            errorRow
+        }
+    }
+    
+    var maintenanceSection: some View {
+        var footer: some View {
+//                Text("Your \(HealthType.maintenanceEnergy.abbreviation) is used in energy goals, when targeting a desired weight change.")
+            Text(HealthType.maintenanceEnergy.reason!)
+        }
+        return Section(footer: footer) {
+            MaintenanceEnergyRow(model)
+                .environment(settingsStore)
+        }
+    }
+}
+
+public struct MaintenanceEstimateSection: View {
+    
+    enum Route {
+        case estimate
+    }
+    
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+
+    @Environment(HealthModel.self) var model: HealthModel
+
+    public var body: some View {
+        Section(footer: footer) {
+            NavigationLink(value: Route.estimate) {
                 label
             }
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                case .maintenance:
+                case .estimate:
                     MaintenanceEstimateView(model)
-                        .environment(settingsStore)
-                case .calculation:
-                    MaintenanceCalculateView(model)
                         .environment(settingsStore)
                 }
             }
         }
     }
-
-    var maintenanceSection: some View {
-        
-        var calculateSection: some View {
-            var footer: some View {
-//                Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
-                Text("Compares your weight change to the dietary energy you consumed to determine your adaptive maintenance. [Learn More.](https://example.com)")
-            }
-            
-            var toggleRow: some View {
-                HStack {
-                    Text("Adaptive Maintenance")
-//                    Text("Use Adaptive Calculation")
-                        .layoutPriority(1)
-                    Spacer()
-                    Toggle("", isOn: $model.maintenanceEnergyIsAdaptive)
-                }
-            }
-
-            @ViewBuilder
-            var showCalculationRow: some View {
-                if model.maintenanceEnergyIsAdaptive {
-                    NavigationLink(value: Route.calculation) {
-//                        Text("Show Adaptive Calculation")
-                        Text("Show Calculation")
-                    }
-//                    .navigationDestination(for: Route.self) { route in
-//                        switch route {
-//                        case .adaptiveCalculation:
-//                            MaintenanceCalculateView(model)
-//                                .environment(settingsStore)
-//                        }
-//                    }
-                }
-            }
-            
-            @ViewBuilder
-            var errorRow: some View {
-                if let error = model.health.maintenanceEnergy?.error {
-                    MaintenanceCalculationErrorCell(error)
-                }
-            }
-
-            return Section(footer: footer) {
-                toggleRow
-                showCalculationRow
-                errorRow
-            }
-        }
-        
-        var maintenanceSection: some View {
-            var footer: some View {
-//                Text("Your \(HealthType.maintenanceEnergy.abbreviation) is used in energy goals, when targeting a desired weight change.")
-                Text(HealthType.maintenanceEnergy.reason!)
-            }
-            return Section(footer: footer) {
-                MaintenanceEnergyRow(model)
-                    .environment(settingsStore)
-            }
-        }
-
-        return Group {
-            maintenanceSection
-            calculateSection
+    @ViewBuilder
+    var footer: some View {
+        if model.maintenanceEnergyIsAdaptive {
+            Text("This estimate is used when there isn't sufficient weight or nutrition data to make a calculation.")
         }
     }
     
-//    var maintenanceSection_: some View {
-//        var header: some View {
-//            HStack(alignment: .lastTextBaseline) {
-//                HealthHeaderText("Maintenance Energy", isLarge: true)
-//                Spacer()
-//                Button("Remove") {
-//                    withAnimation {
-//                        model.remove(.maintenanceEnergy)
-//                    }
-//                }
-//                .textCase(.none)
-//            }
-//        }
-//        
-//        var footer: some View {
-//            Text(HealthType.maintenanceEnergy.reason!)
-//        }
-//        
-//        return Section(header: header) {
-//            if let requiredString = health.tdeeRequiredString {
-//                Text(requiredString)
-//                    .foregroundStyle(Color(.tertiaryLabel))
-//            } else {
-//                if let maintenanceEnergy = health.estimatedMaintenance {
-//                    HStack(alignment: .firstTextBaseline, spacing: 2) {
-//                        Text(maintenanceEnergy.formattedEnergy)
-//                            .animation(.default, value: maintenanceEnergy)
-//                            .contentTransition(.numericText(value: maintenanceEnergy))
-//                            .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-//                            .foregroundStyle(.secondary)
-//                        Text(health.energyUnit.abbreviation)
-//                            .foregroundStyle(Color(.tertiaryLabel))
-//                            .font(.system(.body, design: .rounded, weight: .semibold))
-//                    }
-//                    .frame(maxWidth: .infinity, alignment: .trailing)
-//                }
-//            }
-//        }
-//    }
+    var label: some View {
+        HStack {
+            Text("Estimated")
+            Spacer()
+            MaintenanceEstimateText(model, settingsStore)
+        }
+    }
+}
+
+public struct MaintenanceFormSections: View {
+    
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+
+    @Bindable var model: HealthModel
+
+    public init(_ model: HealthModel) {
+        self.model = model
+    }
+
+    public var body: some View {
+        Group {
+            MaintenanceCalculationSection(model)
+            MaintenanceEstimateSection()
+                .environment(model)
+        }
+    }
+}
+
+
+#Preview {
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                HealthSummary(model: MockHealthModel)
+                    .environment(SettingsStore.shared)
+            }
+        }
 }
