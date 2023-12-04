@@ -29,28 +29,28 @@ public struct MaintenanceEstimateView: View {
         .onChange(of: focusedType, model.focusedTypeChanged)
     }
     
-    func appeared() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            hasAppeared = true
-        }
-    }
-
     var form: some View {
         Form {
-            RestingEnergySection(
-                model: model,
-                settingsStore: settingsStore,
-                focusedType: $focusedType
-            )
-            Section {
-                symbol("+")
-            }
-            .listSectionSpacing(0)
-            ActiveEnergySection(
-                model: model,
-                settingsStore: settingsStore,
-                focusedType: $focusedType
-            )
+            HealthLink(type: .restingEnergy)
+                .environment(settingsStore)
+                .environment(model)
+//            RestingEnergySections(
+//                model: model,
+//                settingsStore: settingsStore,
+//                focusedType: $focusedType
+//            )
+//            Section {
+//                symbol("+")
+//            }
+//            .listSectionSpacing(0)
+            HealthLink(type: .activeEnergy)
+                .environment(settingsStore)
+                .environment(model)
+//            ActiveEnergySection(
+//                model: model,
+//                settingsStore: settingsStore,
+//                focusedType: $focusedType
+//            )
 //            Section {
 //                symbol("=")
 //            }
@@ -60,6 +60,12 @@ public struct MaintenanceEstimateView: View {
         .toolbar { keyboardToolbarContent }
     }
     
+    func appeared() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            hasAppeared = true
+        }
+    }
+
     var keyboardToolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .keyboard) {
             HStack {
@@ -118,4 +124,41 @@ public struct MaintenanceEstimateView: View {
             }
         }
     }
+}
+
+struct HealthLink: View {
+    
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+    @Environment(HealthModel.self) var model: HealthModel
+    let type: HealthType
+    
+    var body: some View {
+        NavigationLink(value: type) {
+            HStack {
+                Text(type.name)
+                Spacer()
+                if let string = model.health.summaryDetail(for: type) {
+                    Text(string)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Not set")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .navigationDestination(for: HealthType.self) { type in
+            HealthForm(model, [type])
+                .environment(settingsStore)
+        }
+    }
+}
+
+#Preview {
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                MaintenanceEstimateView(MockHealthModel)
+                    .environment(SettingsStore.shared)
+            }
+        }
 }

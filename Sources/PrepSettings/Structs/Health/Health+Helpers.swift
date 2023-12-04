@@ -169,6 +169,18 @@ extension Health {
             guard let isSmoker else { return nil }
             return isSmoker ? "Yes" : "No"
 
+        case .restingEnergy:
+            guard let kcal = restingEnergy?.value else { return nil }
+            let unit = SettingsStore.energyUnit
+            let value = EnergyUnit.kcal.convert(kcal, to: unit)
+            return "\(value.formattedEnergy) \(unit.abbreviation)"
+
+        case .activeEnergy:
+            guard let kcal = activeEnergy?.value else { return nil }
+            let unit = SettingsStore.energyUnit
+            let value = EnergyUnit.kcal.convert(kcal, to: unit)
+            return "\(value.formattedEnergy) \(unit.abbreviation)"
+
         default:
             return nil
         }

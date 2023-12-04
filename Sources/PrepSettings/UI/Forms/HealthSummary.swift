@@ -2,33 +2,6 @@ import SwiftUI
 import PrepShared
 import TipKit
 
-struct HealthLink: View {
-    
-    @Environment(SettingsStore.self) var settingsStore: SettingsStore
-    @Environment(HealthModel.self) var model: HealthModel
-    let type: HealthType
-    
-    var body: some View {
-        NavigationLink(value: type) {
-            HStack {
-                Text(type.name)
-                Spacer()
-                if let string = model.health.summaryDetail(for: type) {
-                    Text(string)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Not set")
-                        .foregroundStyle(.tertiary)
-                }
-            }
-        }
-        .navigationDestination(for: HealthType.self) { type in
-            HealthForm(model, [type])
-                .environment(settingsStore)
-        }
-    }
-}
-
 public struct HealthSummary: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
