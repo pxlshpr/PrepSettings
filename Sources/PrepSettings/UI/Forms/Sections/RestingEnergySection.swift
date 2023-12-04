@@ -7,8 +7,85 @@ struct RestingEnergySection: View {
     @Bindable var settingsStore: SettingsStore
 
     var focusedType: FocusState<HealthType?>.Binding
-    
+
     var body: some View {
+        sourceSection
+        equationSection
+        equationParamsSection
+        valueSection
+    }
+    
+    var sourceSection: some View {
+        Section {
+            ForEach(RestingEnergySource.allCases, id: \.self) { source in
+                Button {
+                    model.restingEnergySource = source
+                } label: {
+                    HStack {
+                        Text(source.menuTitle)
+                            .foregroundStyle(Color(.label))
+                        Spacer()
+                        Image(systemName: "checkmark")
+                            .opacity(model.restingEnergySource == source ? 1 : 0)
+                    }
+                }
+            }
+        }
+    }
+    
+    var valueSection: some View {
+        Section {
+            valueRow
+        }
+    }
+    
+    var equationSection: some View {
+        
+        var section: some View {
+            Section("Equation") {
+                ForEach(RestingEnergyEquation.inOrderOfYear, id: \.self) { equation in
+                    Button {
+                        model.restingEnergyEquation = equation
+                    } label: {
+                        HStack {
+                            Text(equation.name)
+                                .foregroundStyle(Color(.label))
+                            Spacer()
+                            Text(equation.year)
+                                .foregroundStyle(Color(.secondaryLabel))
+                            Image(systemName: "checkmark")
+                                .opacity(model.restingEnergyEquation == equation ? 1 : 0)
+                        }
+                    }
+                }
+            }
+        }
+        
+        return Group {
+            if model.restingEnergySource == .equation {
+                section
+            }
+        }
+    }
+    
+    var equationParamsSection: some View {
+        var section: some View {
+            Section("Health Details") {
+                ForEach(model.restingEnergyEquation.params, id: \.self) { type in
+                    HealthLink(type: type)
+                        .environment(settingsStore)
+                        .environment(model)
+                }
+            }
+        }
+        return Group {
+            if model.restingEnergySource == .equation, !model.restingEnergyEquation.params.isEmpty {
+                section
+            }
+        }
+    }
+    
+    var body_: some View {
         Section(footer: footer) {
             HealthTopRow(type: .restingEnergy, model: model)
             content
@@ -22,7 +99,7 @@ struct RestingEnergySection: View {
     @ViewBuilder
     var content: some View {
         switch model.restingEnergySource {
-        case .healthKit:      healthContent
+        case .healthKit:    healthContent
         case .equation:     equationContent
         case .userEntered:  valueRow
         }
@@ -137,3 +214,15 @@ struct RestingEnergySection: View {
     }
 }
 
+#Preview {
+    @FocusState var focusedType: HealthType?
+    return NavigationStack {
+        Form {
+            RestingEnergySection(
+                model: MockHealthModel,
+                settingsStore: SettingsStore.shared,
+                focusedType: $focusedType
+            )
+        }
+    }
+}

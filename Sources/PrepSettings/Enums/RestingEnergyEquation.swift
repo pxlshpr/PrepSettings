@@ -45,6 +45,10 @@ public extension RestingEnergyEquation {
 
 public extension RestingEnergyEquation {
     
+    static var inOrderOfYear: [RestingEnergyEquation] {
+        [.henryOxford, .katchMcardle, .mifflinStJeor, .schofield, .rozaShizgal, .cunningham, .harrisBenedict]
+    }
+    
     static var latest: [RestingEnergyEquation] {
         [.henryOxford, .katchMcardle, .mifflinStJeor, .schofield]
     }

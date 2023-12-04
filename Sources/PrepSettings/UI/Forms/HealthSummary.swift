@@ -2,6 +2,33 @@ import SwiftUI
 import PrepShared
 import TipKit
 
+struct HealthLink: View {
+    
+    @Environment(SettingsStore.self) var settingsStore: SettingsStore
+    @Environment(HealthModel.self) var model: HealthModel
+    let type: HealthType
+    
+    var body: some View {
+        NavigationLink(value: type) {
+            HStack {
+                Text(type.name)
+                Spacer()
+                if let string = model.health.summaryDetail(for: type) {
+                    Text(string)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Not set")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .navigationDestination(for: HealthType.self) { type in
+            HealthForm(model, [type])
+                .environment(settingsStore)
+        }
+    }
+}
+
 public struct HealthSummary: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
@@ -195,25 +222,28 @@ public struct HealthSummary: View {
     }
 
     func content(for type: HealthType) -> some View {
-        NavigationLink(value: type) {
-            HStack {
-                Text(type.name)
-                Spacer()
-                if let string = model.health.summaryDetail(for: type) {
-                    Text(string)
-                        .foregroundStyle(.secondary)
-//                        .foregroundStyle(Color.accentColor)
-                } else {
-                    Text("Not set")
-                        .foregroundStyle(.tertiary)
-                }
-            }
-        }
-        .navigationDestination(for: HealthType.self) { type in
-            HealthForm(model, [type])
-                .environment(settingsStore)
-        }
+        HealthLink(type: type)
+            .environment(settingsStore)
+            .environment(model)
+//        NavigationLink(value: type) {
+//            HStack {
+//                Text(type.name)
+//                Spacer()
+//                if let string = model.health.summaryDetail(for: type) {
+//                    Text(string)
+//                        .foregroundStyle(.secondary)
+//                } else {
+//                    Text("Not set")
+//                        .foregroundStyle(.tertiary)
+//                }
+//            }
+//        }
+//        .navigationDestination(for: HealthType.self) { type in
+//            HealthForm(model, [type])
+//                .environment(settingsStore)
+//        }
     }
+    
     func content_(for type: HealthType) -> some View {
         
         @ViewBuilder
@@ -237,7 +267,7 @@ public struct HealthSummary: View {
             case .age:
                 HealthAgeSection(model, $focusedType)
             case .weight:
-                HealthWeightSection(model, settingsStore, $focusedType)
+                HealthWeightSections(model, settingsStore, $focusedType)
             case .height:
                 HealthHeightSection(model, settingsStore, $focusedType)
             case .sex:

@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-struct HealthWeightSection: View {
+struct HealthWeightSections: View {
     
     @Bindable var settingsStore: SettingsStore
     @Bindable var model: HealthModel
@@ -16,8 +16,16 @@ struct HealthWeightSection: View {
         self.settingsStore = settingsStore
         self.focusedType = focusedType
     }
-    
+
     var body: some View {
+        Section(footer: footer) {
+            HealthTopRow(type: .weight, model: model)
+            valueRow
+            healthKitErrorCell
+        }
+    }
+    
+    var body_ : some View {
         Section(footer: footer) {
             HealthTopRow(type: .weight, model: model)
             valueRow
@@ -74,5 +82,14 @@ struct HealthWeightSection: View {
             focusedType: focusedType,
             healthType: .weight
         )
+    }
+}
+
+#Preview {
+    @FocusState var focusedType: HealthType?
+    return NavigationStack {
+        Form {
+            HealthWeightSections(MockHealthModel, SettingsStore.shared, $focusedType)
+        }
     }
 }

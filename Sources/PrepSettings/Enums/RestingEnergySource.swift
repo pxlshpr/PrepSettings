@@ -15,9 +15,11 @@ extension RestingEnergySource: Pickable {
     
     public var menuTitle: String {
         switch self {
-        case .healthKit:    "Health app"
+//        case .healthKit:    "Health app"
+        case .healthKit:    "Sync with Apple Health"
         case .equation:     "Equation"
-        case .userEntered:  "Entered manually"
+//        case .userEntered:  "Entered manually"
+        case .userEntered:  "Custom"
         }
     }
     
