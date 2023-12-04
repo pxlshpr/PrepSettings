@@ -15,6 +15,7 @@ extension RestingEnergyEquation: Pickable {
     public var pickedTitle: String { name }
     public var menuTitle: String { name }
     public static var `default`: RestingEnergyEquation { .katchMcardle }
+    public var detail: String? { year }
 }
 
 public extension RestingEnergyEquation {

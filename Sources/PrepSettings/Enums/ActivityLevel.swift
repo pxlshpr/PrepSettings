@@ -3,7 +3,7 @@ import PrepShared
 
 public enum ActivityLevel: Int16, Codable, Hashable, CaseIterable {
     
-    case notSet = 1
+//    case notSet = 1
     case sedentary
     case lightlyActive
     case moderatelyActive
@@ -15,7 +15,7 @@ public extension ActivityLevel {
     
     var name: String {
         switch self {
-        case .notSet:           return "Do not use"
+//        case .notSet:           return "Do not use"
         case .sedentary:        return "Sedentary"
         case .lightlyActive:    return "Lightly active"
         case .moderatelyActive: return "Moderately active"
@@ -26,7 +26,7 @@ public extension ActivityLevel {
     
     var scaleFactor: Double {
         switch self {
-        case .notSet:           return 1
+//        case .notSet:           return 1
         case .sedentary:        return 1.2
         case .lightlyActive:    return 1.375
         case .moderatelyActive: return 1.55
@@ -39,5 +39,8 @@ public extension ActivityLevel {
 extension ActivityLevel: Pickable {
     public var pickedTitle: String { name }
     public var menuTitle: String { name }
+    public var detail: String? {
+        "× \(scaleFactor.cleanWithoutRounding)"
+    }
     public static var `default`: ActivityLevel { .sedentary }
 }

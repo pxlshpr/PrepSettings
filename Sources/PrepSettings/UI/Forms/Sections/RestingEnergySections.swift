@@ -14,64 +14,19 @@ struct RestingEnergySections: View {
         equationParamsSection
         intervalTypeSection
         intervalPeriodSection
+        intervalSection
+        healthKitErrorSection
         valueSection
     }
     
     var sourceSection: some View {
-        Section {
-            ForEach(RestingEnergySource.allCases, id: \.self) { source in
-                Button {
-                    model.restingEnergySource = source
-                } label: {
-                    HStack {
-                        Image(systemName: "checkmark")
-                            .opacity(model.restingEnergySource == source ? 1 : 0)
-                        Text(source.menuTitle)
-                            .foregroundStyle(Color(.label))
-                        Spacer()
-                    }
-                }
-            }
-        }
+        PickerSection($model.restingEnergySource)
     }
     
-    var valueSection: some View {
-        Group {
-            Section {
-                intervalRow
-            }
-            Section {
-                valueRow
-            }
-        }
-    }
-    
+    @ViewBuilder
     var equationSection: some View {
-        
-        var section: some View {
-            Section("Equation") {
-                ForEach(RestingEnergyEquation.inOrderOfYear, id: \.self) { equation in
-                    Button {
-                        model.restingEnergyEquation = equation
-                    } label: {
-                        HStack {
-                            Image(systemName: "checkmark")
-                                .opacity(model.restingEnergyEquation == equation ? 1 : 0)
-                            Text(equation.name)
-                                .foregroundStyle(Color(.label))
-                            Spacer()
-                            Text(equation.year)
-                                .foregroundStyle(Color(.secondaryLabel))
-                        }
-                    }
-                }
-            }
-        }
-        
-        return Group {
-            if model.restingEnergySource == .equation {
-                section
-            }
+        if model.restingEnergySource == .equation {
+            PickerSection($model.restingEnergyEquation)
         }
     }
     
@@ -92,133 +47,54 @@ struct RestingEnergySections: View {
         }
     }
 
+    @ViewBuilder
     var intervalTypeSection: some View {
-        
-        var section: some View {
-            Section("Sync") {
-                ForEach(HealthIntervalType.allCases, id: \.self) { type in
-                    Button {
-                        model.restingEnergyIntervalType = type
-                    } label: {
-                        HStack {
-                            Image(systemName: "checkmark")
-                                .opacity(type == model.restingEnergyIntervalType ? 1 : 0)
-                            VStack(alignment: .leading) {
-                                Text(type.menuTitle)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(Color(.label))
-                                Text(type.detail)
-                                    .font(.subheadline)
-                                    .foregroundStyle(Color(.secondaryLabel))
-                            }
-                            Spacer()
-                        }
-                    }
-                }
-            }
-        }
-        
-        return Group {
-            if model.restingEnergySource == .healthKit {
-                section
-            }
+        if model.restingEnergySource == .healthKit {
+            PickerSection($model.restingEnergyIntervalType, "Sync")
         }
     }
     
+    @ViewBuilder
     var intervalPeriodSection: some View {
+        if model.restingEnergySource == .healthKit,
+           model.restingEnergyIntervalType == .average
+        {
+            stepperSection
+            periodSection
+        }
+    }
+    
+    var periodSection: some View {
+        PickerSection($model.restingEnergyIntervalPeriod)
+    }
+    
+    var stepperSection: some View {
+        var stepper: some View {
+            Stepper(
+                "",
+                value: $model.restingEnergyIntervalValue,
+                in: model.restingEnergyIntervalPeriod.range
+            )
+        }
         
-        var section: some View {
-            var stepper: some View {
-                Stepper(
-                    "",
-                    value: $model.restingEnergyIntervalValue,
-                    in: model.restingEnergyIntervalPeriod.range
-                )
-            }
-            
-            var value: some View {
-                Text("\(model.restingEnergyIntervalValue)")
-                    .font(NumberFont)
-                    .contentTransition(.numericText(value: Double(model.restingEnergyIntervalValue)))
+        var value: some View {
+            Text("\(model.restingEnergyIntervalValue)")
+                .font(NumberFont)
+                .contentTransition(.numericText(value: Double(model.restingEnergyIntervalValue)))
 //                    .foregroundStyle(.secondary)
-            }
-            
-            var picker: some View {
-                MenuPicker<HealthPeriod>($model.restingEnergyIntervalPeriod)
-            }
-            
-            var legacyRow: some View {
-                HStack {
-                    Spacer()
-                    stepper
-                        .fixedSize()
-                    value
-                    picker
-                }
-            }
-            
-            var row: some View {
-                HStack {
-                    stepper
-                        .fixedSize()
-                    Spacer()
-                    value
-                }
-            }
-            
-            var periodButtons: some View {
-                ForEach(HealthPeriod.allCases, id: \.self) { period in
-                    Button {
-                        model.restingEnergyIntervalPeriod = period
-                    } label: {
-                        HStack {
-                            Image(systemName: "checkmark")
-                                .opacity(model.restingEnergyIntervalPeriod == period ? 1 : 0)
-                            Text(period.name.capitalized)
-                                .foregroundStyle(Color(.label))
-                            Spacer()
-                        }
-                    }
-                }
-            }
-            
-            return Group {
-                Section("Daily average period") {
-//                    legacyRow
-                    row
-                }
-                Section {
-                    periodButtons
-                }
-            }
         }
         
-        return Group {
-            if model.restingEnergySource == .healthKit,
-               model.restingEnergyIntervalType == .average
-            {
-                section
+        return Section("Daily average period") {
+            HStack {
+                stepper
+                    .fixedSize()
+                Spacer()
+                value
             }
         }
     }
     
-    var healthKitSection: some View {
-        
-        var section: some View {
-            Section("Apple Health") {
-                PickerField("Use", $model.restingEnergyIntervalType)
-                healthKitIntervalField
-            }
-        }
-        
-        return Group {
-            if model.restingEnergySource == .healthKit {
-                section
-            }
-        }
-    }
-    
-    var intervalRow: some View {
+    var intervalSection: some View {
         
         var label: String {
             model.restingEnergyIntervalType == .average ? "Period" : "Date"
@@ -228,12 +104,12 @@ struct RestingEnergySections: View {
             guard let interval = model.restingEnergyInterval else { return "" }
             return switch model.restingEnergyIntervalType {
             case .average:      interval.dateRange(with: model.health.date).string
-            case .sameDay:      model.health.date.healthFormat
+            case .sameDay:      model.health.date.healthDateFormat
             case .previousDay:  model.health.date.moveDayBy(-1).healthFormat
             }
         }
         
-        return Group {
+        return Section {
             if model.restingEnergySource == .healthKit {
                 HStack {
                     Text(label)
@@ -245,7 +121,7 @@ struct RestingEnergySections: View {
         }
     }
     
-    var valueRow: some View {
+    var valueSection: some View {
         
         @ViewBuilder
         var calculatedValue: some View {
@@ -271,106 +147,29 @@ struct RestingEnergySections: View {
             }
         }
         
-        return HStack {
-            Spacer()
-            if model.isSettingTypeFromHealthKit(.restingEnergy) {
-                ProgressView()
-            } else {
-                switch model.restingEnergySource.isManual {
-                case true:
-                    manualValue
-                case false:
-                    calculatedValue
-                }
-            }
-        }
-    }
-    
-    var healthKitIntervalField: some View {
-        HealthEnergyIntervalField(
-            type: model.restingEnergyIntervalType,
-            value: $model.restingEnergyIntervalValue,
-            period: $model.restingEnergyIntervalPeriod
-        )
-    }
-    
-
-    //MARK: - Legacy
-    var body_: some View {
-        Section(footer: footer) {
-            HealthTopRow(type: .restingEnergy, model: model)
-            content
-        }
-    }
-    
-    var footer: some View {
-        Text(HealthType.restingEnergy.reason!)
-    }
-
-    @ViewBuilder
-    var content: some View {
-        switch model.restingEnergySource {
-        case .healthKit:    healthContent
-        case .equation:     equationContent
-        case .userEntered:  valueRow
-        }
-    }
-    
-    var healthContent: some View {
-        
-        return Group {
-            PickerField("Use", $model.restingEnergyIntervalType)
-            healthKitIntervalField
-            valueRow
-        }
-    }
-
-    enum Route {
-        case params
-    }
-    
-    var equationContent: some View {
-        var healthLink: some View {
-            var params: [HealthType] {
-                model.restingEnergyEquation.params
-            }
-            
-            var title: String {
-                if params.count == 1, let param = params.first {
-                    param.name
+        return Section {
+            HStack {
+                Spacer()
+                if model.isSettingTypeFromHealthKit(.restingEnergy) {
+                    ProgressView()
                 } else {
-                    "Health Details"
+                    switch model.restingEnergySource.isManual {
+                    case true:
+                        manualValue
+                    case false:
+                        calculatedValue
+                    }
                 }
             }
-            
-            return NavigationLink(value: Route.params) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(title)
-                    Spacer()
-                    HealthTexts(model.health, settingsStore).restingEnergyHealthLinkText
-                }
-            }
-            .navigationDestination(for: Route.self) { route in
-                switch route {
-                case .params:
-                    HealthForm(model)
-                        .environment(settingsStore)
-                }
-            }
-        }
-        
-        return Group {
-            PickerField("Equation", $model.restingEnergyEquation)
-            healthLink
-            valueRow
-            healthKitErrorCell
         }
     }
     
     @ViewBuilder
-    var healthKitErrorCell: some View {
+    var healthKitErrorSection: some View {
         if model.shouldShowHealthKitError(for: .restingEnergy) {
-            HealthKitErrorCell(type: .restingEnergy)
+            Section {
+                HealthKitErrorCell(type: .restingEnergy)
+            }
         }
     }
 }
@@ -390,24 +189,4 @@ struct RestingEnergySections: View {
                 .navigationTitle("Resting Energy")
             }
         }
-}
-
-struct LargeHealthValue: View {
-    
-    let value: Double
-    let unitString: String
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-            Spacer()
-            Text(value.formattedEnergy)
-                .animation(.default, value: value)
-                .contentTransition(.numericText(value: value))
-                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                .foregroundStyle(.primary)
-            Text(unitString)
-                .foregroundStyle(.primary)
-                .font(.system(.body, design: .default, weight: .semibold))
-        }
-    }
 }

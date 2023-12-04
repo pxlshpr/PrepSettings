@@ -315,7 +315,12 @@ public extension Health {
         guard let restingEnergyValue else { return nil }
         return EnergyUnit.kcal.convert(restingEnergyValue, to: unit)
     }
-    
+
+    func activeEnergyValue(in unit: EnergyUnit) -> Double? {
+        guard let activeEnergyValue else { return nil }
+        return EnergyUnit.kcal.convert(activeEnergyValue, to: unit)
+    }
+
     var restingEnergyValue: Double? {
         get { restingEnergy?.value }
         set {

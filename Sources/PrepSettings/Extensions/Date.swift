@@ -36,6 +36,13 @@ public extension Date {
         }
     }
 
+    var healthDateFormat: String {
+        let formatter = DateFormatter()
+        let sameYear = year == Date().year
+        formatter.dateFormat = sameYear ? "d MMM" : "d MMM yyyy"
+        return formatter.string(from: self)
+    }
+    
     var healthFormat: String {
         let dayString: String
         var timeString = shortTime

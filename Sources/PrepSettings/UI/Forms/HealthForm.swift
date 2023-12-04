@@ -90,7 +90,7 @@ public struct HealthForm: View {
             case .restingEnergy:
                 RestingEnergySections(model: model, settingsStore: settingsStore, focusedType: $focusedType)
             case .activeEnergy:
-                ActiveEnergySection(model: model, settingsStore: settingsStore, focusedType: $focusedType)
+                ActiveEnergySections(model: model, settingsStore: settingsStore, focusedType: $focusedType)
             default:
                 EmptyView()
             }

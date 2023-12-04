@@ -36,6 +36,8 @@ public extension HealthModel {
     /// This is supposed to handle single changes only (eg. when we change the weight source), and not multiple different changes
     func handleChanges(from old: Health) async throws {
         
+//        typesBeingSetFromHealthKit = []
+        
         /// Get the first type that has changed from a non-HealthKit source to HealthKit
         if let type = health.typeToFetchFromHealthKit(from: old) {
             try await setTypeFromHealthKit(type)

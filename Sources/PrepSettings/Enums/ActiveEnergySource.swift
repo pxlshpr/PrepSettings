@@ -11,9 +11,9 @@ extension ActiveEnergySource: Pickable {
     
     public var pickedTitle: String {
         switch self {
-        case .healthKit:        "Health app"
-        case .activityLevel:    "Activity level"
-        case .userEntered:      "Entered manually"
+        case .healthKit:        "Sync with Apple Health"
+        case .activityLevel:    "Activity Level Multiplier"
+        case .userEntered:      "Custom"
         }
     }
     
