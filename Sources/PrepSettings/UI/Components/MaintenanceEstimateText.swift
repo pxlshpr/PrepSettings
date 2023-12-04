@@ -19,10 +19,7 @@ struct MaintenanceEstimateText: View {
 
     @ViewBuilder
     var body: some View {
-        if let requiredString = model.health.tdeeRequiredString {
-            Text(requiredString)
-                .foregroundStyle(Color(.tertiaryLabel))
-        } else if let value {
+        if let value {
             HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
                 Text(value.formattedEnergy)
                     .animation(.default, value: value)
@@ -34,7 +31,8 @@ struct MaintenanceEstimateText: View {
 //                    .font(.system(.body, design: .default, weight: .semibold))
             }
         } else {
-            EmptyView()
+            Text("Not set")
+                .foregroundStyle(.tertiary)
         }
     }
 }

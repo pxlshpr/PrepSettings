@@ -44,7 +44,7 @@ extension HealthStore {
         for interval: HealthInterval = .init(0, .day),
         on date: Date = Date.now,
         in unit: EnergyUnit = .kcal
-    ) async throws -> Double {
+    ) async throws -> Double? {
         try await HealthKitEnergyRequest(.resting, unit, interval, date).dailyAverage()
     }
     
@@ -52,7 +52,7 @@ extension HealthStore {
         for interval: HealthInterval = .init(0, .day),
         on date: Date = Date.now,
         in unit: EnergyUnit = .kcal
-    ) async throws -> Double {
+    ) async throws -> Double? {
         try await HealthKitEnergyRequest(.active, unit, interval, date).dailyAverage()
     }
 }

@@ -5,6 +5,7 @@ struct HealthKitErrorCell: View {
     let type: HealthType
     var body: some View {
         HStack(alignment: .top) {
+//        HStack {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 50))
                 .foregroundStyle(Color.accentColor)
@@ -12,13 +13,28 @@ struct HealthKitErrorCell: View {
                 Text(heading)
                     .fontWeight(.semibold)
                 Text(message)
-                    .font(.system(.callout))
+                    .font(.callout)
                     .foregroundStyle(.secondary)
-                TagView(string: location)
+                    .fixedSize(horizontal: false, vertical: true)
+                location
                 Text(secondaryMessage)
                     .font(.system(.callout))
                     .foregroundStyle(Color(.secondaryLabel))
             }
+        }
+        .padding(.vertical, 10)
+    }
+    
+    var location: some View {
+//        TagView(string: locationString)
+        HStack {
+            Divider()
+                .frame(minWidth: 2)
+                .overlay { Color(.tertiaryLabel) }
+            Text(locationString)
+                .italic()
+                .font(.callout)
+                .foregroundStyle(.secondary)
         }
     }
     
@@ -34,7 +50,15 @@ struct HealthKitErrorCell: View {
         "If allowed, then there may be no \(type.abbreviation) data."
     }
     
-    var location: String {
+    var locationString: String {
         "Settings > Privacy & Security > Health > Prep"
+    }
+}
+
+#Preview {
+    NavigationStack {
+        Form {
+            HealthKitErrorCell(type: .restingEnergy)
+        }
     }
 }
