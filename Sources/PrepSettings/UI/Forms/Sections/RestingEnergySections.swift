@@ -95,7 +95,7 @@ struct RestingEnergySections: View {
     var intervalTypeSection: some View {
         
         var section: some View {
-            Section("Apple Health") {
+            Section("Sync") {
                 ForEach(HealthIntervalType.allCases, id: \.self) { type in
                     Button {
                         model.restingEnergyIntervalType = type
@@ -250,32 +250,11 @@ struct RestingEnergySections: View {
         @ViewBuilder
         var calculatedValue: some View {
             if let value = model.health.restingEnergyValue(in: settingsStore.energyUnit) {
-//                Text("\(value.formattedEnergy) \(settingsStore.energyUnit.abbreviation)")
-                HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                    Image(systemName: "equal")
-                        .foregroundStyle(.secondary)
-                        .font(.title2)
-                        .fontWeight(.heavy)
-                    Spacer()
-                    Text(value.formattedEnergy)
-                        .animation(.default, value: value)
-                        .contentTransition(.numericText(value: value))
-                        .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                        .foregroundStyle(.primary)
-                    Text(settingsStore.energyUnit.abbreviation)
-                        .foregroundStyle(.primary)
-                        .font(.system(.body, design: .default, weight: .semibold))
-                }
-
+                LargeHealthValue(
+                    value: value,
+                    unitString: settingsStore.energyUnit.abbreviation
+                )
             }
-//            CalculatedEnergyView(
-//                valueBinding: $model.health.restingEnergyValue,
-////                unitBinding: $model.health.energyUnit,
-//                unitBinding: $settingsStore.energyUnit,
-//                intervalBinding: $model.restingEnergyInterval,
-//                date: model.health.date,
-//                source: model.restingEnergySource
-//            )
         }
         
         var manualValue: some View {
@@ -411,4 +390,24 @@ struct RestingEnergySections: View {
                 .navigationTitle("Resting Energy")
             }
         }
+}
+
+struct LargeHealthValue: View {
+    
+    let value: Double
+    let unitString: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
+            Spacer()
+            Text(value.formattedEnergy)
+                .animation(.default, value: value)
+                .contentTransition(.numericText(value: value))
+                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+                .foregroundStyle(.primary)
+            Text(unitString)
+                .foregroundStyle(.primary)
+                .font(.system(.body, design: .default, weight: .semibold))
+        }
+    }
 }

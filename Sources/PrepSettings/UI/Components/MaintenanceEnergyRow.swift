@@ -149,16 +149,10 @@ struct MaintenanceEnergyRow: View {
         }
         
         func valueContent(_ value: Double) -> some View {
-            HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                Text(value.formattedEnergy)
-                    .animation(.default, value: value)
-                    .contentTransition(.numericText(value: value))
-                    .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                    .foregroundStyle(foregroundColor)
-                Text(settingsStore.energyUnit.abbreviation)
-                    .foregroundStyle(foregroundColor)
-                    .font(.system(.body, design: .default, weight: .semibold))
-            }
+            LargeHealthValue(
+                value: value,
+                unitString: settingsStore.energyUnit.abbreviation
+            )
         }
         
         var loadingContent: some View {

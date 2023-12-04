@@ -6,7 +6,6 @@ public struct MaintenanceEstimateView: View {
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
     @Bindable var model: HealthModel
     @State var hasAppeared = false
-    @FocusState var focusedType: HealthType?
     
     public init(_ model: HealthModel) {
         self.model = model
@@ -21,43 +20,38 @@ public struct MaintenanceEstimateView: View {
             }
         }
         .onAppear(perform: appeared)
-//        .navigationTitle("Maintenance Energy")
-//        .navigationTitle("Estimate")
         .navigationTitle("Estimated Maintenance")
-//        .navigationBarTitleDisplayMode(.large)
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: focusedType, model.focusedTypeChanged)
     }
     
     var form: some View {
         Form {
+            restingEnergySection
+            activeEnergySection
+            estimateSection
+        }
+    }
+    var restingEnergySection: some View {
+        var footer: some View {
+            Text(HealthType.restingEnergy.reason!)
+        }
+        return Section(footer: footer) {
             HealthLink(type: .restingEnergy)
                 .environment(settingsStore)
                 .environment(model)
-//            RestingEnergySections(
-//                model: model,
-//                settingsStore: settingsStore,
-//                focusedType: $focusedType
-//            )
-//            Section {
-//                symbol("+")
-//            }
-//            .listSectionSpacing(0)
+        }
+    }
+    
+    var activeEnergySection: some View {
+        var footer: some View {
+            Text(HealthType.activeEnergy.reason!)
+        }
+        
+        return Section(footer: footer) {
             HealthLink(type: .activeEnergy)
                 .environment(settingsStore)
                 .environment(model)
-//            ActiveEnergySection(
-//                model: model,
-//                settingsStore: settingsStore,
-//                focusedType: $focusedType
-//            )
-//            Section {
-//                symbol("=")
-//            }
-//            .listSectionSpacing(0)
-            estimateSection
         }
-        .toolbar { keyboardToolbarContent }
     }
     
     func appeared() {
@@ -66,61 +60,38 @@ public struct MaintenanceEstimateView: View {
         }
     }
 
-    var keyboardToolbarContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .keyboard) {
-            HStack {
-                Spacer()
-                Button("Done") {
-                    focusedType = nil
+    var estimateSection: some View {
+        var content: some View {
+            
+            func content(_ value: Double) -> some View {
+                LargeHealthValue(
+                    value: value,
+                    unitString: "\(settingsStore.energyUnit.abbreviation) / day"
+                )
+            }
+            
+            var value: Double? {
+                model.health.estimatedMaintenance(in: settingsStore.energyUnit)
+            }
+            
+            return Group {
+                if let value {
+                    content(value)
+                } else {
+                    Text("Not set")
+                        .foregroundStyle(.tertiary)
                 }
-                .fontWeight(.semibold)
             }
         }
-    }
-    
-    func symbol(_ string: String) -> some View {
-        Text(string)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .font(.system(.title, design: .rounded, weight: .semibold))
-            .foregroundColor(.secondary)
-            .listRowBackground(EmptyView())
-    }
-    
-    var estimateSection: some View {
-        Section {
-            VStack {
-//                HStack {
-//                    Text("Estimated")
-//                        .fontWeight(.semibold)
-//                    Spacer()
-//                }
-                HStack {
-                    if model.health.tdeeRequiredString == nil, model.health.estimatedMaintenanceInKcal != nil 
-                    {
-                        Image(systemName: "equal")
-                            .foregroundStyle(.secondary)
-                            .font(.title2)
-                            .fontWeight(.heavy)
-                    }
-                    Spacer()
-                    if let string = model.health.tdeeRequiredString {
-                        Text(string)
-                            .foregroundStyle(Color(.tertiaryLabel))
-                    } else if let value = model.health.estimatedMaintenance(in: settingsStore.energyUnit) {
-                        HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                            Text(value.formattedEnergy)
-                                .animation(.default, value: value)
-                                .contentTransition(.numericText(value: value))
-                                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                            Text("\(settingsStore.energyUnit.abbreviation) / day")
-                                .foregroundStyle(.secondary)
-                                .font(.system(.body, design: .default, weight: .semibold))
-                        }
-                        .multilineTextAlignment(.trailing)
-                    } else {
-                        EmptyView()
-                    }
-                }
+        
+        var footer: some View {
+            Text("Your estimated resting and active energies are added to get an estimate of your maintenance.")
+        }
+        
+        return Section(footer: footer) {
+            HStack {
+                Spacer()
+                content
             }
         }
     }

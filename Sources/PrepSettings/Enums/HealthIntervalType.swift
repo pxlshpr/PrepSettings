@@ -11,11 +11,13 @@ extension HealthIntervalType {
     var detail: String {
         switch self {
         case .average:
-            "Use the daily average of a specified period before this day"
+//            "Use the daily average of a specified period before this day"
+            "The daily average of the resting energy for a period before this day will be used"
         case .sameDay:
-            "Use the value for this date"
+            "The resting energy for today in Apple Health will always be used"
         case .previousDay:
-            "Use the value for the day before this date"
+//            "Use the value for the day before this date"
+            "The resting energy for yesterday in Apple Health will be used"
         }
     }
 }

@@ -267,24 +267,19 @@ struct MaintenanceCalculateView: View {
         
         var valueRow: some View {
             HStack {
-                if maintenance.adaptiveValue != nil {
-                    Image(systemName: "equal")
-                        .foregroundStyle(.secondary)
-                        .font(.title2)
-                        .fontWeight(.heavy)
-                }
+//                if maintenance.adaptiveValue != nil {
+//                    Image(systemName: "equal")
+//                        .foregroundStyle(.secondary)
+//                        .font(.title2)
+//                        .fontWeight(.heavy)
+//                }
                 Spacer()
                 if let value = maintenance.adaptiveValue {
-                    HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                        Text(value.formattedEnergy)
-                            .animation(.default, value: value)
-                            .contentTransition(.numericText(value: value))
-                            .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                        Text("\(settingsStore.energyUnit.abbreviation) / day")
-                            .foregroundStyle(.secondary)
-                            .font(.system(.body, design: .default, weight: .semibold))
-                    }
-                    .multilineTextAlignment(.trailing)
+                    LargeHealthValue(
+                        value: value,
+                        unitString: "\(settingsStore.energyUnit.abbreviation) / day"
+                    )
+//                    .multilineTextAlignment(.trailing)
                 } else {
                     Text("Not enough data")
                         .foregroundStyle(.tertiary)
