@@ -24,11 +24,11 @@ struct RestingEnergySections: View {
                     model.restingEnergySource = source
                 } label: {
                     HStack {
+                        Image(systemName: "checkmark")
+                            .opacity(model.restingEnergySource == source ? 1 : 0)
                         Text(source.menuTitle)
                             .foregroundStyle(Color(.label))
                         Spacer()
-                        Image(systemName: "checkmark")
-                            .opacity(model.restingEnergySource == source ? 1 : 0)
                     }
                 }
             }
@@ -36,8 +36,13 @@ struct RestingEnergySections: View {
     }
     
     var valueSection: some View {
-        Section {
-            valueRow
+        Group {
+            Section {
+                intervalRow
+            }
+            Section {
+                valueRow
+            }
         }
     }
     
@@ -50,13 +55,13 @@ struct RestingEnergySections: View {
                         model.restingEnergyEquation = equation
                     } label: {
                         HStack {
+                            Image(systemName: "checkmark")
+                                .opacity(model.restingEnergyEquation == equation ? 1 : 0)
                             Text(equation.name)
                                 .foregroundStyle(Color(.label))
                             Spacer()
                             Text(equation.year)
                                 .foregroundStyle(Color(.secondaryLabel))
-                            Image(systemName: "checkmark")
-                                .opacity(model.restingEnergyEquation == equation ? 1 : 0)
                         }
                     }
                 }
@@ -96,6 +101,8 @@ struct RestingEnergySections: View {
                         model.restingEnergyIntervalType = type
                     } label: {
                         HStack {
+                            Image(systemName: "checkmark")
+                                .opacity(type == model.restingEnergyIntervalType ? 1 : 0)
                             VStack(alignment: .leading) {
                                 Text(type.menuTitle)
                                     .fontWeight(.semibold)
@@ -105,8 +112,6 @@ struct RestingEnergySections: View {
                                     .foregroundStyle(Color(.secondaryLabel))
                             }
                             Spacer()
-                            Image(systemName: "checkmark")
-                                .opacity(type == model.restingEnergyIntervalType ? 1 : 0)
                         }
                     }
                 }
@@ -154,9 +159,10 @@ struct RestingEnergySections: View {
             
             var row: some View {
                 HStack {
-                    value
-                    Spacer()
                     stepper
+                        .fixedSize()
+                    Spacer()
+                    value
                 }
             }
             
@@ -166,11 +172,11 @@ struct RestingEnergySections: View {
                         model.restingEnergyIntervalPeriod = period
                     } label: {
                         HStack {
-                            Text(period.name)
-                                .foregroundStyle(Color(.label))
-                            Spacer()
                             Image(systemName: "checkmark")
                                 .opacity(model.restingEnergyIntervalPeriod == period ? 1 : 0)
+                            Text(period.name.capitalized)
+                                .foregroundStyle(Color(.label))
+                            Spacer()
                         }
                     }
                 }
@@ -188,7 +194,9 @@ struct RestingEnergySections: View {
         }
         
         return Group {
-            if model.restingEnergyIntervalType == .average {
+            if model.restingEnergySource == .healthKit,
+               model.restingEnergyIntervalType == .average
+            {
                 section
             }
         }
@@ -210,16 +218,64 @@ struct RestingEnergySections: View {
         }
     }
     
+    var intervalRow: some View {
+        
+        var label: String {
+            model.restingEnergyIntervalType == .average ? "Period" : "Date"
+        }
+        
+        var detail: String {
+            guard let interval = model.restingEnergyInterval else { return "" }
+            return switch model.restingEnergyIntervalType {
+            case .average:      interval.dateRange(with: model.health.date).string
+            case .sameDay:      model.health.date.healthFormat
+            case .previousDay:  model.health.date.moveDayBy(-1).healthFormat
+            }
+        }
+        
+        return Group {
+            if model.restingEnergySource == .healthKit {
+                HStack {
+                    Text(label)
+                    Spacer()
+                    Text(detail)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+    
     var valueRow: some View {
+        
+        @ViewBuilder
         var calculatedValue: some View {
-            CalculatedEnergyView(
-                valueBinding: $model.health.restingEnergyValue,
-//                unitBinding: $model.health.energyUnit,
-                unitBinding: $settingsStore.energyUnit,
-                intervalBinding: $model.restingEnergyInterval,
-                date: model.health.date,
-                source: model.restingEnergySource
-            )
+            if let value = model.health.restingEnergyValue(in: settingsStore.energyUnit) {
+//                Text("\(value.formattedEnergy) \(settingsStore.energyUnit.abbreviation)")
+                HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
+                    Image(systemName: "equal")
+                        .foregroundStyle(.secondary)
+                        .font(.title2)
+                        .fontWeight(.heavy)
+                    Spacer()
+                    Text(value.formattedEnergy)
+                        .animation(.default, value: value)
+                        .contentTransition(.numericText(value: value))
+                        .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+                        .foregroundStyle(.primary)
+                    Text(settingsStore.energyUnit.abbreviation)
+                        .foregroundStyle(.primary)
+                        .font(.system(.body, design: .default, weight: .semibold))
+                }
+
+            }
+//            CalculatedEnergyView(
+//                valueBinding: $model.health.restingEnergyValue,
+////                unitBinding: $model.health.energyUnit,
+//                unitBinding: $settingsStore.energyUnit,
+//                intervalBinding: $model.restingEnergyInterval,
+//                date: model.health.date,
+//                source: model.restingEnergySource
+//            )
         }
         
         var manualValue: some View {

@@ -15,7 +15,7 @@ extension ClosedRange where Bound == Date {
         
         let upperYear = upperBound.year == Date.now.year ? "" : " \(upperBound.year)"
         let lowerYear = lowerBound.year == Date.now.year ? "" : " \(lowerBound.year)"
-
+        
         let upper = "\(upperBound.day) \(upperBound.shortMonth)\(upperYear)"
         
         return if sameYear {

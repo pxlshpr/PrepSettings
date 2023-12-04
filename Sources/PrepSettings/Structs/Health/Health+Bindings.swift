@@ -311,6 +311,11 @@ public extension Health {
         }
     }
     
+    func restingEnergyValue(in unit: EnergyUnit) -> Double? {
+        guard let restingEnergyValue else { return nil }
+        return EnergyUnit.kcal.convert(restingEnergyValue, to: unit)
+    }
+    
     var restingEnergyValue: Double? {
         get { restingEnergy?.value }
         set {
