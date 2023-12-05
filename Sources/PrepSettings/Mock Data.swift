@@ -84,7 +84,7 @@ func fetchSettingsFromDocuments() async throws -> Settings {
 }
 
 let MockMaintenanceValues = [
-    Date(fromDateString: "2021_08_28")!: (nil, 1800.0),
+    Date(fromDateString: "2021_08_28")!: (93.8, 1800.0),
     Date(fromDateString: "2021_08_27")!: (93, nil), /// weight
     Date(fromDateString: "2021_08_26")!: (nil, nil), /// weight
     Date(fromDateString: "2021_08_25")!: (nil, nil),
