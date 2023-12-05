@@ -190,8 +190,14 @@ extension Health {
         maintenanceEnergy ?? .init()
     }
     
+    var isUsingCalculatedMaintenance: Bool {
+        maintenanceEnergyIsAdaptive
+        && hasCalculatedMaintenance
+    }
+    
     var hasCalculatedMaintenance: Bool {
-        maintenance.adaptiveValue != nil
+        maintenanceEnergy?.adaptiveValue != nil
+        && maintenanceEnergy?.error == nil
     }
     
     var hasEstimatedMaintenance: Bool {

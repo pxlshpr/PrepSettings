@@ -5,6 +5,7 @@ import PrepShared
 public extension Health {
     
     struct MaintenanceEnergy: Hashable, Codable {
+        
         public var isAdaptive: Bool
         public var adaptiveValue: Double?
         public var error: MaintenanceCalculationError?

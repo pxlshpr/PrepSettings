@@ -14,9 +14,9 @@ public extension Health {
             }
             maintenanceEnergy?.isAdaptive = newValue
             /// If we've turned it off, clear the previous value
-            if !newValue {
-                maintenanceEnergy?.adaptiveValue = nil
-            }
+//            if !newValue {
+//                maintenanceEnergy?.adaptiveValue = nil
+//            }
         }
     }
     

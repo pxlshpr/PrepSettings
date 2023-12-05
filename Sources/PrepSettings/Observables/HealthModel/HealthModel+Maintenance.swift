@@ -84,14 +84,6 @@ extension HealthModel {
     }
 }
 
-public extension HealthModel {
-    var hasAdaptiveMaintenanceEnergyValue: Bool {
-        maintenanceEnergyIsAdaptive
-        && health.maintenanceEnergy?.adaptiveValue != nil
-        && health.maintenanceEnergy?.error == nil
-    }
-}
-
 extension HealthModel {
 
     /// Returns any backend weight values we have for the date range (specified by `interval`) used for the moving average for `date`

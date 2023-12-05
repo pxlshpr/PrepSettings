@@ -20,6 +20,15 @@ public struct MaintenanceFormSections: View {
             MaintenanceCalculatedSection(model)
             MaintenanceEstimatedSection(model)
             MaintenanceValueSection(model)
+            removeSection
+        }
+    }
+    
+    var removeSection: some View {
+        Section {
+            Button("Remove") {
+                
+            }
         }
     }
 }

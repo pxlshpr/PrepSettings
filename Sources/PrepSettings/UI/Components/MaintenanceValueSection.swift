@@ -20,7 +20,7 @@ struct MaintenanceValueSection: View {
     var body: some View {
         Section(footer: footer) {
             VStack {
-                topRow
+                picker
                 /// Conditionally show the bottom row, only if we have the value, so that we don't get shown the default source values for a split second during the removal animations.
                 if model.health.hasType(type) {
                     bottomRow
@@ -36,8 +36,8 @@ struct MaintenanceValueSection: View {
     }
 
     @ViewBuilder
-    var topRow: some View {
-        if model.hasAdaptiveMaintenanceEnergyValue {
+    var picker: some View {
+        if model.hasCalculatedMaintenance {
             Picker("", selection: $model.maintenanceEnergyIsAdaptive) {
                 Text("Adaptive").tag(true)
                 Text("Estimated").tag(false)
@@ -62,7 +62,7 @@ struct MaintenanceValueSection: View {
     }
     
     var showAdaptive: Bool {
-        model.hasAdaptiveMaintenanceEnergyValue
+        model.health.isUsingCalculatedMaintenance
     }
     
     var calculatedTag: some View {
@@ -139,7 +139,7 @@ struct MaintenanceValueSection: View {
         
         @ViewBuilder
         var content: some View {
-            if !model.hasAdaptiveMaintenanceEnergyValue {
+            if !model.health.isUsingCalculatedMaintenance {
                 if model.isSettingMaintenanceFromHealthKit {
                     loadingContent
                 } else if let message = model.health.tdeeRequiredString {
