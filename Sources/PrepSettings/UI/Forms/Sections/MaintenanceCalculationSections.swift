@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-struct MaintenanceCalculatedSection: View {
+struct MaintenanceAdaptiveSection: View {
     
     enum Route {
         case calculation
@@ -39,7 +39,7 @@ struct MaintenanceCalculatedSection: View {
         .navigationDestination(for: Route.self) { route in
             switch route {
             case .calculation:
-                MaintenanceCalculateView(model)
+                MaintenanceAdaptiveForm(model)
                     .environment(settingsStore)
             }
         }
@@ -84,7 +84,7 @@ struct MaintenanceCalculatedSection: View {
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .calculation:
-                    MaintenanceCalculateView(model)
+                    MaintenanceAdaptiveForm(model)
                         .environment(settingsStore)
                 }
             }
@@ -94,7 +94,7 @@ struct MaintenanceCalculatedSection: View {
     @ViewBuilder
     var errorRow: some View {
         if let error = model.health.maintenance?.adaptive.error {
-            MaintenanceCalculationErrorCell(error)
+            MaintenanceAdaptiveErrorCell(error)
         }
     }
 }

@@ -4,7 +4,7 @@ import PrepShared
 /// [ ] If there is no weight data—show "
 /// [ ] When this is the first time user is using this, let them
 /// [ ] Always give the user
-struct MaintenanceCalculationErrorCell: View {
+struct MaintenanceAdaptiveErrorCell: View {
     
     let error: MaintenanceCalculationError
     

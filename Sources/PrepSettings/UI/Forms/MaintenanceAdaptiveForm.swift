@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-struct MaintenanceCalculateView: View {
+struct MaintenanceAdaptiveForm: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
 
@@ -23,15 +23,8 @@ struct MaintenanceCalculateView: View {
                 Color.clear
             }
         }
-//        .navigationTitle("Adaptive")
-//        .navigationTitle("Maintenance Energy")
-        .navigationTitle("Calculated Maintenance")
-//        .navigationTitle("Calculation")
-//        .navigationTitle("Adaptive Calculation")
-//        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("Adaptive Maintenance")
         .navigationBarTitleDisplayMode(.inline)
-//        .toolbar { toolbarContent }
-//        .navigationBarBackButtonHidden(isEditing)
         .onAppear(perform: appeared)
     }
     
@@ -44,6 +37,7 @@ struct MaintenanceCalculateView: View {
     var content: some View {
         List {
             section
+            fetchFromHealthKitSection
 //            daysSection
 //            weightSection
 //            dietaryEnergySection
@@ -58,6 +52,16 @@ struct MaintenanceCalculateView: View {
                 DietaryEnergySamplesList()
                     .environment(settingsStore)
                     .environment(healthModel)
+            }
+        }
+    }
+    
+    var fetchFromHealthKitSection: some View {
+        Section {
+            Button("Fetch Available Data") {
+                Task {
+                    try await healthModel.calculateAdaptiveMaintenance()
+                }
             }
         }
     }
@@ -324,7 +328,7 @@ let MockMaintenanceSamples: [MaintenanceSample] = [
     Text("Health Details")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                MaintenanceCalculateView(MockHealthModel)
+                MaintenanceAdaptiveForm(MockHealthModel)
                     .environment(SettingsStore.shared)
                     .onAppear {
                         SettingsStore.configureAsMock()

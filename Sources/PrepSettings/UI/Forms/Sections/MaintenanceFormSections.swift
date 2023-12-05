@@ -17,7 +17,7 @@ public struct MaintenanceFormSections: View {
     /// [ ] Have another section with a toggle to choose between "calculated" and "adaptive" when it has been set
     public var body: some View {
         Group {
-            MaintenanceCalculatedSection(model)
+            MaintenanceAdaptiveSection(model)
             MaintenanceEstimatedSection(model)
             MaintenanceValueSection(model)
             removeSection
@@ -27,7 +27,9 @@ public struct MaintenanceFormSections: View {
     var removeSection: some View {
         Section {
             Button("Remove") {
-                
+                withAnimation {
+                    model.remove(.maintenance)
+                }
             }
         }
     }

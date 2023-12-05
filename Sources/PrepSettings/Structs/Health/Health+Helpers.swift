@@ -78,8 +78,9 @@ extension Health {
         case .isSmoker:
             isSmoker = false
         case .maintenance:
-            maintenance?.estimated.restingEnergy = .init(source: .userEntered, value: 1600)
-            maintenance?.estimated.activeEnergy = .init(source: .userEntered, value: 400)
+            maintenance = .init(prefersAdaptive: true)
+//            maintenance?.estimated.restingEnergy = .init(source: .userEntered, value: 1600)
+//            maintenance?.estimated.activeEnergy = .init(source: .userEntered, value: 400)
         default:
             break
         }
