@@ -9,8 +9,8 @@ public enum HealthSource: Int16, Codable, CaseIterable {
 public extension HealthSource {
     var name: String {
         switch self {
-        case .healthKit:    "Health app"
-        case .userEntered:  "Entered manually"
+        case .healthKit:    "Apple Health"
+        case .userEntered:  "Custom"
         }
     }
     
@@ -26,4 +26,12 @@ extension HealthSource: Pickable {
     public var pickedTitle: String { name }
     public var menuTitle: String { name }
     public static var `default`: HealthSource { .userEntered }
+    public var description: String? {
+        switch self {
+        case .healthKit:
+            "Use the latest weight data from Apple Health"
+        case .userEntered:
+            "Use a custom entered value"
+        }
+    }
 }
