@@ -182,6 +182,7 @@ internal extension HealthStore {
         do {
             try await store.requestAuthorization(toShare: Set(), read: Set(readTypes))
         } catch {
+            /// This error is not thrown if permissions have been revoked
             throw HealthStoreError.permissionsError(error)
         }
     }
@@ -225,8 +226,9 @@ extension HealthStore {
         from startDate: Date,
         to endDate: Date
     ) async throws -> HKStatisticsCollection {
+        
+        /// Request for permissions. **Note:** an error is not thrown here is permissions are not granted/ later revoked.
         try await HealthStore.requestPermissions(quantityTypeIdentifiers: [typeIdentifier])
-//        try await requestPersmissions()
         
         /// Always get samples up to the start of the next day, so that we get all of `date`'s results too
         let endDate = endDate.startOfDay.moveDayBy(1)

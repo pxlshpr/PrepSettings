@@ -130,6 +130,9 @@ struct RestingEnergySections: View {
                     value: value,
                     unitString: settingsStore.energyUnit.abbreviation
                 )
+            } else {
+                Text("Not set")
+                    .foregroundStyle(.tertiary)
             }
         }
         

@@ -57,6 +57,7 @@ extension HealthKitEnergyRequest {
         }
         
         guard !sumQuantities.isEmpty else {
+            /// This indicates that there is no data—or permissions haven't been granted
             return nil
         }
         

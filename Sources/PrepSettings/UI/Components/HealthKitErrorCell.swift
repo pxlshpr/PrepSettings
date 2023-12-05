@@ -6,7 +6,8 @@ struct HealthKitErrorCell: View {
     var body: some View {
         HStack(alignment: .top) {
 //        HStack {
-            Image(systemName: "exclamationmark.triangle")
+//            Image(systemName: "exclamationmark.triangle")
+            Image(systemName: "info.circle")
                 .font(.system(size: 50))
                 .foregroundStyle(Color.accentColor)
             VStack(alignment: .leading) {
@@ -17,9 +18,9 @@ struct HealthKitErrorCell: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 location
-                Text(secondaryMessage)
-                    .font(.system(.callout))
-                    .foregroundStyle(Color(.secondaryLabel))
+//                Text(secondaryMessage)
+//                    .font(.system(.callout))
+//                    .foregroundStyle(Color(.secondaryLabel))
             }
         }
         .padding(.vertical, 10)
@@ -39,11 +40,13 @@ struct HealthKitErrorCell: View {
     }
     
     var heading: String {
-        "Data unavailable"
+//        "Data unavailable"
+        "No Data"
     }
     
     var message: String {
-        "Check that you have allowed Prep to read your \(type.abbreviation) in:"
+        "There is no \(type.abbreviation) data available. Check that you have allowed Prep to read it in:"
+//        "Check that you have allowed Prep to read your \(type.abbreviation) in:"
     }
     
     var secondaryMessage: String {
