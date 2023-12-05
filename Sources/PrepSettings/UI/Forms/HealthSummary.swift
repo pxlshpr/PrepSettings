@@ -43,7 +43,7 @@ public struct HealthSummary: View {
         Form {
             dateSection
             syncAllSection
-            content(for: .maintenanceEnergy)
+            content(for: .maintenance)
             content(for: .age)
             content(for: .sex)
             content(for: .height)
@@ -251,7 +251,7 @@ public struct HealthSummary: View {
                 HealthTopRow(type: .pregnancyStatus, model: model)
             case .isSmoker:
                 HealthTopRow(type: .isSmoker, model: model)
-            case .maintenanceEnergy:
+            case .maintenance:
                 MaintenanceFormSections(model)
                     .environment(settingsStore)
             default:

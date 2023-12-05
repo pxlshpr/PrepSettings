@@ -3,6 +3,33 @@ import PrepShared
 
 public extension Health {
     
+    var restingEnergy: RestingEnergy? {
+        get {
+            maintenance?.estimated.restingEnergy
+        }
+        set {
+            guard let newValue else {
+                maintenance = nil
+                return
+            }
+            maintenance?.estimated.restingEnergy = newValue
+        }
+    }
+    
+    
+    var activeEnergy: ActiveEnergy? {
+        get {
+            maintenance?.estimated.activeEnergy
+        }
+        set {
+            guard let newValue else {
+                maintenance = nil
+                return
+            }
+            maintenance?.estimated.activeEnergy = newValue
+        }
+    }
+    
     var tdeeRequiredString: String? {
         switch (restingEnergyValue, activeEnergyValue) {
         case (.some, .some): nil
@@ -22,7 +49,7 @@ public extension Health {
         case .fatPercentage:        fatPercentage != nil
         case .restingEnergy:        restingEnergy?.value != nil
         case .activeEnergy:         activeEnergy?.value != nil
-        case .maintenanceEnergy:    haveValue(for: .restingEnergy) && haveValue(for: .activeEnergy)
+        case .maintenance:    haveValue(for: .restingEnergy) && haveValue(for: .activeEnergy)
         case .pregnancyStatus:      pregnancyStatus != nil
         case .isSmoker:             isSmoker != nil
         }
@@ -50,9 +77,9 @@ extension Health {
             isSmoker = nil
         case .isSmoker:
             isSmoker = false
-        case .maintenanceEnergy:
-            restingEnergy = .init(source: .userEntered, value: 1600)
-            activeEnergy = .init(source: .userEntered, value: 400)
+        case .maintenance:
+            maintenance?.estimated.restingEnergy = .init(source: .userEntered, value: 1600)
+            maintenance?.estimated.activeEnergy = .init(source: .userEntered, value: 400)
         default:
             break
         }
@@ -60,9 +87,7 @@ extension Health {
     
     mutating func remove(_ type: HealthType) {
         switch type {
-        case .maintenanceEnergy:
-            restingEnergy = nil
-            activeEnergy = nil
+        case .maintenance: maintenance = nil
         case .sex:              sex = nil
         case .age:              age = nil
         case .weight:           weight = nil
@@ -79,7 +104,7 @@ extension Health {
 extension Health {
     func hasType(_ type: HealthType) -> Bool {
         switch type {
-        case .maintenanceEnergy:    restingEnergy != nil && activeEnergy != nil
+        case .maintenance:    restingEnergy != nil && activeEnergy != nil
         case .activeEnergy:         activeEnergy != nil
         case .restingEnergy:        restingEnergy != nil
         case .sex:                  sex != nil
@@ -96,7 +121,7 @@ extension Health {
     
     func hasValue(for type: HealthType) -> Bool {
         switch type {
-        case .maintenanceEnergy:    hasMaintenanceValue
+        case .maintenance:    hasMaintenanceValue
         case .restingEnergy:        restingEnergy?.value != nil
         case .activeEnergy:         activeEnergy?.value != nil
         case .sex:                  sex?.value != nil
@@ -111,10 +136,8 @@ extension Health {
     }
     
     var maintenanceValueInKcal: Double? {
-        if maintenanceEnergyIsAdaptive,
-           let value = maintenanceEnergy?.adaptiveValue,
-            maintenanceEnergy?.error == nil
-        {
+        if prefersAdaptiveMaintenance,
+           let value = maintenance?.value {
             value
         } else if let value = estimatedMaintenanceInKcal {
             value
@@ -131,7 +154,7 @@ extension Health {
     func summaryDetail(for type: HealthType) -> String? {
         
         switch type {
-        case .maintenanceEnergy:
+        case .maintenance:
             guard let value = maintenanceValue(in: SettingsStore.energyUnit) else { return nil }
             return "\(value.formattedEnergy) \(SettingsStore.energyUnit.abbreviation)"
 
@@ -186,18 +209,14 @@ extension Health {
         }
     }
     
-    var maintenance: Health.MaintenanceEnergy {
-        maintenanceEnergy ?? .init()
-    }
-    
     var isUsingCalculatedMaintenance: Bool {
-        maintenanceEnergyIsAdaptive
+        prefersAdaptiveMaintenance
         && hasCalculatedMaintenance
     }
     
     var hasCalculatedMaintenance: Bool {
-        maintenanceEnergy?.adaptiveValue != nil
-        && maintenanceEnergy?.error == nil
+        maintenance?.adaptive.value != nil
+        && maintenance?.adaptive.error == nil
     }
     
     var hasEstimatedMaintenance: Bool {

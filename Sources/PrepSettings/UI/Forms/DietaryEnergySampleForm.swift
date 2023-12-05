@@ -147,7 +147,7 @@ struct DietaryEnergySampleForm: View {
                 unitBinding: unitBinding,
                 valueBinding: binding,
                 focusedType: $focusedType,
-                healthType: .maintenanceEnergy /// placeholder that's not really needed for any function
+                healthType: .maintenance /// placeholder that's not really needed for any function
             )
         }
         
@@ -289,7 +289,7 @@ struct DietaryEnergySampleForm: View {
                 /// Give the text field some time to display before triggering the focus
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     if type == .userEntered {
-                        focusedType = .maintenanceEnergy
+                        focusedType = .maintenance
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             sendSelectAllTextAction()
                         }

@@ -73,8 +73,8 @@ struct MaintenanceCalculateView: View {
         }
     }
     
-    var maintenance: Health.MaintenanceEnergy {
-        healthModel.health.maintenanceEnergy ?? .init()
+    var maintenance: Health.Maintenance {
+        healthModel.health.maintenance ?? .init()
     }
     
     var date: Date {
@@ -92,7 +92,7 @@ struct MaintenanceCalculateView: View {
             HStack {
                 Text("Dietary Energy")
                 Spacer()
-                if let total = maintenance.dietaryEnergy.total {
+                if let total = maintenance.adaptive.dietaryEnergy.total {
                     Text("\(total.formattedEnergy) kcal")
                         .foregroundStyle(.secondary)
                 } else {
@@ -152,7 +152,7 @@ struct MaintenanceCalculateView: View {
         }
 
         var previousDate: Date {
-            maintenance.interval.startDate(with: date)
+            maintenance.adaptive.interval.startDate(with: date)
         }
         
         var samplesLink: some View {
@@ -164,8 +164,8 @@ struct MaintenanceCalculateView: View {
         return Group {
 //            Section(header: header, footer: footer) {
             Section(header: header) {
-                maintenance.weightChangeRow(bodyMassUnit: settingsStore.bodyMassUnit)
-                maintenance.equivalentEnergyRow(energyUnit: settingsStore.energyUnit)
+                maintenance.adaptive.weightChangeRow(bodyMassUnit: settingsStore.bodyMassUnit)
+                maintenance.adaptive.equivalentEnergyRow(energyUnit: settingsStore.energyUnit)
                 samplesLink
             }
         }
@@ -207,7 +207,7 @@ struct MaintenanceCalculateView: View {
             HStack {
                 Text("Weight Change")
                 Spacer()
-                maintenance.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
+                maintenance.adaptive.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
             }
         }
     }
@@ -235,7 +235,7 @@ struct MaintenanceCalculateView: View {
             HStack {
                 Text("Total Consumed")
                 Spacer()
-                if let total = maintenance.dietaryEnergy.total {
+                if let total = maintenance.adaptive.dietaryEnergy.total {
                     Text("\(total.formattedEnergy) kcal")
                         .foregroundStyle(.secondary)
                 } else {
@@ -274,7 +274,7 @@ struct MaintenanceCalculateView: View {
 //                        .fontWeight(.heavy)
 //                }
                 Spacer()
-                if let value = maintenance.adaptiveValue {
+                if let value = maintenance.adaptive.value {
                     LargeHealthValue(
                         value: value,
                         unitString: "\(settingsStore.energyUnit.abbreviation) / day"

@@ -27,7 +27,7 @@ struct MaintenanceCalculatedSection: View {
             HStack {
                 Text("Adaptive")
                 Spacer()
-                if let value = model.health.calculatedMaintenanceValue(in: settingsStore.energyUnit) {
+                if let value = model.health.adaptiveMaintenanceValue(in: settingsStore.energyUnit) {
                     Text("\(value.formattedEnergy) \(settingsStore.energyUnit.abbreviation)")
                         .foregroundStyle(.secondary)
                 } else {
@@ -93,7 +93,7 @@ struct MaintenanceCalculatedSection: View {
     
     @ViewBuilder
     var errorRow: some View {
-        if let error = model.health.maintenanceEnergy?.error {
+        if let error = model.health.maintenance?.adaptive.error {
             MaintenanceCalculationErrorCell(error)
         }
     }
@@ -105,7 +105,7 @@ struct MaintenanceCalculatedSection: View {
             NavigationStack {
 //                HealthSummary(model: MockHealthModel)
 //                    .environment(SettingsStore.shared)
-                HealthForm(MockHealthModel, [.maintenanceEnergy])
+                HealthForm(MockHealthModel, [.maintenance])
                     .environment(SettingsStore.shared)
             }
         }

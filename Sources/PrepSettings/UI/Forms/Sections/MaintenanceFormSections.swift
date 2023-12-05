@@ -40,7 +40,7 @@ public struct MaintenanceFormSections: View {
             NavigationStack {
 //                HealthSummary(model: MockHealthModel)
 //                    .environment(SettingsStore.shared)
-                HealthForm(MockHealthModel, [.maintenanceEnergy])
+                HealthForm(MockHealthModel, [.maintenance])
                     .environment(SettingsStore.shared)
             }
         }

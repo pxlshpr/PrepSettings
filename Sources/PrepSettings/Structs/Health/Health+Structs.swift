@@ -4,50 +4,121 @@ import PrepShared
 
 public extension Health {
     
-    struct MaintenanceEnergy: Hashable, Codable {
+    //MARK: New
+    struct Maintenance: Hashable, Codable {
+        public var adaptive: Adaptive
+        public var estimated: Estimated
+        public var prefersAdaptive: Bool
         
-        public var isAdaptive: Bool
-        public var adaptiveValue: Double?
-        public var error: MaintenanceCalculationError?
-        
-        public var interval: HealthInterval
-        public var weightChange: WeightChange
-        public var dietaryEnergy: DietaryEnergy
-
-        public init(isAdaptive: Bool = true) {
-            self.isAdaptive = isAdaptive
-            self.adaptiveValue = nil
-            self.error = nil
-            self.interval = DefaultMaintenanceEnergyInterval
-            self.weightChange = .init()
-            self.dietaryEnergy = .init()
-        }
-        
-        public init(
-            interval: HealthInterval,
-            weightChange: WeightChange,
-            dietaryEnergy: DietaryEnergy
-        ) {
-            self.isAdaptive = true
-            self.interval = interval
-            self.weightChange = weightChange
-            self.dietaryEnergy = dietaryEnergy
+        public struct Adaptive: Hashable, Codable {
+            public var interval: HealthInterval
+            public var weightChange: WeightChange
+            public var dietaryEnergy: DietaryEnergy
+            public var value: Double?
+            public var error: MaintenanceCalculationError?
             
-            let result = Self.calculate(
-                weightChange: weightChange,
-                dietaryEnergy: dietaryEnergy,
-                interval: interval
-            )
-            switch result {
-            case .success(let value):
-                self.adaptiveValue = value
+            public init() {
+                self.interval = DefaultMaintenanceEnergyInterval
+                self.weightChange = .init()
+                self.dietaryEnergy = .init()
+                self.value = nil
                 self.error = nil
-            case .failure(let error):
-                self.adaptiveValue = nil
-                self.error = error
+            }
+            
+            public init(
+                interval: HealthInterval,
+                weightChange: WeightChange,
+                dietaryEnergy: DietaryEnergy
+            ) {
+                self.interval = interval
+                self.weightChange = weightChange
+                self.dietaryEnergy = dietaryEnergy
+                
+                let result = Self.calculate(
+                    weightChange: weightChange,
+                    dietaryEnergy: dietaryEnergy,
+                    interval: interval
+                )
+                switch result {
+                case .success(let value):
+                    self.value = value
+                    self.error = nil
+                case .failure(let error):
+                    self.value = nil
+                    self.error = error
+                }
             }
         }
+        
+        public struct Estimated: Hashable, Codable {
+            public var restingEnergy: RestingEnergy
+            public var activeEnergy: ActiveEnergy
+            public var value: Double?
+            
+            public init() {
+                self.restingEnergy = .init(source: .default)
+                self.activeEnergy = .init(source: .default)
+                self.value = nil
+            }
+        }
+        
+        public var value: Double? {
+            guard prefersAdaptive else { return estimated.value }
+            return adaptive.value ?? estimated.value
+        }
+        
+        public init(prefersAdaptive: Bool = true) {
+            self.adaptive = Adaptive()
+            self.estimated = Estimated()
+            self.prefersAdaptive = prefersAdaptive
+        }
     }
+    
+    //MARK: Legacy
+//    struct MaintenanceEnergy: Hashable, Codable {
+//        
+//        public var isAdaptive: Bool
+//        public var adaptiveValue: Double?
+//        public var error: MaintenanceCalculationError?
+//        
+//        public var interval: HealthInterval
+//        public var weightChange: WeightChange
+//        public var dietaryEnergy: DietaryEnergy
+//
+//        public init(isAdaptive: Bool = true) {
+//            self.isAdaptive = isAdaptive
+//            self.adaptiveValue = nil
+//            self.error = nil
+//            self.interval = DefaultMaintenanceEnergyInterval
+//            self.weightChange = .init()
+//            self.dietaryEnergy = .init()
+//        }
+//        
+//        public init(
+//            interval: HealthInterval,
+//            weightChange: WeightChange,
+//            dietaryEnergy: DietaryEnergy
+//        ) {
+//            self.isAdaptive = true
+//            self.interval = interval
+//            self.weightChange = weightChange
+//            self.dietaryEnergy = dietaryEnergy
+//            
+//            let result = Self.calculate(
+//                weightChange: weightChange,
+//                dietaryEnergy: dietaryEnergy,
+//                interval: interval
+//            )
+//            switch result {
+//            case .success(let value):
+//                self.adaptiveValue = value
+//                self.error = nil
+//            case .failure(let error):
+//                self.adaptiveValue = nil
+//                self.error = error
+//            }
+//        }
+//    }
     
     struct RestingEnergy: Hashable, Codable {
         public var source: RestingEnergySource

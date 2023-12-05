@@ -5,10 +5,10 @@ public extension HealthModel {
     
     //MARK: Energy Burn
     var maintenanceEnergyIsAdaptive: Bool {
-        get { health.maintenanceEnergyIsAdaptive }
+        get { health.prefersAdaptiveMaintenance }
         set {
             withAnimation {
-                health.maintenanceEnergyIsAdaptive = newValue
+                health.prefersAdaptiveMaintenance = newValue
             }
             Task {
 //                await MainActor.run {
@@ -19,11 +19,11 @@ public extension HealthModel {
                 if newValue {
 //                    try await calculateAdaptiveMaintenance()
                 } else {
-                    await MainActor.run {
-                        withAnimation {
-                            health.maintenanceEnergy?.error = nil
-                        }
-                    }
+//                    await MainActor.run {
+//                        withAnimation {
+//                            health.maintenanceEnergy?.error = nil
+//                        }
+//                    }
                 }
             }
         }
@@ -40,12 +40,12 @@ public extension HealthModel {
     }
 
     var maintenanceWeightChangeDelta: Double? {
-        get { health.maintenanceEnergy?.weightChange.delta }
+        get { health.maintenance?.adaptive.weightChange.delta }
         set {
             Task {
                 await MainActor.run {
                     withAnimation {
-                        health.maintenanceEnergy?.weightChange.delta = newValue
+                        health.maintenance?.adaptive.weightChange.delta = newValue
                     }
                 }
                 
@@ -55,20 +55,20 @@ public extension HealthModel {
     }
     
     var maintenanceWeightChangeType: WeightChangeType {
-        get { health.maintenanceEnergy?.weightChange.type ?? .usingWeights }
+        get { health.maintenance?.adaptive.weightChange.type ?? .usingWeights }
         set {
             Task {
                 await MainActor.run {
                     withAnimation {
-                        health.maintenanceEnergy?.weightChange.type = newValue
+                        health.maintenance?.adaptive.weightChange.type = newValue
                     }
                 }
                 
                 switch newValue {
                 case .userEntered:
                     /// Reset the weight samples
-                    health.maintenanceEnergy?.weightChange.current = .init()
-                    health.maintenanceEnergy?.weightChange.previous = .init()
+                    health.maintenance?.adaptive.weightChange.current = .init()
+                    health.maintenance?.adaptive.weightChange.previous = .init()
                 case .usingWeights:
                     break
                 }

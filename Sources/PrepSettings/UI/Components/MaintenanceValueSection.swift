@@ -10,7 +10,7 @@ struct MaintenanceValueSection: View {
 
     @Environment(\.colorScheme) var colorScheme
 
-    let type = HealthType.maintenanceEnergy
+    let type = HealthType.maintenance
     @Bindable var model: HealthModel
 
     init(_ model: HealthModel) {
@@ -32,7 +32,7 @@ struct MaintenanceValueSection: View {
     }
     
     var footer: some View {
-        Text(HealthType.maintenanceEnergy.reason!)
+        Text(HealthType.maintenance.reason!)
     }
 
     @ViewBuilder
@@ -95,7 +95,7 @@ struct MaintenanceValueSection: View {
     
     var verticalAlignment: VerticalAlignment {
         switch type {
-        case .maintenanceEnergy:
+        case .maintenance:
             model.isSettingMaintenanceFromHealthKit ? .center : .firstTextBaseline
         default:
             .firstTextBaseline
@@ -126,8 +126,8 @@ struct MaintenanceValueSection: View {
         
         var value: Double {
             if model.maintenanceEnergyIsAdaptive,
-               let value = model.health.maintenanceEnergy?.adaptiveValue,
-                model.health.maintenanceEnergy?.error == nil
+               let value = model.health.maintenance?.adaptive.value,
+               model.health.maintenance?.adaptive.error == nil
             {
                 value
             } else if let value = model.health.estimatedMaintenance(in: settingsStore.energyUnit) {

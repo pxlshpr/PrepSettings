@@ -16,9 +16,9 @@ struct DietaryEnergySamplesList: View {
     
     var samplesSection: some View {
         Section {
-            ForEach(0..<maintenance.dietaryEnergy.samples.count, id: \.self) {
+            ForEach(0..<maintenance.adaptive.dietaryEnergy.samples.count, id: \.self) {
                 dietaryEnergyCell(
-                    sample: maintenance.dietaryEnergy.samples[$0],
+                    sample: maintenance.adaptive.dietaryEnergy.samples[$0],
                     date: DietaryEnergy.dateForSample(at: $0, for: date)
                 )
             }
@@ -49,8 +49,8 @@ struct DietaryEnergySamplesList: View {
         }
     }
     
-    var maintenance: Health.MaintenanceEnergy {
-        healthModel.health.maintenanceEnergy ?? .init()
+    var maintenance: Health.Maintenance {
+        healthModel.health.maintenance ?? .init()
     }
     
     var date: Date {

@@ -5,18 +5,14 @@ import PrepShared
 public extension Health {
     
     //MARK: Energy Burn
-    var maintenanceEnergyIsAdaptive: Bool {
-        get { maintenanceEnergy?.isAdaptive ?? false }
+    var prefersAdaptiveMaintenance: Bool {
+        get { maintenance?.prefersAdaptive ?? false }
         set {
-            guard maintenanceEnergy != nil else {
-                maintenanceEnergy = .init(isAdaptive: newValue)
+            guard maintenance != nil else {
+                maintenance = .init(prefersAdaptive: newValue)
                 return
             }
-            maintenanceEnergy?.isAdaptive = newValue
-            /// If we've turned it off, clear the previous value
-//            if !newValue {
-//                maintenanceEnergy?.adaptiveValue = nil
-//            }
+            maintenance?.prefersAdaptive = newValue
         }
     }
     
@@ -311,8 +307,8 @@ public extension Health {
         }
     }
 
-    func calculatedMaintenanceValue(in unit: EnergyUnit) -> Double? {
-        guard let value = maintenance.adaptiveValue else { return nil }
+    func adaptiveMaintenanceValue(in unit: EnergyUnit) -> Double? {
+        guard let value = maintenance?.adaptive.value else { return nil }
         return EnergyUnit.kcal.convert(value, to: unit)
     }
 

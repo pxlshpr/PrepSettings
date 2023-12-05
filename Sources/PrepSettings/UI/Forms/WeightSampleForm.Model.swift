@@ -229,7 +229,7 @@ extension HealthModel {
             get: { self.intervalValue },
             set: { newValue in
                 withAnimation {
-                    self.health.maintenanceEnergy?.interval = .init(newValue, self.intervalPeriod)
+                    self.health.maintenance?.adaptive.interval = .init(newValue, self.intervalPeriod)
                 }
                 Task {
                     try await self.calculateAdaptiveMaintenance()
@@ -250,7 +250,7 @@ extension HealthModel {
                     default:
                         break
                     }
-                    self.health.maintenanceEnergy?.interval = .init(value, newValue)
+                    self.health.maintenance?.adaptive.interval = .init(value, newValue)
                 }
                 Task {
                     try await self.calculateAdaptiveMaintenance()
@@ -259,8 +259,8 @@ extension HealthModel {
         )
     }
     
-    var maintenance: Health.MaintenanceEnergy {
-        health.maintenance
+    var maintenance: Health.Maintenance {
+        health.maintenance ?? .init()
     }
     
     var hasCalculatedMaintenance: Bool {
@@ -276,10 +276,10 @@ extension HealthModel {
     }
     
     var intervalPeriod: HealthPeriod {
-        maintenance.interval.period
+        maintenance.adaptive.interval.period
     }
 
     var intervalValue: Int {
-        maintenance.interval.value
+        maintenance.adaptive.interval.value
     }
 }

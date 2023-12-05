@@ -2,7 +2,7 @@ import Foundation
 import PrepShared
 
 public enum HealthType: CaseIterable {
-    case maintenanceEnergy
+    case maintenance
     case restingEnergy
     case activeEnergy
     case sex
@@ -18,7 +18,7 @@ public enum HealthType: CaseIterable {
 public extension HealthType {
     static var summaryTypes: [HealthType] {
         [
-            .maintenanceEnergy,
+            .maintenance,
             .age,
             .sex,
             .height,
@@ -52,7 +52,7 @@ public extension HealthType {
     
     var abbreviation: String {
         switch self {
-        case .maintenanceEnergy:    "maintenance energy"
+        case .maintenance:    "maintenance energy"
         case .restingEnergy:        "resting energy"
         case .activeEnergy:         "active energy"
         case .sex:                  "biological sex"
@@ -68,7 +68,7 @@ public extension HealthType {
     
     var name: String {
         switch self {
-        case .maintenanceEnergy:    "Maintenance Energy"
+        case .maintenance:    "Maintenance Energy"
         case .restingEnergy:        "Resting Energy"
         case .activeEnergy:         "Active Energy"
         case .sex:                  "Biological Sex"
@@ -121,7 +121,7 @@ extension HealthType {
             "The estimated energy you burn when your body is completely at rest."
         case .activeEnergy:
             "The estimated energy you burn while being active."
-        case .maintenanceEnergy:
+        case .maintenance:
 //            "Your daily energy burn is used in energy goals targeting a desired weight change."
             "The daily energy needed to maintain your weight. Used to create relative energy goals."
         case .sex:

@@ -25,7 +25,7 @@ struct HealthTopRow: View {
     
     var verticalAlignment: VerticalAlignment {
         switch type {
-        case .maintenanceEnergy:
+        case .maintenance:
             model.isSettingMaintenanceFromHealthKit ? .center : .firstTextBaseline
         default:
             .firstTextBaseline

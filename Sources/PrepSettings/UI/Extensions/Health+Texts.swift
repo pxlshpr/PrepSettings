@@ -15,7 +15,7 @@ struct HealthTexts {
         self.bodyMassUnit = settingsStore.bodyMassUnit
     }
     
-    var maintenanceEnergy: Health.MaintenanceEnergy? { health.maintenanceEnergy }
+    var maintenance: Health.Maintenance? { health.maintenance }
     var restingEnergy: Health.RestingEnergy? { health.restingEnergy }
     var activeEnergy: Health.ActiveEnergy? { health.activeEnergy }
     var weight: HealthQuantity? { health.weight }
@@ -69,7 +69,7 @@ struct HealthTexts {
         case .fatPercentage:        fatPercentageText
         case .restingEnergy:        restingEnergyText
         case .activeEnergy:         activeEnergyText
-        case .maintenanceEnergy:    maintenanceText
+        case .maintenance:    maintenanceText
         case .pregnancyStatus:      pregnancyStatusText
         case .isSmoker:             isSmokerText
         default:                    EmptyView()

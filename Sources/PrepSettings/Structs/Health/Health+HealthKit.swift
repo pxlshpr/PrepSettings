@@ -25,8 +25,10 @@ public extension Health {
         case .sex:              sexValue = value?.sex
         case .age:              ageHealthKitDateComponents = value?.dateComponents
 
-        case .maintenanceEnergy:
-            maintenanceEnergy = value?.maintenanceEnergy
+        case .maintenance:
+            if let adaptiveMaintenance = value?.adaptiveMaintenance {
+                maintenance?.adaptive = adaptiveMaintenance
+            }
 
         default:                break
         }

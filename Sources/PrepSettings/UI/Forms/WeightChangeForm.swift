@@ -47,8 +47,8 @@ struct WeightChangeForm: View {
     var weightsSections: some View {
         if type == .usingWeights {
             Section("Weights") {
-                weightCell(sample: maintenance.weightChange.current, isPrevious: false)
-                weightCell(sample: maintenance.weightChange.previous, isPrevious: true)
+                weightCell(sample: maintenance.adaptive.weightChange.current, isPrevious: false)
+                weightCell(sample: maintenance.adaptive.weightChange.previous, isPrevious: true)
             }
         }
     }
@@ -63,7 +63,7 @@ struct WeightChangeForm: View {
                 Spacer()
                 switch type {
                 case .usingWeights:
-                    maintenance.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
+                    maintenance.adaptive.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
                 case .userEntered:
                     textField
                 }
@@ -107,7 +107,7 @@ struct WeightChangeForm: View {
                 unitBinding: unitBinding,
                 valueBinding: valueBinding,
                 focusedType: $focusedType,
-                healthType: .maintenanceEnergy
+                healthType: .maintenance
             )
         }
         
@@ -177,7 +177,7 @@ struct WeightChangeForm: View {
             if type == .usingWeights {
                 focusedType = nil
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    healthModel.health.maintenanceEnergy?.weightChange.calculateDelta()
+                    healthModel.health.maintenance?.adaptive.weightChange.calculateDelta()
                 }
             }
             
@@ -191,7 +191,7 @@ struct WeightChangeForm: View {
             if type == .userEntered {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     /// Set focus to text field after a delay if we select "custom"
-                    focusedType = .maintenanceEnergy
+                    focusedType = .maintenance
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         sendSelectAllTextAction()
                     }
@@ -265,11 +265,11 @@ struct WeightChangeForm: View {
     }
     
     var previousDate: Date {
-        maintenance.interval.startDate(with: currentDate)
+        maintenance.adaptive.interval.startDate(with: currentDate)
     }
 
-    var maintenance: Health.MaintenanceEnergy {
-        healthModel.health.maintenanceEnergy ?? .init()
+    var maintenance: Health.Maintenance {
+        healthModel.health.maintenance ?? .init()
     }
 }
 

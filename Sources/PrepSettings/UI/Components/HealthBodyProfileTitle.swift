@@ -10,7 +10,7 @@ struct HealthBodyProfileTitle: View {
     
     @ViewBuilder
     var body: some View {
-        if model.health.hasType(.maintenanceEnergy) {
+        if model.health.hasType(.maintenance) {
             content
                 .padding(.top)
         } else {

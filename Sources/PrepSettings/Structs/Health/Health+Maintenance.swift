@@ -6,8 +6,8 @@ public let DefaultWeightMovingAverageInterval: HealthInterval = .init(1, .week)
 
 extension Health {
     var dateRangeForMaintenanceBackendValues: ClosedRange<Date> {
-        let interval = maintenanceEnergy?.interval ?? DefaultMaintenanceEnergyInterval
-        let previousWeightMovingAverageInterval = maintenanceEnergy?.weightChange.previous.movingAverageInterval ?? DefaultWeightMovingAverageInterval
+        let interval = maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval
+        let previousWeightMovingAverageInterval = maintenance?.adaptive.weightChange.previous.movingAverageInterval ?? DefaultWeightMovingAverageInterval
         
         let intervalStartDate = interval.startDate(with: date)
         let movingAverageStartDate = previousWeightMovingAverageInterval.startDate(with: intervalStartDate)
@@ -15,7 +15,7 @@ extension Health {
     }
 
     var dateRangeForMaintenanceCalculation: ClosedRange<Date> {
-        let interval = maintenanceEnergy?.interval ?? DefaultMaintenanceEnergyInterval
+        let interval = maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval
         let intervalStartDate = interval.startDate(with: date)
         return intervalStartDate...date
     }
@@ -98,7 +98,30 @@ extension Health {
 //    }
 //}
 
-extension Health.MaintenanceEnergy {
+//extension Health.MaintenanceEnergy {
+//    static func calculate(
+//        weightChange: WeightChange,
+//        dietaryEnergy: DietaryEnergy,
+//        interval: HealthInterval
+//    ) -> Result<Double, MaintenanceCalculationError> {
+//        
+//        guard let weightDeltaInKcal = weightChange.deltaEnergyEquivalentInKcal,
+//              let dietaryEnergyTotal = dietaryEnergy.total //TODO: Handle kcal/kj
+//        else {
+//            return switch (weightChange.isEmpty, dietaryEnergy.isEmpty) {
+//            case (true, false): .failure(.noWeightData)
+//            case (false, true): .failure(.noNutritionData)
+//            default:            .failure(.noWeightOrNutritionData)
+//            }
+//        }
+//        
+//        let value = (dietaryEnergyTotal - weightDeltaInKcal) / Double(interval.numberOfDays)
+//        
+//        return .success(value)
+//    }
+//}
+
+extension Health.Maintenance.Adaptive {
     static func calculate(
         weightChange: WeightChange,
         dietaryEnergy: DietaryEnergy,

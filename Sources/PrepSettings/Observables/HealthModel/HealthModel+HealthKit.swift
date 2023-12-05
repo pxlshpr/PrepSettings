@@ -90,13 +90,8 @@ public extension HealthModel {
         case .sex:              .sex(.male)
         case .age:              .age(DefaultDateOfBirth.dateComponentsWithoutTime)
         
-        case .maintenanceEnergy:
-                .maintenanceEnergy(Health.MaintenanceEnergy(isAdaptive: true))
-//            if [1, 2].randomElement() == 1 {
-//                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 0, error: .noWeightData))
-//            } else {
-//                .maintenanceEnergy(Health.MaintenanceEnergy(adaptiveValue: 2693, error: nil))
-//            }
+        case .maintenance:
+                .adaptiveMaintenance(Health.Maintenance.Adaptive())
 
         default: nil
         }
@@ -119,7 +114,7 @@ public extension HealthModel {
         case .age: return .age(
             try await HealthStore.dateOfBirthComponents()
         )
-        case .maintenanceEnergy:
+        case .maintenance:
             //TODO: Revisit this
             return nil
 //            guard let maintenance = try await health.calculate() else {
@@ -182,9 +177,9 @@ public extension HealthModel {
     }
     
     var isSettingMaintenanceFromHealthKit: Bool {
-        if health.maintenanceEnergyIsAdaptive, isSettingTypeFromHealthKit(.maintenanceEnergy) {
+        if health.prefersAdaptiveMaintenance, isSettingTypeFromHealthKit(.maintenance) {
             return true
-        } else if !(health.maintenanceEnergyIsAdaptive && health.maintenanceEnergy?.adaptiveValue != nil) {
+        } else if !(health.prefersAdaptiveMaintenance && health.maintenance?.adaptive.value != nil) {
             return isSettingTypeFromHealthKit(.restingEnergy) || isSettingTypeFromHealthKit(.activeEnergy)
         }
         return false

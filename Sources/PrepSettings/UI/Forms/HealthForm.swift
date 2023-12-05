@@ -84,7 +84,7 @@ public struct HealthForm: View {
                 HealthTopRow(type: .pregnancyStatus, model: model)
             case .isSmoker:
                 HealthTopRow(type: .isSmoker, model: model)
-            case .maintenanceEnergy:
+            case .maintenance:
                 MaintenanceFormSections(model)
                     .environment(settingsStore)
             case .restingEnergy:
