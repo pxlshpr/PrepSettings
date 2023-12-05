@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-public struct MaintenanceEstimateSection: View {
+public struct MaintenanceEstimatedSection: View {
     
     enum Route {
         case estimate
@@ -9,8 +9,12 @@ public struct MaintenanceEstimateSection: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
 
-    @Environment(HealthModel.self) var model: HealthModel
+    @Bindable var model: HealthModel
 
+    init(_ model: HealthModel) {
+        self.model = model
+    }
+    
     public var body: some View {
         Section(footer: footer) {
             NavigationLink(value: Route.estimate) {

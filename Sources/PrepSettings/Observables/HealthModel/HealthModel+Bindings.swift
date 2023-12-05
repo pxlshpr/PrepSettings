@@ -7,12 +7,15 @@ public extension HealthModel {
     var maintenanceEnergyIsAdaptive: Bool {
         get { health.maintenanceEnergyIsAdaptive }
         set {
+            withAnimation {
+                health.maintenanceEnergyIsAdaptive = newValue
+            }
             Task {
-                await MainActor.run {
-                    withAnimation {
-                        health.maintenanceEnergyIsAdaptive = newValue
-                    }
-                }
+//                await MainActor.run {
+//                    withAnimation {
+//                        health.maintenanceEnergyIsAdaptive = newValue
+//                    }
+//                }
                 if newValue {
                     try await calculateAdaptiveMaintenance()
                 } else {
@@ -228,7 +231,7 @@ public extension HealthModel {
 //        set { health.maintenanceEnergyAdaptiveValue = newValue }
 //    }
 //
-//    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
+//    var maintenanceEnergyAdaptiveError: MaintenanceCalculationError? {
 //        get { health.maintenanceEnergyAdaptiveError }
 //        set { health.maintenanceEnergyAdaptiveError = newValue }
 //    }

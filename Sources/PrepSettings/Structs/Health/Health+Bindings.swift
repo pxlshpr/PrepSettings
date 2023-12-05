@@ -282,7 +282,7 @@ public extension Health {
 //        }
 //    }
 //    
-//    var maintenanceEnergyAdaptiveError: AdaptiveMaintenanceError? {
+//    var maintenanceEnergyAdaptiveError: MaintenanceCalculationError? {
 //        get { maintenanceEnergy?.error }
 //        set {
 //            guard maintenanceEnergy != nil else {
@@ -310,7 +310,12 @@ public extension Health {
             activeEnergy?.value = newValue
         }
     }
-    
+
+    func calculatedMaintenanceValue(in unit: EnergyUnit) -> Double? {
+        guard let value = maintenance.adaptiveValue else { return nil }
+        return EnergyUnit.kcal.convert(value, to: unit)
+    }
+
     func restingEnergyValue(in unit: EnergyUnit) -> Double? {
         guard let restingEnergyValue else { return nil }
         return EnergyUnit.kcal.convert(restingEnergyValue, to: unit)

@@ -11,11 +11,15 @@ public struct MaintenanceFormSections: View {
         self.model = model
     }
 
+    /// [ ] Remove minus button
+    /// [ ] Have estimated and "Calculated" as two separate rows
+    /// [ ] Calculated should just say "Not set" when not set
+    /// [ ] Have another section with a toggle to choose between "calculated" and "adaptive" when it has been set
     public var body: some View {
         Group {
-            MaintenanceCalculationSection(model)
-            MaintenanceEstimateSection()
-                .environment(model)
+            MaintenanceCalculatedSection(model)
+            MaintenanceEstimatedSection(model)
+            MaintenanceValueSection(model)
         }
     }
 }
@@ -25,7 +29,9 @@ public struct MaintenanceFormSections: View {
     Text("")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                HealthSummary(model: MockHealthModel)
+//                HealthSummary(model: MockHealthModel)
+//                    .environment(SettingsStore.shared)
+                HealthForm(MockHealthModel, [.maintenanceEnergy])
                     .environment(SettingsStore.shared)
             }
         }

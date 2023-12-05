@@ -7,7 +7,7 @@ public extension Health {
     struct MaintenanceEnergy: Hashable, Codable {
         public var isAdaptive: Bool
         public var adaptiveValue: Double?
-        public var error: AdaptiveMaintenanceError?
+        public var error: MaintenanceCalculationError?
         
         public var interval: HealthInterval
         public var weightChange: WeightChange

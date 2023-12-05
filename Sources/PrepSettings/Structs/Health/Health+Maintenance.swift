@@ -103,7 +103,7 @@ extension Health.MaintenanceEnergy {
         weightChange: WeightChange,
         dietaryEnergy: DietaryEnergy,
         interval: HealthInterval
-    ) -> Result<Double, AdaptiveMaintenanceError> {
+    ) -> Result<Double, MaintenanceCalculationError> {
         
         guard let weightDeltaInKcal = weightChange.deltaEnergyEquivalentInKcal,
               let dietaryEnergyTotal = dietaryEnergy.total //TODO: Handle kcal/kj
