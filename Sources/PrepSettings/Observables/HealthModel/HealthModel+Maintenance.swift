@@ -36,6 +36,7 @@ extension HealthModel {
         let maintenance = health.maintenance ?? .init()
         var weightChange = maintenance.adaptive.weightChange
         weightChange.setValues(values, health.date, maintenance.adaptive.interval)
+        weightChange.calculateDelta()
         return weightChange
     }
     
