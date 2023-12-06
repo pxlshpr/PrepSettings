@@ -29,7 +29,9 @@ extension HealthSource: Pickable {
     public var description: String? {
         switch self {
         case .healthKit:
-            "Use the latest weight data from Apple Health"
+//            "Use the latest weight data from Apple Health"
+//            "Use the most recent weight data from Apple Health"
+            "Use weight data from Apple Health"
         case .userEntered:
             "Use a custom entered value"
         }
