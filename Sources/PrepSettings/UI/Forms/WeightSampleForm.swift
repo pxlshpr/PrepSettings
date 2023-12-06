@@ -38,7 +38,7 @@ struct WeightSampleForm: View {
     
     var body: some View {
         Form {
-            HealthWeightSections(
+            WeightSections(
                 sample: model.sample,
                 date: model.date,
                 healthModel: healthModel,

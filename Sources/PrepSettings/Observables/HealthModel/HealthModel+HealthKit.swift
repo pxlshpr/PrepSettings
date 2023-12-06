@@ -57,11 +57,7 @@ public extension HealthModel {
         await showProgressBar()
         
         /// Get the value here
-        let value = if isPreview {
-            try await previewValue(for: type)
-        } else {
-            try await healthKitValue(for: type)
-        }
+        let value = try await healthKitValue(for: type)
         
         /// If this isn't the current model (ie, a past one), don't clear out the value if its not available so that we preserve the validity of goals in plans as a priority
         if !isCurrent { guard value != nil else { return } }
@@ -98,6 +94,11 @@ public extension HealthModel {
     }
 
     func healthKitValue(for type: HealthType) async throws -> HealthKitValue? {
+        
+        guard !isPreview else {
+            return try await previewValue(for: type)
+        }
+
         switch type {
         case .weight: return .weight(
             try await HealthStore.latestDaysWeights(in: .kg, for: health.date)

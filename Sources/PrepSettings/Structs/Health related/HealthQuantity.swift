@@ -2,10 +2,16 @@ import Foundation
 
 public struct HealthQuantity: Hashable, Codable {
     public var source: HealthSource
+    public var isDailyAverage: Bool
     public var quantity: Quantity?
     
-    public init(source: HealthSource, quantity: Quantity? = nil) {
+    public init(
+        source: HealthSource,
+        isDailyAverage: Bool = false,
+        quantity: Quantity? = nil
+    ) {
         self.source = source
+        self.isDailyAverage = isDailyAverage
         self.quantity = quantity
     }
 }

@@ -1,6 +1,7 @@
 import SwiftUI
 import PrepShared
 
+let LargeNumberFont = Font.system(.largeTitle, design: .monospaced, weight: .bold)
 struct HealthNumberField<Unit: HealthUnit>: View {
     
     let unitBinding: Binding<Unit>
@@ -27,28 +28,35 @@ struct HealthNumberField<Unit: HealthUnit>: View {
     }
     
     var body: some View {
-        HStack {
+        HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
             switch unitBinding.wrappedValue.hasTwoComponents {
             case true:
                 NumberField(
                     placeholder: "Required",
-                    binding: firstComponentBinding
+                    binding: firstComponentBinding,
+                    font: LargeNumberFont
                 )
                 .focused(focusedType, equals: healthType)
+
                 unitView
+                
                 NumberField(
                     placeholder: "",
-                    binding: secondComponentBinding
+                    binding: secondComponentBinding,
+                    font: LargeNumberFont
                 )
+                
                 /// only pass the isFocusedBinding to first component
                 if let string = Unit.secondaryUnit {
                     Text(string)
                         .foregroundStyle(.secondary)
+                        .font(.system(.body, design: .default, weight: .semibold))
                 }
             case false:
                 NumberField(
                     placeholder: "Required",
-                    binding: valueBinding
+                    binding: valueBinding,
+                    font: LargeNumberFont
                 )
                 .focused(focusedType, equals: healthType)
                 unitView
@@ -62,6 +70,7 @@ struct HealthNumberField<Unit: HealthUnit>: View {
         
         Text(unitBinding.wrappedValue.abbreviation)
             .foregroundStyle(.secondary)
+            .font(.system(.body, design: .default, weight: .semibold))
     }
 }
 

@@ -240,7 +240,7 @@ public struct HealthSummary: View {
             case .age:
                 HealthAgeSection(model, $focusedType)
             case .weight:
-                HealthWeightSections(
+                WeightSections(
                     healthModel: model,
                     settingsStore: settingsStore,
                     focusedType: $focusedType
