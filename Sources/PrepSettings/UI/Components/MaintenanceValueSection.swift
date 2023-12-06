@@ -115,6 +115,7 @@ struct MaintenanceValueSection: View {
         func valueContent(_ value: Double) -> some View {
             LargeHealthValue(
                 value: value,
+                valueString: value.formattedEnergy,
                 unitString: settingsStore.energyUnit.abbreviation
             )
         }

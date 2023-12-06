@@ -82,7 +82,7 @@ public extension HealthModel {
     func previewValue(for type: HealthType) async throws -> HealthKitValue? {
         try await sleepTask(1.0)
         return switch type {
-        case .weight:           .weight(.init(value: 83, date: Date.now.movingHourBy(-3)))
+        case .weight:           .weight([.init(value: 83, date: Date.now.movingHourBy(-3))])
         case .height:           .height(.init(value: 175, date: Date.now.moveDayBy(-1)))
         case .leanBodyMass:     .leanBodyMass(.init(value: 67, date: Date.now.movingHourBy(-3)))
         case .restingEnergy:    .restingEnergy(1600)
@@ -100,7 +100,7 @@ public extension HealthModel {
     func healthKitValue(for type: HealthType) async throws -> HealthKitValue? {
         switch type {
         case .weight: return .weight(
-            try await HealthStore.weight(in: .kg, for: health.date)
+            try await HealthStore.latestDaysWeights(in: .kg, for: health.date)
         )
         case .height: return .height(
             try await HealthStore.height(in: .cm, for: health.date)

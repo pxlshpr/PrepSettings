@@ -3,7 +3,7 @@ import PrepShared
 import HealthKit
 
 public enum HealthKitValue {
-    case weight(Quantity?)
+    case weight([Quantity]?)
     case height(Quantity?)
     case leanBodyMass(Quantity?)
     
@@ -28,9 +28,14 @@ extension HealthKitValue {
 }
 
 public extension HealthKitValue {
+    var quantities: [Quantity]? {
+        switch self {
+        case .weight(let quantities):       quantities
+        default: nil
+        }
+    }
     var quantity: Quantity? {
         switch self {
-        case .weight(let quantity):         quantity
         case .height(let quantity):         quantity
         case .leanBodyMass(let quantity):   quantity
         default: nil
@@ -66,5 +71,4 @@ public extension HealthKitValue {
         default: nil
         }
     }
-
 }

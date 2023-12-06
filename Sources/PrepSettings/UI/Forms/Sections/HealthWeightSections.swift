@@ -17,6 +17,8 @@ enum WeightFormType {
 }
 
 struct HealthWeightSections: View {
+
+    @Environment(\.scenePhase) var scenePhase: ScenePhase
     
     @Bindable var settingsStore: SettingsStore
     @Bindable var healthModel: HealthModel
@@ -69,18 +71,32 @@ struct HealthWeightSections: View {
     }
     
     var body: some View {
-        sourceSection
-        dateSection
-//        movingAverageSection
-        movingAverageIntervalSection
-        movingAverageValuesSection
-        averageSection
-        averageEntriesSection
-        valueSection
+        Group {
+            sourceSection
+            dateSection
+            movingAverageIntervalSection
+            movingAverageValuesSection
+            averageSection
+            averageEntriesSection
+            valueSection
+        }
+        .onAppear(perform: appeared)
+        .onChange(of: scenePhase, scenePhaseChanged)
     }
 }
 
 extension HealthWeightSections {
+    
+    func appeared() {
+        model.fetchValues()
+    }
+    
+    func scenePhaseChanged(old: ScenePhase, new: ScenePhase) {
+        switch new {
+        case .active:   model.fetchValues()
+        default:        break
+        }
+    }
     
     var movingAverageIntervalSection: some View {
         
@@ -136,11 +152,10 @@ extension HealthWeightSections {
                 HStack {
                     Text("Date")
                     Spacer()
-//                    Text("Yesterday, 9:08 pm")
-//                    Text("Yesterday's Average")
-                    Text("1 Dec 2021")
-//                    Text("1 Dec 2021, 9:08 pm")
-                        .foregroundStyle(.secondary)
+                    if let date = healthModel.health.weight?.quantity?.date {
+                        Text(date.healthFormat)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
@@ -157,19 +172,15 @@ extension HealthWeightSections {
     }
     
     var averageEntriesSection: some View {
-        var section: some View {
+        func section(_ quantities: [Quantity]) -> some View {
             Section(footer: Text("The average of these values is being used")) {
-                HStack {
-                    Text("9:53 am")
-                    Spacer()
-                    Text("95.7 kg")
-                        .foregroundStyle(.secondary)
-                }
-                HStack {
-                    Text("2:32 pm")
-                    Spacer()
-                    Text("96.3 kg")
-                        .foregroundStyle(.secondary)
+                ForEach(quantities, id: \.self) { quantity in
+                    HStack {
+                        Text(quantity.date?.shortTime ?? "")
+                        Spacer()
+                        Text("\(BodyMassUnit.kg.convert(quantity.value, to: settingsStore.bodyMassUnit).clean) \(settingsStore.bodyMassUnit.abbreviation)")
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
@@ -184,9 +195,13 @@ extension HealthWeightSections {
             }
         }
         
+        var quantities: [Quantity]? {
+            model.healthKitLatestDayQuantities
+        }
+        
         return Group {
-            if shouldShow {
-                section
+            if shouldShow, let quantities {
+                section(quantities)
             }
         }
     }
@@ -292,53 +307,52 @@ extension HealthWeightSections {
     }
     
     var valueSection: some View {
-        var valueRow: some View {
-            HStack {
-//                Text("Weight")
-                Spacer()
-                switch model.formType {
-                case .healthDetails, .adaptiveSampleAverageComponent:
-                    if let weight = healthModel.health.weight {
-                        switch weight.source {
-                        case .healthKit:
-    //                        Text("95.7 kg")
-                            Text("95.4 kg")
-                                .foregroundStyle(.secondary)
-    //                        healthValue
-                        case .userEntered:
-                            manualValue
-                        }
-                    }
-                case .adaptiveSample:
-                    if let sampleSource = model.sampleSource {
-                        switch sampleSource {
-                        case .movingAverage:
-                            Text("Not set")
-                                .foregroundStyle(.tertiary)
-                        case .healthKit:
+        
+        @ViewBuilder
+        var weightText: some View {
+            switch model.formType {
+            case .healthDetails:
+                if let weight = healthModel.health.weight {
+                    switch weight.source {
+                    case .healthKit:
+                        if let value = model.computedValue(in: settingsStore.bodyMassUnit) {
+                            LargeHealthValue(
+                                value: value,
+                                valueString: value.clean,
+                                unitString: settingsStore.bodyMassUnit.abbreviation
+                            )
+                            .foregroundStyle(.secondary)
+                        } else {
                             Text("No data")
                                 .foregroundStyle(.tertiary)
-                        case .userEntered:
-                            manualValue
                         }
+                    case .userEntered:
+                        manualValue
+                    }
+                }
+            case .adaptiveSampleAverageComponent:
+                EmptyView()
+            case .adaptiveSample:
+                if let sampleSource = model.sampleSource {
+                    switch sampleSource {
+                    case .movingAverage:
+                        Text("Not set")
+                            .foregroundStyle(.tertiary)
+                    case .healthKit:
+                        Text("No data")
+                            .foregroundStyle(.tertiary)
+                    case .userEntered:
+                        manualValue
                     }
                 }
             }
         }
         
-        var averagedEntriesRow: some View {
-            HStack {
-                Text("Averaged Entries")
-                Spacer()
-                Text("3")
-                    .foregroundStyle(.secondary)
-            }
-        }
-        
         return Section {
-//            dateRow
-            valueRow
-//            averagedEntriesRow
+            HStack {
+                Spacer()
+                weightText
+            }
         }
     }
 
@@ -417,6 +431,9 @@ extension HealthWeightSections {
         let initialSample: WeightSample?
         var sample: WeightSample?
         
+        var healthKitLatestDayQuantities: [Quantity]?
+        var healthKitValueForDate: Double?
+        
         /// Health init
         init(
             healthModel: HealthModel
@@ -475,6 +492,68 @@ extension HealthWeightSections {
 
 extension HealthWeightSections.Model {
     
+    var healthKitLatestQuantity: Quantity? {
+        healthKitLatestDayQuantities?.last
+    }
+    
+    func fetchValues() {
+        Task {
+            switch formType {
+            case .healthDetails:
+                /// [ ] Fetch the latest day's values from HealthKit
+                /// [ ] Keep this stored in the model
+                /// [ ] If this value exists (ie is stored), only then show the Apple Health option in source
+                let healthKitValue = try await healthModel.healthKitValue(for: .weight)
+                await MainActor.run {
+                    self.healthKitLatestDayQuantities = healthKitValue?.quantities
+                }
+            case .adaptiveSampleAverageComponent:
+                /// [ ] Fetch the date's value
+                /// [ ] Keep this stored in the model
+                /// [ ] If this value exists (ie is stored), only then show the Apple Health option
+                break
+            case .adaptiveSample:
+                /// [ ] Fetch the date's value, along with the values for all dates within the moving average interval (if sourceType is moving average)
+                /// [ ] Keep them stored in the model
+                /// [ ] If the value for the date exists, only then show the Apple Health option
+                break
+            }
+        }
+    }
+    
+    func computedValue(in unit: BodyMassUnit) -> Double? {
+        switch formType {
+        case .healthDetails:
+            switch source {
+            case .healthKit: 
+                guard let value = healthKitLatestQuantity?.value else { return nil }
+                return BodyMassUnit.kg.convert(value, to: unit)
+            default:
+                return nil
+            }
+
+        case .adaptiveSample:
+            switch sampleSource {
+            case .healthKit:
+                guard let value = healthKitValueForDate else { return nil }
+                return BodyMassUnit.kg.convert(value, to: unit)
+            case .movingAverage:
+                return 69.0
+            default:
+                return nil
+            }
+            
+        case .adaptiveSampleAverageComponent:
+            switch source {
+            case .healthKit:
+                guard let value = healthKitValueForDate else { return nil }
+                return BodyMassUnit.kg.convert(value, to: unit)
+            default:
+                return nil
+            }
+        }
+    }
+    
     var quantity: Quantity? {
         guard let value else { return nil }
         return .init(value: value, date: date)
@@ -488,8 +567,13 @@ extension HealthWeightSections.Model {
                 
                 switch self.formType {
                 case .healthDetails:
+                    /// [ ] Directly set the source instead of using the binding
+                    /// [ ] If we switch to HealthKit, simply use the value that we would have fetched (this option shouldn't be available otherwise)
+                    /// [ ] We might have to stop syncing weight from healthKit whenever biometrics change since we're doing it in the form
                     self.healthModel.weightSource = newValue
                 case .adaptiveSampleAverageComponent:
+                    /// [ ] We can only set to HealthKit if there is a value available—and if we do this, change the Health details for that date only
+                    /// [ ] If we switch to custom, change the average component and also the health details weight by updating the 'backend weight
                     Task {
                         if let quantity = self.quantity {
                             try await self.healthModel.delegate.updateBackendWeight(
@@ -500,6 +584,7 @@ extension HealthWeightSections.Model {
                         }
                     }
                 case .adaptiveSample:
+                    /// Not handled here (we use `sampleBinding` instead
                     break
                 }
             }
@@ -510,6 +595,9 @@ extension HealthWeightSections.Model {
         Binding<WeightSampleSource>(
             get: { self.sampleSource ?? .userEntered },
             set: { newValue in
+                /// [ ] If we switch to `.movingAverage` – fetch the values for the dates from the backend (whatever value we have stored for each date)
+                /// [ ] If we switch to `.healthKit` – use the values we would have fetched depending on if we're using average day's entires or not
+                
                 withAnimation {
                     self.sampleSource = newValue
                 }

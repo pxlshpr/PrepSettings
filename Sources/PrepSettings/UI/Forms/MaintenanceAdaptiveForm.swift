@@ -281,6 +281,7 @@ struct MaintenanceAdaptiveForm: View {
                 if let value = maintenance.adaptive.value {
                     LargeHealthValue(
                         value: value,
+                        valueString: value.formattedEnergy,
                         unitString: "\(settingsStore.energyUnit.abbreviation) / day"
                     )
 //                    .multilineTextAlignment(.trailing)

@@ -66,6 +66,7 @@ public struct MaintenanceEstimateView: View {
             func content(_ value: Double) -> some View {
                 LargeHealthValue(
                     value: value,
+                    valueString: value.formattedEnergy,
                     unitString: "\(settingsStore.energyUnit.abbreviation) / day"
                 )
             }

@@ -54,7 +54,7 @@ public extension Date {
             let sameYear = year == Date().year
             formatter.dateFormat = sameYear ? "d MMM" : "d MMM yy"
             dayString = formatter.string(from: self)
-            timeString = ""
+//            timeString = ""
         }
         if timeString.isEmpty {
             return dayString

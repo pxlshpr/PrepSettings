@@ -105,7 +105,7 @@ struct RestingEnergySections: View {
             return switch model.restingEnergyIntervalType {
             case .average:      interval.dateRange(with: model.health.date).string
             case .sameDay:      model.health.date.healthDateFormat
-            case .previousDay:  model.health.date.moveDayBy(-1).healthFormat
+            case .previousDay:  model.health.date.moveDayBy(-1).healthDateFormat
             }
         }
         
@@ -128,6 +128,7 @@ struct RestingEnergySections: View {
             if let value = model.health.restingEnergyValue(in: settingsStore.energyUnit) {
                 LargeHealthValue(
                     value: value,
+                    valueString: value.formattedEnergy,
                     unitString: settingsStore.energyUnit.abbreviation
                 )
             } else {

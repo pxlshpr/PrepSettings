@@ -5,7 +5,15 @@ let DefaultNumberOfDaysForAdaptiveMaintenance = 7
 let DefaultNumberOfDaysForMovingAverage = 7
 
 extension HealthStore {
-    
+
+    static func latestDaysWeights(
+        in unit: BodyMassUnit = .kg,
+        for date: Date = Date.now
+    ) async throws -> [Quantity]? {
+        try await HealthKitQuantityRequest(.weight, unit.healthKitUnit)
+            .mostRecentDaysQuantities(to: date)
+    }
+
     static func weight(
         in unit: BodyMassUnit = .kg,
         for date: Date = Date.now
