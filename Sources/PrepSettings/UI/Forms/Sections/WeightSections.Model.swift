@@ -124,10 +124,34 @@ extension WeightSections.Model {
             healthModel.health.weight?.quantity = quantity
         }
     }
+    
+    func setWeight() {
+        switch formType {
+        case .healthDetails:
+            healthModel.add(.weight)
+        default:
+            break
+        }
+    }
+
+    func removeWeight() {
+        switch formType {
+        case .healthDetails:
+            healthModel.remove(.weight)
+        default:
+            break
+        }
+    }
 }
 
 extension WeightSections.Model {
     
+    var isUserEntered: Bool {
+        switch formType {
+        case .adaptiveSample:   sampleSource == .userEntered
+        default:                source == .userEntered
+        }
+    }
     var footerString: String? {
         switch formType {
         case .healthDetails:

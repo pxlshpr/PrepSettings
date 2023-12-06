@@ -1,5 +1,6 @@
 import SwiftUI
 import PrepShared
+import SwiftHaptics
 
 /// [x] Create a type for the use of this form, being either the main Health.weight one, a Weight Sample or a Weight Data point or something?
 /// [ ] When showing the weight data point thing, give the option to use average of past x interval, which should include the section with the links to the Weight Sample forms
@@ -92,6 +93,7 @@ extension WeightSections {
                 dailyAverageSection
                 dailyAverageValuesSection
                 valueSection
+                removeSection
             }
         }
     }
@@ -107,7 +109,17 @@ extension WeightSections {
         return Section(footer: footer) {
             Button("Set Weight") {
                 withAnimation {
-                    healthModel.add(.weight)
+                    model.setWeight()
+                }
+            }
+        }
+    }
+    
+    var removeSection: some View {
+        Section {
+            Button("Remove") {
+                withAnimation {
+                    model.removeWeight()
                 }
             }
         }
@@ -115,6 +127,11 @@ extension WeightSections {
     
     func appeared() {
         model.fetchValues()
+        if model.isUserEntered {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                focusTextField()
+            }
+        }
     }
     
     func scenePhaseChanged(old: ScenePhase, new: ScenePhase) {
@@ -200,10 +217,11 @@ extension WeightSections {
     
     var dailyAverageValuesSection: some View {
         func section(_ quantities: [Quantity]) -> some View {
-            Section(footer: Text("The average of these values is being used")) {
+            Section(footer: Text("The average of these values is being used.")) {
                 ForEach(quantities, id: \.self) { quantity in
                     HStack {
                         Text(quantity.date?.shortTime ?? "")
+                            .foregroundStyle(.secondary)
                         Spacer()
                         Text("\(BodyMassUnit.kg.convert(quantity.value, to: settingsStore.bodyMassUnit).clean) \(settingsStore.bodyMassUnit.abbreviation)")
                             .foregroundStyle(.secondary)
@@ -304,13 +322,55 @@ extension WeightSections {
         }
     }
     
-    @ViewBuilder
+    func focusTextField() {
+//        Haptics.selectionFeedback()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            focusedType.wrappedValue = .weight
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sendSelectAllTextAction()
+            }
+        }
+    }
+
+    func unfocusTextField() {
+        focusedType.wrappedValue = nil
+    }
+
     var sourceSection: some View {
-        switch model.formType {
-        case .adaptiveSample:
-            PickerSection(model.sampleSourceBinding)
-        default:
-            PickerSection(model.sourceBinding)
+        
+        var sampleSourcePicker: some View {
+            PickerSection(Binding<WeightSampleSource>(
+                get: { model.sampleSourceBinding.wrappedValue },
+                set: { newValue in
+                    model.sampleSourceBinding.wrappedValue = newValue
+                    if newValue == .userEntered {
+                        focusTextField()
+                    } else {
+                        unfocusTextField()
+                    }
+                }
+            ))
+        }
+        
+        var sourcePicker: some View {
+            PickerSection(Binding<HealthSource>(
+                get: { model.sourceBinding.wrappedValue },
+                set: { newValue in
+                    model.sourceBinding.wrappedValue = newValue
+                    if newValue == .userEntered {
+                        focusTextField()
+                    } else {
+                        unfocusTextField()
+                    }
+                }
+            ))
+        }
+        
+        return Group {
+            switch model.formType {
+            case .adaptiveSample:   sampleSourcePicker
+            default:                sourcePicker
+            }
         }
     }
     
