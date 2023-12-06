@@ -233,14 +233,14 @@ public extension Health {
 extension Health {
     mutating func handleFocusLoss(for type: HealthType) {
         
-        let typesToRemoveIfNil: [HealthType] = [.weight, .height, .leanBodyMass, .age]
+        let typesToRemoveIfNil: [HealthType] = []
         for type in typesToRemoveIfNil {
             if valueIsNil(for: type) {
                 remove(type)
             }
         }
         
-        let typesToSetToZeroIfNil: [HealthType] = [.activeEnergy, .restingEnergy]
+        let typesToSetToZeroIfNil: [HealthType] = [.activeEnergy, .restingEnergy, .weight, .height, .leanBodyMass, .age]
         for type in typesToSetToZeroIfNil {
             if valueIsNil(for: type) {
                 guard let zeroValue = HealthKitValue.zeroValue(for: type) else { continue }

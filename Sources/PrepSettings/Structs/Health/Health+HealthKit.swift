@@ -41,9 +41,9 @@ public extension Health {
     }
     
     func typeToFetchFromHealthKit(from old: Health) -> HealthType? {
-        if old.weightSource != .healthKit, weightSource == .healthKit {
-            return .weight
-        }
+//        if old.weightSource != .healthKit, weightSource == .healthKit {
+//            return .weight
+//        }
         if old.leanBodyMassSource != .healthKit, leanBodyMassSource == .healthKit {
             return .leanBodyMass
         }

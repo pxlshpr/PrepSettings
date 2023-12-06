@@ -87,6 +87,9 @@ extension WeightSections.Model {
                 
                 await MainActor.run {
                     self.healthKitLatestDayQuantities = healthKitValue?.quantities
+                    if source == .healthKit {
+                        setHealthKitQuantity()
+                    }
                 }
             case .adaptiveSampleAverageComponent:
                 /// [ ] Fetch the date's value
@@ -122,6 +125,7 @@ extension WeightSections.Model {
         
         withAnimation {
             healthModel.health.weight?.quantity = quantity
+            print("WE here")
         }
     }
     

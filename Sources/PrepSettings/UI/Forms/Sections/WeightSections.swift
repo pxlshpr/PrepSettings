@@ -391,8 +391,9 @@ extension WeightSections {
                             )
                             .foregroundStyle(.secondary)
                         } else {
-                            Text("No data")
-                                .foregroundStyle(.tertiary)
+                            HealthKitErrorCell(type: .weight)
+//                            Text("No data")
+//                                .foregroundStyle(.tertiary)
                         }
                     case .userEntered:
                         manualValue
