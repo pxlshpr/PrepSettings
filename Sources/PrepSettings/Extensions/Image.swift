@@ -10,7 +10,7 @@ extension Image {
         }
         self.init(uiImage: image)
         #elseif canImport(AppKit)
-        guard let path = Bundle.module.path(forResource: name, ofType: type),
+        guard let path = Bundle.module.path(forResource: name, ofType: formType),
               let image = NSImage(contentsOfFile: path) else {
             self.init(name)
             return

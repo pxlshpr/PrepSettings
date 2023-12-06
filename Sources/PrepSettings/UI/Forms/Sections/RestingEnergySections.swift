@@ -13,8 +13,8 @@ struct RestingEnergySections: View {
         equationSection
         equationParamsSection
         intervalTypeSection
-        intervalPeriodSection
-        intervalSection
+        intervalSections
+        dateSection
         healthKitErrorSection
         valueSection
     }
@@ -55,7 +55,7 @@ struct RestingEnergySections: View {
     }
     
     @ViewBuilder
-    var intervalPeriodSection: some View {
+    var intervalSections: some View {
         if model.restingEnergySource == .healthKit,
            model.restingEnergyIntervalType == .average
         {
@@ -94,7 +94,7 @@ struct RestingEnergySections: View {
         }
     }
     
-    var intervalSection: some View {
+    var dateSection: some View {
         
         var label: String {
             model.restingEnergyIntervalType == .average ? "Period" : "Date"

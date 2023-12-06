@@ -251,7 +251,7 @@ struct WeightChangeForm: View {
             healthModel: healthModel,
             settingsStore: settingsStore,
             didSave: didSaveWeight
-        )
+        )        
     }
     
     struct WeightSampleRoute: Hashable {

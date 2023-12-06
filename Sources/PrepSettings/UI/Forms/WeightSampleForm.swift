@@ -38,6 +38,22 @@ struct WeightSampleForm: View {
     
     var body: some View {
         Form {
+            HealthWeightSections(
+                sample: model.sample,
+                date: model.date,
+                healthModel: healthModel,
+                settingsStore: settingsStore,
+                focusedType: $focusedType
+            )
+        }
+        .navigationTitle("Weight")
+        .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: focusedType, healthModel.focusedTypeChanged)
+        .toolbar { keyboardToolbarContent }
+    }
+    
+    var body_: some View {
+        Form {
             valueSection
             movingAverageSection
             movingAverageValuesSection
@@ -244,9 +260,7 @@ struct WeightSampleForm: View {
         }
     }
     
-    
-    
-     func cell(weight: DatedWeight) -> some View {
+    func cell(weight: DatedWeight) -> some View {
         NavigationLink(value: weight) {
             WeightCell(weight: weight)
                 .environment(settingsStore)

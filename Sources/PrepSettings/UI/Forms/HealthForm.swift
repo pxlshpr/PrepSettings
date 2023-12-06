@@ -75,7 +75,11 @@ public struct HealthForm: View {
             case .age:
                 HealthAgeSection(model, $focusedType)
             case .weight:
-                HealthWeightSections(model, settingsStore, $focusedType)
+                HealthWeightSections(
+                    healthModel: model,
+                    settingsStore: settingsStore,
+                    focusedType: $focusedType
+                )
             case .leanBodyMass:
                 HealthLeanBodyMassSection(model, settingsStore, $focusedType)
             case .height:
