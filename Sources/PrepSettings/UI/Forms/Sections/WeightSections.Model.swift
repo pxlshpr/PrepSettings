@@ -125,7 +125,6 @@ extension WeightSections.Model {
         
         withAnimation {
             healthModel.health.weight?.quantity = quantity
-            print("WE here")
         }
     }
     
