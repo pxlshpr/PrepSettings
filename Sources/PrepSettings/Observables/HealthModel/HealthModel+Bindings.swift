@@ -42,15 +42,10 @@ public extension HealthModel {
     var maintenanceWeightChangeDelta: Double? {
         get { health.maintenance?.adaptive.weightChange.delta }
         set {
-            Task {
-                await MainActor.run {
-                    withAnimation {
-                        health.maintenance?.adaptive.weightChange.delta = newValue
-                    }
-                }
-                
-                calculateAdaptiveMaintenance()
+            withAnimation {
+                health.maintenance?.adaptive.weightChange.delta = newValue
             }
+            calculateAdaptiveMaintenance()
         }
     }
     

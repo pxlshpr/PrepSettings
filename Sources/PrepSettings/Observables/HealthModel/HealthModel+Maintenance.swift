@@ -3,6 +3,7 @@ import SwiftUI
 extension HealthModel {
     
     func calculateAdaptiveMaintenance() {
+        print("recalculating")
         withAnimation {
             health.maintenance?.adaptive.recalculate()
         }
