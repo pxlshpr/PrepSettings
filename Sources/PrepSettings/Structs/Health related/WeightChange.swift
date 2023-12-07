@@ -18,12 +18,14 @@ public struct WeightChange: Hashable, Codable {
 public extension WeightChange {
     mutating func calculateDelta() {
         guard
+            type == .usingWeights,
             let currentValue = current.value,
             let previousValue = previous.value
         else {
             delta = nil
             return
         }
+        print("💡 Calculating delta")
         delta = currentValue - previousValue
     }
     

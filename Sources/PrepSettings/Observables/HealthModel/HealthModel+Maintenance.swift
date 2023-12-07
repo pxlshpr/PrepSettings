@@ -1,8 +1,15 @@
 import SwiftUI
 
 extension HealthModel {
+    
+    func calculateAdaptiveMaintenance() {
+        withAnimation {
+            health.maintenance?.adaptive.recalculate()
+        }
+    }
+    
     /// Used when turning on adaptive calculation initially. Fetches backend and HealthKit data and calculates using those
-    func calculateAdaptiveMaintenance() async throws {
+    func fetchBackendValuesForAdaptiveMaintenance() async throws {
         
         /// Get the backend values for the date range spanning the st
         let dateRange = health.dateRangeForMaintenanceBackendValues

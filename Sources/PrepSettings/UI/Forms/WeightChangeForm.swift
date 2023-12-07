@@ -17,9 +17,9 @@ struct WeightChangeForm: View {
     
     var body: some View {
         Form {
-            weightChangeSection
             sourceSection
             weightsSections
+            valueSection
         }
         .navigationTitle("Weight Change")
         .navigationBarTitleDisplayMode(.inline)
@@ -46,24 +46,34 @@ struct WeightChangeForm: View {
     @ViewBuilder
     var weightsSections: some View {
         if type == .usingWeights {
-            Section("Weights") {
-                weightCell(sample: maintenance.adaptive.weightChange.current, isPrevious: false)
+            Section("Previous") {
                 weightCell(sample: maintenance.adaptive.weightChange.previous, isPrevious: true)
+            }
+            Section("Current") {
+                weightCell(sample: maintenance.adaptive.weightChange.current, isPrevious: false)
             }
         }
     }
     
-    var weightChangeSection: some View {
+    var valueSection: some View {
         
+        /// [ ] "No change" option broken
         @ViewBuilder
         var valueRow: some View {
             HStack {
-                Text(healthModel.health.dateRangeForMaintenanceCalculation.string)
-                    .layoutPriority(1)
+//                Text(healthModel.health.dateRangeForMaintenanceCalculation.string)
+//                    .layoutPriority(1)
                 Spacer()
                 switch type {
                 case .usingWeights:
-                    maintenance.adaptive.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
+                    if let delta = maintenance.adaptive.weightChange.delta(in: settingsStore.bodyMassUnit) {
+                        LargeHealthValue(
+                            value: delta,
+                            valueString: delta.clean,
+                            unitString: settingsStore.bodyMassUnit.abbreviation
+                        )
+                    }
+//                    maintenance.adaptive.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
                 case .userEntered:
                     textField
                 }
@@ -111,17 +121,17 @@ struct WeightChangeForm: View {
             )
         }
         
-        var footer: some View {
-            var string: String {
-                switch type {
-                case .usingWeights:
-                    "Your weight change is being calculated by using your current and previous weights."
-                case .userEntered:
-                    "Your are a using a custom entered weight change."
-                }
-            }
-            return Text(string)
-        }
+//        var footer: some View {
+//            var string: String {
+//                switch type {
+//                case .usingWeights:
+//                    "Your weight change is being calculated by using your current and previous weights."
+//                case .userEntered:
+//                    "Your are a using a custom entered weight change."
+//                }
+//            }
+//            return Text(string)
+//        }
         
         var delta: Double? {
             get {
@@ -163,11 +173,11 @@ struct WeightChangeForm: View {
             }
         }
         
-        return Section(footer: footer) {
-            valueRow
+        return Section {
             if type == .userEntered {
                 deltaTypeRow
             }
+            valueRow
         }
     }
     

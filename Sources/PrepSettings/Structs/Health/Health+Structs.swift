@@ -48,6 +48,22 @@ public extension Health {
                     self.error = error
                 }
             }
+            
+            mutating func recalculate() {
+                let result = Self.calculate(
+                    weightChange: weightChange,
+                    dietaryEnergy: dietaryEnergy,
+                    interval: interval
+                )
+                switch result {
+                case .success(let value):
+                    self.value = value
+                    self.error = nil
+                case .failure(let error):
+                    self.value = nil
+                    self.error = error
+                }
+            }
         }
         
         public struct Estimated: Hashable, Codable {

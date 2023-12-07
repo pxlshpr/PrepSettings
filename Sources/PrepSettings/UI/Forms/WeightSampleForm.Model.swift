@@ -232,7 +232,7 @@ extension HealthModel {
                     self.health.maintenance?.adaptive.interval = .init(newValue, self.intervalPeriod)
                 }
                 Task {
-                    try await self.calculateAdaptiveMaintenance()
+                    try await self.fetchBackendValuesForAdaptiveMaintenance()
                 }
             }
         )
@@ -253,7 +253,7 @@ extension HealthModel {
                     self.health.maintenance?.adaptive.interval = .init(value, newValue)
                 }
                 Task {
-                    try await self.calculateAdaptiveMaintenance()
+                    try await self.fetchBackendValuesForAdaptiveMaintenance()
                 }
             }
         )

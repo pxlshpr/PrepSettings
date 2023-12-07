@@ -49,7 +49,7 @@ public extension HealthModel {
                     }
                 }
                 
-                try await calculateAdaptiveMaintenance()
+                calculateAdaptiveMaintenance()
             }
         }
     }
@@ -73,7 +73,7 @@ public extension HealthModel {
                     break
                 }
                 
-                try await calculateAdaptiveMaintenance()
+                try await fetchBackendValuesForAdaptiveMaintenance()
             }
         }
     }
