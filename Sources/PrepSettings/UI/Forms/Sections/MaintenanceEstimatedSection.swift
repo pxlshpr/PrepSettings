@@ -23,7 +23,7 @@ public struct MaintenanceEstimatedSection: View {
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .estimate:
-                    MaintenanceEstimateView(model)
+                    EstimatedMaintenanceForm(model)
                         .environment(settingsStore)
                 }
             }

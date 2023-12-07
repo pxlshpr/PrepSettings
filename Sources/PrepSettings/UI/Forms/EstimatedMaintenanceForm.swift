@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-public struct MaintenanceEstimateView: View {
+public struct EstimatedMaintenanceForm: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
     @Bindable var model: HealthModel
@@ -129,7 +129,7 @@ struct HealthLink: View {
     Text("")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                MaintenanceEstimateView(MockHealthModel)
+                EstimatedMaintenanceForm(MockHealthModel)
                     .environment(SettingsStore.shared)
             }
         }

@@ -14,7 +14,8 @@ extension Health.Maintenance.Adaptive {
             }
             .foregroundStyle(.secondary)
         } else {
-            Text("Set weights")
+            Text("Not set")
+//            Text("Set weights")
 //            switch (weightChange.previous.value == nil, weightChange.current.value == nil) {
 //            case (true, true):
 //                Text("Set weights")

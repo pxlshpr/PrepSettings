@@ -140,7 +140,11 @@ extension Health.Maintenance.Adaptive {
         
         let value = (dietaryEnergyTotal - weightDeltaInKcal) / Double(interval.numberOfDays)
         
-        return .success(value)
+        guard value > 0 else {
+            return .failure(.weightChangeExceedsNutrition)
+        }
+        
+        return .success(max(value, 0))
     }
 }
 

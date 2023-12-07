@@ -39,7 +39,7 @@ struct MaintenanceAdaptiveSection: View {
         .navigationDestination(for: Route.self) { route in
             switch route {
             case .calculation:
-                MaintenanceAdaptiveForm(model)
+                AdaptiveMaintenanceForm(model)
                     .environment(settingsStore)
             }
         }
@@ -84,7 +84,7 @@ struct MaintenanceAdaptiveSection: View {
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .calculation:
-                    MaintenanceAdaptiveForm(model)
+                    AdaptiveMaintenanceForm(model)
                         .environment(settingsStore)
                 }
             }
