@@ -18,7 +18,8 @@ struct MaintenanceValueSection: View {
     }
 
     var body: some View {
-        Section(footer: footer) {
+//        Section(footer: footer) {
+        Section {
             VStack {
                 picker
                 /// Conditionally show the bottom row, only if we have the value, so that we don't get shown the default source values for a split second during the removal animations.

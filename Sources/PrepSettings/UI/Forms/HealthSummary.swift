@@ -216,73 +216,73 @@ public struct HealthSummary: View {
 //        }
     }
     
-    func content_(for type: HealthType) -> some View {
-        
-        @ViewBuilder
-        var footer: some View {
-            if let reason = type.reason {
-                Text(reason)
-            }
-        }
-        
-        var addButton: some View {
-            Button("Set \(type.nameWhenSetting)") {
-                withAnimation {
-                    model.add(type)
-                }
-            }
-        }
-        
-        @ViewBuilder
-        var section: some View {
-            switch type {
-            case .age:
-                HealthAgeSection(model, $focusedType)
-            case .weight:
-                WeightSections(
-                    healthModel: model,
-                    settingsStore: settingsStore,
-                    focusedType: $focusedType
-                )
-            case .height:
-                HealthHeightSection(model, settingsStore, $focusedType)
-            case .sex:
-                HealthSexSection(model)
-            case .leanBodyMass:
-                HealthLeanBodyMassSection(model, settingsStore, $focusedType)
-            case .pregnancyStatus:
-                HealthTopRow(type: .pregnancyStatus, model: model)
-            case .isSmoker:
-                HealthTopRow(type: .isSmoker, model: model)
-            case .maintenance:
-                MaintenanceFormSections(model)
-                    .environment(settingsStore)
-            default:
-                EmptyView()
-            }
-        }
-        
-        var addSection: some View {
-            @ViewBuilder
-            var header: some View {
-                switch type {
-                case .age:   HealthBodyProfileTitle(model)
-                default:        EmptyView()
-                }
-            }
-            return Section(header: header, footer: footer) {
-                addButton
-            }
-        }
-        
-        return Group {
-            if model.health.hasType(type) {
-                section
-            } else {
-                addSection
-            }
-        }
-    }
+//    func content_(for type: HealthType) -> some View {
+//        
+//        @ViewBuilder
+//        var footer: some View {
+//            if let reason = type.reason {
+//                Text(reason)
+//            }
+//        }
+//        
+//        var addButton: some View {
+//            Button("Set \(type.nameWhenSetting)") {
+//                withAnimation {
+//                    model.add(type)
+//                }
+//            }
+//        }
+//        
+//        @ViewBuilder
+//        var section: some View {
+//            switch type {
+//            case .age:
+//                HealthAgeSection(model, $focusedType)
+//            case .weight:
+//                WeightSections(
+//                    healthModel: model,
+//                    settingsStore: settingsStore,
+//                    focusedType: $focusedType
+//                )
+//            case .height:
+//                HealthHeightSection(model, settingsStore, $focusedType)
+//            case .sex:
+//                HealthSexSection(model)
+//            case .leanBodyMass:
+//                HealthLeanBodyMassSection(model, settingsStore, $focusedType)
+//            case .pregnancyStatus:
+//                HealthTopRow(type: .pregnancyStatus, model: model)
+//            case .isSmoker:
+//                HealthTopRow(type: .isSmoker, model: model)
+//            case .maintenance:
+//                MaintenanceFormSections(model)
+//                    .environment(settingsStore)
+//            default:
+//                EmptyView()
+//            }
+//        }
+//        
+//        var addSection: some View {
+//            @ViewBuilder
+//            var header: some View {
+//                switch type {
+//                case .age:   HealthBodyProfileTitle(model)
+//                default:        EmptyView()
+//                }
+//            }
+//            return Section(header: header, footer: footer) {
+//                addButton
+//            }
+//        }
+//        
+//        return Group {
+//            if model.health.hasType(type) {
+//                section
+//            } else {
+//                addSection
+//            }
+//        }
+//    }
     
     var dailyValuesSection: some View {
         var footer: some View {

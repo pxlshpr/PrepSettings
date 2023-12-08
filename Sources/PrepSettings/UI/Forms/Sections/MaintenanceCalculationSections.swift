@@ -17,7 +17,8 @@ struct MaintenanceAdaptiveSection: View {
 
     var body: some View {
 //        toggleRow
-        Section(footer: footer) {
+//        Section(footer: footer) {
+        Section {
             calculatedRow
         }
     }
@@ -47,7 +48,8 @@ struct MaintenanceAdaptiveSection: View {
     //MARK: - Legacy
 
     var body_: some View {
-        Section(footer: footer) {
+//        Section(footer: footer) {
+        Section {
             toggleRow
             showCalculationRow
             errorRow

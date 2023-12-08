@@ -16,7 +16,8 @@ public struct MaintenanceEstimatedSection: View {
     }
     
     public var body: some View {
-        Section(footer: footer) {
+//        Section(footer: footer) {
+        Section {
             NavigationLink(value: Route.estimate) {
                 label
             }
