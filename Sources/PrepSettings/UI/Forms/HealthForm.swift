@@ -101,7 +101,9 @@ public struct HealthForm: View {
         }
 
         return Group {
-            if model.health.hasType(type) {
+            if type == .maintenance {
+                section
+            } else if model.health.hasType(type) {
                 section
             } else {
                 addSection

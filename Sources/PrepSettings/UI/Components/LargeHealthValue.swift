@@ -12,9 +12,12 @@ struct LargeHealthValue: View {
             Text(valueString)
                 .animation(.default, value: value)
                 .contentTransition(.numericText(value: value))
-                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+//                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
+                .font(.system(.largeTitle, design: .rounded, weight: .bold))
             Text(unitString)
-                .font(.system(.body, design: .default, weight: .semibold))
+//                .font(.system(.body, design: .default, weight: .semibold))
+                .font(.system(.body, design: .rounded, weight: .semibold))
+                .foregroundStyle(.secondary)
         }
     }
 }

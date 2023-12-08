@@ -5,10 +5,10 @@ public struct MaintenanceFormSections: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
 
-    @Bindable var model: HealthModel
+    @Bindable var healthModel: HealthModel
 
     public init(_ model: HealthModel) {
-        self.model = model
+        self.healthModel = model
     }
 
     /// [ ] Remove minus button
@@ -18,10 +18,24 @@ public struct MaintenanceFormSections: View {
     public var body: some View {
         Group {
             explanationSection
-            MaintenanceAdaptiveSection(model)
-            MaintenanceEstimatedSection(model)
-            MaintenanceValueSection(model)
-            removeSection
+            if healthModel.health.hasType(.maintenance) {
+                MaintenanceAdaptiveSection(healthModel)
+                MaintenanceEstimatedSection(healthModel)
+                MaintenanceValueSection(healthModel)
+                removeSection
+            } else {
+                addSection
+            }
+        }
+    }
+    
+    var addSection: some View {
+        Section {
+            Button("Set Maintenance Energy") {
+                withAnimation {
+                    healthModel.add(.maintenance)
+                }
+            }
         }
     }
     
@@ -36,7 +50,7 @@ public struct MaintenanceFormSections: View {
         Section {
             Button("Remove") {
                 withAnimation {
-                    model.remove(.maintenance)
+                    healthModel.remove(.maintenance)
                 }
             }
         }

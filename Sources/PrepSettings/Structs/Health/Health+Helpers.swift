@@ -158,53 +158,53 @@ extension Health {
         case .maintenance:
             guard let value = maintenanceValue(in: SettingsStore.energyUnit) else { return nil }
             return "\(value.formattedEnergy) \(SettingsStore.energyUnit.abbreviation)"
-
+            
         case .sex:
             guard let sex = sex?.value else { return nil }
             return sex.name
-
+            
         case .age:
             guard let age = age?.value else { return nil }
             return "\(age) years"
-
+            
         case .weight:
             guard let kg = weight?.quantity?.value else { return nil }
             let unit = SettingsStore.bodyMassUnit
             let value = BodyMassUnit.kg.convert(kg, to: unit)
             return "\(value.clean) \(unit.abbreviation)"
-
+            
         case .leanBodyMass:
             guard let kg = leanBodyMass?.quantity?.value else { return nil }
             let unit = SettingsStore.bodyMassUnit
             let value = BodyMassUnit.kg.convert(kg, to: unit)
             return "\(value.clean) \(unit.abbreviation)"
-
+            
         case .height:
             guard let cm = height?.quantity?.value else { return nil }
             let unit = SettingsStore.heightUnit
             let value = HeightUnit.cm.convert(cm, to: unit)
             return "\(value.clean) \(unit.abbreviation)"
-
+            
         case .pregnancyStatus:
             guard let pregnancyStatus else { return nil }
             return pregnancyStatus.name
-
+            
         case .isSmoker:
             guard let isSmoker else { return nil }
             return isSmoker ? "Yes" : "No"
-
+            
         case .restingEnergy:
             guard let kcal = restingEnergy?.value else { return nil }
             let unit = SettingsStore.energyUnit
             let value = EnergyUnit.kcal.convert(kcal, to: unit)
             return "\(value.formattedEnergy) \(unit.abbreviation)"
-
+            
         case .activeEnergy:
             guard let kcal = activeEnergy?.value else { return nil }
             let unit = SettingsStore.energyUnit
             let value = EnergyUnit.kcal.convert(kcal, to: unit)
             return "\(value.formattedEnergy) \(unit.abbreviation)"
-
+            
         default:
             return nil
         }
@@ -215,6 +215,10 @@ extension Health {
         && hasCalculatedMaintenance
     }
     
+    var hasCalculatedAndEstimatedMaintenance: Bool {
+        hasCalculatedMaintenance && hasEstimatedMaintenance
+    }
+
     var hasCalculatedMaintenance: Bool {
         maintenance?.adaptive.value != nil
         && maintenance?.adaptive.error == nil

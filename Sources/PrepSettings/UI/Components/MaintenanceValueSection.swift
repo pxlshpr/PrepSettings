@@ -36,15 +36,34 @@ struct MaintenanceValueSection: View {
         Text(HealthType.maintenance.reason!)
     }
 
-    @ViewBuilder
     var picker: some View {
-        if model.hasCalculatedMaintenance {
-            Picker("", selection: $model.maintenanceEnergyIsAdaptive) {
-                Text("Adaptive").tag(true)
-                Text("Estimated").tag(false)
-            }
-            .pickerStyle(.segmented)
+        var disabled: Bool {
+            !model.health.hasCalculatedAndEstimatedMaintenance
         }
+        
+        let selection = Binding<Bool>(
+            get: {
+                switch (model.health.hasCalculatedMaintenance, model.health.hasEstimatedMaintenance) {
+                case (true, true):  model.maintenanceEnergyIsAdaptive
+                case (true, false):     true    /// adaptive
+                case (false, true):     false   /// estimated
+                case (false, false):    true    /// adaptive
+                    
+                }
+            },
+            set: {
+                model.maintenanceEnergyIsAdaptive = $0
+            }
+        )
+        
+//        if model.hasCalculatedMaintenance {
+        return Picker("", selection: selection) {
+            Text("Adaptive").tag(true)
+            Text("Estimated").tag(false)
+        }
+        .pickerStyle(.segmented)
+        .disabled(disabled)
+//        }
     }
     
     var topRow_: some View {
@@ -113,12 +132,18 @@ struct MaintenanceValueSection: View {
             .primary
         }
         
-        func valueContent(_ value: Double) -> some View {
-            LargeHealthValue(
-                value: value,
-                valueString: value.formattedEnergy,
-                unitString: settingsStore.energyUnit.abbreviation
-            )
+        @ViewBuilder
+        var valueContent: some View {
+            if let value {
+                LargeHealthValue(
+                    value: value,
+                    valueString: value.formattedEnergy,
+                    unitString: "\(settingsStore.energyUnit.abbreviation) / day"
+                )
+            } else {
+                Text("Not Set")
+                    .foregroundStyle(.secondary)
+            }
         }
         
         var loadingContent: some View {
@@ -126,16 +151,16 @@ struct MaintenanceValueSection: View {
                 .fixedSize(horizontal: true, vertical: false)
         }
         
-        var value: Double {
+        var value: Double? {
             if model.maintenanceEnergyIsAdaptive,
                let value = model.health.maintenance?.adaptive.value,
                model.health.maintenance?.adaptive.error == nil
             {
-                value
+                EnergyUnit.kcal.convert(value, to: settingsStore.energyUnit)
             } else if let value = model.health.estimatedMaintenance(in: settingsStore.energyUnit) {
                 value
             } else {
-                0
+                nil
             }
         }
         
@@ -155,9 +180,10 @@ struct MaintenanceValueSection: View {
         }
         
         return ZStack(alignment: .bottomTrailing) {
-            content
-            valueContent(value)
-                .opacity(showValue ? 1 : 0)
+//            content
+            valueContent
+            LargePlaceholderText
+                .opacity(0)
         }
     }
 }

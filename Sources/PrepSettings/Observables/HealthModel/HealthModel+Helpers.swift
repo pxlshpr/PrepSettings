@@ -1,4 +1,5 @@
 import Foundation
+import SwiftSugar
 
 extension HealthModel {
     
@@ -21,6 +22,7 @@ extension HealthModel {
         switch type {
         case .maintenance:
             Task {
+//                try await sleepTask(1)
                 try await fetchBackendValuesForAdaptiveMaintenance()
             }
         default:
