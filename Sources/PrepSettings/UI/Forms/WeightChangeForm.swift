@@ -8,11 +8,17 @@ struct WeightChangeForm: View {
     @Environment(\.dismiss) var dismiss
     
     @FocusState var focusedType: HealthType?
-    @State var deltaType: DeltaType
+    
+    @State var textFieldValue: Double? = nil
+    @State var isNegative = false
 
     init(_ healthModel: HealthModel) {
         self.healthModel = healthModel
-        _deltaType = State(initialValue: healthModel.maintenanceWeightChangeDeltaType)
+        
+        if let delta = healthModel.maintenanceWeightChangeDelta {
+            _textFieldValue = State(initialValue: abs(delta))
+            _isNegative = State(initialValue: delta < 0)
+        }
     }
     
     var body: some View {
@@ -23,8 +29,24 @@ struct WeightChangeForm: View {
         }
         .navigationTitle("Weight Change")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: focusedType, healthModel.focusedTypeChanged)
+//        .onChange(of: focusedType, healthModel.focusedTypeChanged)
+        .onChange(of: focusedType, focusedTypeChanged)
         .toolbar { keyboardToolbarContent }
+    }
+    
+    func focusedTypeChanged(old: HealthType?, new: HealthType?) {
+        let lostFocus = new == nil
+        if lostFocus {
+            setDeltaFromTextFieldValue()
+        }
+    }
+    
+    func setDeltaFromTextFieldValue() {
+        if let value = textFieldValue {
+            healthModel.maintenanceWeightChangeDelta = value * (isNegative ? -1 : 1)
+        } else {
+            healthModel.maintenanceWeightChangeDelta = nil
+        }
     }
     
     var keyboardToolbarContent: some ToolbarContent {
@@ -57,12 +79,45 @@ struct WeightChangeForm: View {
     
     var valueSection: some View {
         
-        /// [ ] "No change" option broken
+        var plusMinusButton: some View {
+            
+            var weightChange: WeightChange? {
+                healthModel.health.maintenance?.adaptive.weightChange
+            }
+            var shouldShow: Bool {
+                guard let weightChange,
+                      weightChange.type == .userEntered,
+                      let textFieldValue
+                else { return false }
+                
+                return textFieldValue != 0
+            }
+            
+            let binding = Binding<Bool>(
+                get: { isNegative },
+                set: {
+                    isNegative = $0
+                    setDeltaFromTextFieldValue()
+                }
+            )
+            
+            return Group {
+                if shouldShow {
+                    Picker("", selection: binding) {
+                        Group {
+                            Image(systemName: "minus").tag(true)
+                            Image(systemName: "plus").tag(false)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+            }
+        }
+        
         @ViewBuilder
         var valueRow: some View {
             HStack {
-//                Text(healthModel.health.dateRangeForMaintenanceCalculation.string)
-//                    .layoutPriority(1)
+                plusMinusButton
                 Spacer()
                 switch type {
                 case .usingWeights:
@@ -72,8 +127,10 @@ struct WeightChangeForm: View {
                             valueString: delta.clean,
                             unitString: settingsStore.bodyMassUnit.abbreviation
                         )
+                    } else {
+                        Text("Not Set")
+                            .foregroundStyle(.secondary)
                     }
-//                    maintenance.adaptive.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
                 case .userEntered:
                     textField
                 }
@@ -81,29 +138,7 @@ struct WeightChangeForm: View {
         }
         
         var textField: some View {
-            let valueBinding = Binding<Double?>(
-                get: { 
-                    guard let delta else { return nil }
-                    return switch deltaType {
-                    case .negative:  abs(delta) * -1
-                    default:         abs(delta)
-                    }
-                },
-                set: { newValue in
-                    guard let newValue, newValue != 0 else {
-                        delta = 0
-                        deltaType = .zero
-                        return
-                    }
-                    if deltaType == .zero {
-                        deltaType = newValue > 0 ? .positive : .negative
-                    }
-                    delta = switch deltaType {
-                    case .negative: abs(newValue) * -1
-                    default:        abs(newValue)
-                    }
-                }
-            )
+            
             let unitBinding = Binding<BodyMassUnit>(
                 get: { settingsStore.bodyMassUnit },
                 set: { newValue in
@@ -115,69 +150,17 @@ struct WeightChangeForm: View {
             
             return HealthNumberField(
                 unitBinding: unitBinding,
-                valueBinding: valueBinding,
+                valueBinding: $textFieldValue,
                 focusedType: $focusedType,
                 healthType: .maintenance
             )
         }
-        
-//        var footer: some View {
-//            var string: String {
-//                switch type {
-//                case .usingWeights:
-//                    "Your weight change is being calculated by using your current and previous weights."
-//                case .userEntered:
-//                    "Your are a using a custom entered weight change."
-//                }
-//            }
-//            return Text(string)
-//        }
-        
-        var delta: Double? {
-            get {
-                healthModel.maintenanceWeightChangeDelta
-            }
-            set {
-                healthModel.maintenanceWeightChangeDelta = newValue
-            }
-        }
-        
-        var deltaTypeRow: some View {
-            let binding = Binding<DeltaType>(
-                get: { deltaType },
-                set: { newValue in
-                    
-                    deltaType = newValue
-                    
-                    var delta = healthModel.maintenanceWeightChangeDelta ?? 0
-                    /// If we've changed to a non-zero delta and the value is 0—change it to 1
-                    if delta == 0, newValue != .zero {
-                        delta = 1
-                    }
-                    
-                    healthModel.maintenanceWeightChangeDelta = switch newValue {
-                    case .negative: abs(delta) * -1
-                    case .positive: abs(delta)
-                    case .zero:     0
-                    }
-                }
-            )
-            return HStack {
-                Picker("", selection: binding) {
-                    ForEach(DeltaType.allCases, id: \.self) {
-                        Text($0.nameForWeight).tag($0)
-                            .disabled(true)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
-        }
-        
+
         return Section {
-            if type == .userEntered {
-                deltaTypeRow
+            ZStack(alignment: .bottomTrailing) {
+                valueRow
+                LargePlaceholderText
             }
-            valueRow
         }
     }
     
@@ -192,7 +175,8 @@ struct WeightChangeForm: View {
             }
             
             if type == .userEntered {
-                deltaType = healthModel.maintenanceWeightChangeDeltaType
+                isNegative = healthModel.maintenanceWeightChangeDeltaIsNegative
+                textFieldValue = healthModel.maintenanceWeightChangeDelta
             }
             withAnimation {
                 healthModel.maintenanceWeightChangeType = type
@@ -285,12 +269,22 @@ struct WeightChangeForm: View {
 
 #Preview {
     NavigationStack {
-        WeightChangeForm(MockHealthModel)
+//        WeightChangeForm(MockHealthModel)
+        HealthSummary(model: MockHealthModel)
             .environment(SettingsStore.shared)
             .onAppear {
                 SettingsStore.configureAsMock()
             }
     }
+}
+
+var LargePlaceholderText: some View {
+    LargeHealthValue(
+        value: 0,
+        valueString: "0",
+        unitString: "kg"
+    )
+    .opacity(0)
 }
 
 extension String {

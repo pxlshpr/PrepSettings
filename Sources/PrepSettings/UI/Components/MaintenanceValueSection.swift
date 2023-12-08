@@ -153,7 +153,7 @@ struct MaintenanceValueSection: View {
             model.hasMaintenanceValue
         }
         
-        return ZStack(alignment: .trailing) {
+        return ZStack(alignment: .bottomTrailing) {
             content
             valueContent(value)
                 .opacity(showValue ? 1 : 0)

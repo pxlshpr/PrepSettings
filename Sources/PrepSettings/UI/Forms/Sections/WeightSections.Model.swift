@@ -18,6 +18,8 @@ extension WeightSections {
         var healthKitQuantities: [Quantity]?
         var healthKitValueForDate: Double?
         
+        var backendQuantities: [Date: HealthQuantity]?
+        
         /// Health init
         init(
             healthModel: HealthModel
@@ -74,46 +76,86 @@ extension WeightSections {
     }
 }
 
+public extension Array where Element == Quantity {
+    func removingDuplicateQuantities() -> [Quantity] {
+        var addedDict = [Quantity: Bool]()
+        
+        return filter {
+            let rounded = $0.rounded(toPlaces: 2)
+            return addedDict.updateValue(true, forKey: rounded) == nil
+        }
+    }
+}
+
+extension Quantity {
+    func rounded(toPlaces places: Int) -> Quantity {
+        Quantity(
+            value: self.value.rounded(toPlaces: places),
+            date: self.date
+        )
+    }
+}
 extension WeightSections.Model {
     
-    func fetchValues() {
+    func fetchBackendData() async throws {
+        switch formType {
+        case .adaptiveSample:
+            /// Fetch the backend data for the maximum range for when we use "Moving Average"
+            /// Get the maximum possible date range, that being `2 weeks` from date, backwards
+            let range = date.moveDayBy(-14)...date
+            let quantities = try await healthModel.delegate.weights(for: range)
+            
+            await MainActor.run {
+                self.backendQuantities = quantities
+            }
+            
+        default:
+            break
+        }
+    }
+    
+    func fetchHealthKitData() async throws {
         guard !isPreview else {
             return
         }
         
-        Task {
-            switch formType {
-            case .healthDetails:
-                /// [ ] Fetch the latest day's values from HealthKit
-                /// [ ] Keep this stored in the model
-                /// [ ] If this value exists (ie is stored), only then show the Apple Health option in source
-                let quantities = try await HealthStore.latestDaysWeights(in: .kg, for: date)
-                
-                await MainActor.run {
-                    self.healthKitQuantities = quantities
-                    if source == .healthKit {
-                        setHealthKitQuantity()
-                    }
+        switch formType {
+        case .healthDetails:
+            /// [ ] Fetch the latest day's values from HealthKit
+            /// [ ] Keep this stored in the model
+            /// [ ] If this value exists (ie is stored), only then show the Apple Health option in source
+            let quantities = try await HealthStore.latestDaysWeights(in: .kg, for: date)?
+                .removingDuplicateQuantities()
+            
+            await MainActor.run {
+                self.healthKitQuantities = quantities
+                if source == .healthKit {
+                    setHealthKitQuantity()
                 }
-
-            case .adaptiveSample:
-                /// [ ] Fetch the date's values, along with the values for all dates within the moving average interval (if sourceType is moving average)
-                /// [ ] Keep them stored in the model
-                /// [ ] If the value for the date exists, only then show the Apple Health option
-                let quantities = try await HealthStore.daysWeights(in: .kg, for: date)
-                await MainActor.run {
-                    self.healthKitQuantities = quantities
-                    if source == .healthKit {
-                        setHealthKitQuantity()
-                    }
-                }
-
-            case .adaptiveSampleAverageComponent:
-                /// [ ] Fetch the date's value
-                /// [ ] Keep this stored in the model
-                /// [ ] If this value exists (ie is stored), only then show the Apple Health option
-                break
             }
+
+        case .adaptiveSample:
+            /// [ ] Fetch the date's values, along with the values for all dates within the moving average interval (if sourceType is moving average)
+            /// [ ] Keep them stored in the model
+            /// [ ] If the value for the date exists, only then show the Apple Health option
+
+            let quantities = try await HealthStore.daysWeights(in: .kg, for: date)?
+                .removingDuplicateQuantities()
+            
+            print("We here")
+            
+            await MainActor.run {
+                self.healthKitQuantities = quantities
+                if source == .healthKit {
+                    setHealthKitQuantity()
+                }
+            }
+
+        case .adaptiveSampleAverageComponent:
+            /// [ ] Fetch the date's value
+            /// [ ] Keep this stored in the model
+            /// [ ] If this value exists (ie is stored), only then show the Apple Health option
+            break
         }
     }
     
@@ -426,9 +468,20 @@ extension WeightSections.Model {
         sample?.movingAverageInterval?.numberOfDays ?? DefaultNumberOfDaysForMovingAverage
     }
     
+//    func movingAverageValue(at index: Int) -> Double? {
+//        guard let value = sample?.movingAverageValues?[index]
+//        else { return nil }
+//        return BodyMassUnit.kg.convert(value, to: SettingsStore.bodyMassUnit)
+//    }
+    
     func movingAverageValue(at index: Int) -> Double? {
-        guard let value = sample?.movingAverageValues?[index]
+        let date = self.date.moveDayBy(-index)
+        guard let value = backendQuantities?[date]?.quantity?.value
         else { return nil }
         return BodyMassUnit.kg.convert(value, to: SettingsStore.bodyMassUnit)
+
+//        guard let value = sample?.movingAverageValues?[index]
+//        else { return nil }
+//        return BodyMassUnit.kg.convert(value, to: SettingsStore.bodyMassUnit)
     }
 }

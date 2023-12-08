@@ -15,6 +15,16 @@ extension HealthModel {
     }
     
     func add(_ type: HealthType) {
+        
         health.add(type)
+        
+        switch type {
+        case .maintenance:
+            Task {
+                try await fetchBackendValuesForAdaptiveMaintenance()
+            }
+        default:
+            break
+        }
     }
 }

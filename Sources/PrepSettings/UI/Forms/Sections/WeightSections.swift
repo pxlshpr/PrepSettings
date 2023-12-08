@@ -154,7 +154,10 @@ extension WeightSections {
     }
     
     func appeared() {
-        model.fetchValues()
+        Task {
+            try await model.fetchHealthKitData()
+            try await model.fetchBackendData()
+        }
         if model.isUserEntered {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 focusTextField()
@@ -164,7 +167,10 @@ extension WeightSections {
     
     func scenePhaseChanged(old: ScenePhase, new: ScenePhase) {
         switch new {
-        case .active:   model.fetchValues()
+        case .active:   
+            Task {
+                try await model.fetchHealthKitData()
+            }
         default:        break
         }
     }
@@ -491,22 +497,13 @@ extension WeightSections {
             }
         }
         
-        var placeholderText: some View {
-            LargeHealthValue(
-                value: 0,
-                valueString: "0",
-                unitString: "kg"
-            )
-            .opacity(0)
-        }
-        
         return Section {
-            ZStack {
+            ZStack(alignment: .bottomTrailing) {
                 HStack {
                     Spacer()
                     weightText
                 }
-                placeholderText
+                LargePlaceholderText
             }
         }
     }

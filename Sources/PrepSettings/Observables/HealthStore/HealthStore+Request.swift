@@ -16,10 +16,18 @@ extension HealthStore {
 
     static func daysWeights(
         in unit: BodyMassUnit = .kg,
-        for date: Date = Date.now
+        for date: Date
     ) async throws -> [Quantity]? {
         try await HealthKitQuantityRequest(.weight, unit.healthKitUnit)
-            .daysQuantities(to: date)
+            .daysQuantities(for: date)
+    }
+
+    static func daysWeights(
+        in unit: BodyMassUnit = .kg,
+        for range: ClosedRange<Date>
+    ) async throws -> [Quantity]? {
+        try await HealthKitQuantityRequest(.weight, unit.healthKitUnit)
+            .daysQuantities(for: range)
     }
 
     static func weight(

@@ -24,11 +24,12 @@ struct WeightCell: View {
     var valueText: some View {
         if let value = weight.value {
             HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                Text(value.healthString)
-                    .font(NumberFont)
-                    .animation(.default, value: value)
-                    .contentTransition(.numericText(value: value))
-                Text(settingsStore.bodyMassUnit.abbreviation)
+                Text("\(value.clean) \(settingsStore.bodyMassUnit.abbreviation)")
+//                Text(value.healthString)
+//                    .font(NumberFont)
+//                    .animation(.default, value: value)
+//                    .contentTransition(.numericText(value: value))
+//                Text(settingsStore.bodyMassUnit.abbreviation)
             }
         } else {
             Text("Not Set")

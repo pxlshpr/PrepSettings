@@ -87,10 +87,10 @@ struct IntervalPicker: View {
     
     var body: some View {
         Section(header: header) {
-            HStack {
-                value
+            HStack(spacing: 3) {
                 stepper
                 Spacer()
+                value
                 periodPicker
             }
         }

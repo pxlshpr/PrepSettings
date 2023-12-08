@@ -10,7 +10,9 @@ public protocol HealthModelDelegate {
      – This function in Prep would simply query the backend for the DayEntities in that range and extract the values and supply the data required
      */
     func maintenanceBackendValues(for dateRange: ClosedRange<Date>) async throws -> MaintenanceValues
-    
+
+    func weights(for dateRange: ClosedRange<Date>) async throws -> [Date: HealthQuantity]
+
     /**
      Takes in a weight value, a type (HealthKit or userEntered) and a date and updates it in the backend.
      

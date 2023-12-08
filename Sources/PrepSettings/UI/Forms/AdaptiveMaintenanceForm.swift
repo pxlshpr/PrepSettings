@@ -121,7 +121,7 @@ struct AdaptiveMaintenanceForm: View {
         var value: some View {
             if let delta {
                 HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                    Text("\(delta.cleanAmount)")
+                    Text("\(delta > 0 ? "+" : "")\(delta.cleanAmount)")
                         .font(NumberFont)
                         .contentTransition(.numericText(value: Double(delta)))
                     Text(bodyMassUnit.abbreviation)

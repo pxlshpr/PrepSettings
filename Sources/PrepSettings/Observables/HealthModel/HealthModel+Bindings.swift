@@ -34,10 +34,10 @@ public extension HealthModel {
         return maintenanceWeightChangeDelta < 0
     }
 
-    var maintenanceWeightChangeDeltaType: DeltaType {
-        guard let delta = maintenanceWeightChangeDelta else { return .zero }
-        return delta < 0 ? .negative : .positive
-    }
+//    var maintenanceWeightChangeDeltaType: DeltaType {
+//        guard let delta = maintenanceWeightChangeDelta else { return .zero }
+//        return delta < 0 ? .negative : .positive
+//    }
 
     var maintenanceWeightChangeDelta: Double? {
         get { health.maintenance?.adaptive.weightChange.delta }

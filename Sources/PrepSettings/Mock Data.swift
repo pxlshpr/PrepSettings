@@ -17,6 +17,27 @@ struct MockHealthModelDelegate: HealthModelDelegate {
 //        try await fetchMaintenanceValuesFromDocuments()
     }
     
+    func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthQuantity] {
+        [
+            Date(fromDateString: "2021_08_27")!: .init(source: .userEntered, quantity: .init(value: 93)),
+//            Date(fromDateString: "2021_08_26")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, nil), /// weight
+//            Date(fromDateString: "2021_08_25")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, nil),
+//            Date(fromDateString: "2021_08_24")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, nil),
+            Date(fromDateString: "2021_08_23")!: .init(source: .userEntered, quantity: .init(value: 94)), /// (94, nil), /// weight
+//            Date(fromDateString: "2021_08_22")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, 2300),
+            Date(fromDateString: "2021_08_21")!: .init(source: .userEntered, quantity: .init(value: 94.5)), /// (94.5, nil),
+
+//            Date(fromDateString: "2021_08_20")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, 2250),
+            Date(fromDateString: "2021_08_19")!: .init(source: .userEntered, quantity: .init(value: 92.4)), /// (92.4, 1950), /// weight
+            Date(fromDateString: "2021_08_18")!: .init(source: .userEntered, quantity: .init(value: 94.15)), /// (94.15, 2650), /// weight
+//            Date(fromDateString: "2021_08_17")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, 2534),
+            Date(fromDateString: "2021_08_16")!: .init(source: .userEntered, quantity: .init(value: 92.75)), /// (92.75, 2304), /// weight
+//            Date(fromDateString: "2021_08_15")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, 2055),
+//            Date(fromDateString: "2021_08_14")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, nil),
+//            Date(fromDateString: "2021_08_13")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, nil),
+        ]
+    }
+    
     func updateBackendWeight(for date: Date, with quantity: Quantity?, source: HealthSource) async throws {
         /// [ ] Load the struct from documents—simply amend the value we have, and then save it so that we can test the persistencen
         var values = try await fetchMaintenanceValuesFromDocuments()
