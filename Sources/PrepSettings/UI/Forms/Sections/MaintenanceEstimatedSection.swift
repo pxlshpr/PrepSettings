@@ -33,7 +33,9 @@ public struct MaintenanceEstimatedSection: View {
 //    @ViewBuilder
     var footer: some View {
 //        if model.maintenanceEnergyIsAdaptive {
-            Text("The estimate is also used when there isn't sufficient data to calculate your adaptive maintenance.")
+//            Text("The estimate is also used when there isn't sufficient data to calculate your adaptive maintenance.")
+//        Text("An estimate of your resting and active energies are added together to calculate this.")
+        Text("An estimate based on your resting and active energies.")
 //        }
     }
     
