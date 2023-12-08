@@ -345,6 +345,8 @@ extension WeightSections {
                         cell(weight: DatedWeight(
                             value: model.movingAverageValue(at: $0),
                             date: model.date.moveDayBy(-$0)
+//                            value: 0,
+//                            date: Date.now
                         ))
                     }
                 }

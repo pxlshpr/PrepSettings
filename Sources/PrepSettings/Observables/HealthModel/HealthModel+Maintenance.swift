@@ -17,8 +17,8 @@ extension HealthModel {
         
         if !isPreview {
             //TODO: Do these in parallel
-            try await values.fillInMissingWeightsFromHealthKit(healthModel: self)
-            try await values.fillInMissingDietaryEnergyFromHealthKit()
+//            try await values.fillInMissingWeightsFromHealthKit(healthModel: self)
+//            try await values.fillInMissingDietaryEnergyFromHealthKit()
         } else {
             /// Don't touch HealthKit if we've in a preview
         }

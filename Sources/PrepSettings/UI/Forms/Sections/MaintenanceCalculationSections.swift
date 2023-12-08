@@ -61,7 +61,8 @@ struct MaintenanceAdaptiveSection: View {
     var footer: some View {
 //                Text("Adaptively calculate your \(HealthType.maintenanceEnergy.abbreviation) based on your weight change and dietary energy over the prior week. [Learn More.](https://example.com)")
 //        Text("Compares your weight change to the dietary energy you consumed to determine your adaptive maintenance. [Learn More.](https://example.com)")
-        Text("Compares weight change to dietary energy consumed to determine your true maintenance, continuously adapting it to changes.")
+//        Text("Compares weight change to dietary energy consumed to determine your true maintenance, continuously adapting it to changes.")
+        Text("The most accurate calculation of your maintenance energy..")
     }
     
     var toggleRow: some View {

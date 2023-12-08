@@ -35,6 +35,8 @@ struct MockHealthModelDelegate: HealthModelDelegate {
 //            Date(fromDateString: "2021_08_15")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, 2055),
 //            Date(fromDateString: "2021_08_14")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, nil),
 //            Date(fromDateString: "2021_08_13")!: .init(source: .userEntered, quantity: .init(value: 93)), /// (nil, nil),
+
+            Date(fromDateString: "2021_08_07")!: .init(source: .userEntered, quantity: .init(value: 96.35)), /// (92.75, 2304), /// weight
         ]
     }
     
@@ -122,6 +124,7 @@ let MockMaintenanceValues = [
     Date(fromDateString: "2021_08_15")!: (nil, 2055),
     Date(fromDateString: "2021_08_14")!: (nil, nil),
     Date(fromDateString: "2021_08_13")!: (nil, nil),
+    Date(fromDateString: "2021_08_07")!: (96.35, 1965),
 ]
 
 func resetMockMaintenanceValues() {
