@@ -23,12 +23,24 @@ public extension HealthPeriod {
         }
     }
     
+    var plural: String {
+        switch self {
+        case .day:      "days"
+        case .week:     "weeks"
+        case .month:    "months"
+        }
+    }
+}
+
+public extension HealthPeriod {
+    
     var minValue: Int {
         switch self {
         case .day:  2
         default:    1
         }
     }
+    
     var maxValue: Int {
         switch self {
         case .day:      6
@@ -66,5 +78,7 @@ public extension HealthPeriod {
 extension HealthPeriod: Pickable {
     public var pickedTitle: String { name }
     public var menuTitle: String { name }
+    public var pluralPickedTitle: String { plural }
+    public var pluralMenuTitle: String { plural }
     public static var `default`: HealthPeriod { .week }
 }

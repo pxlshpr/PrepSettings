@@ -63,8 +63,15 @@ struct AdaptiveMaintenanceForm: View {
                 healthModel.health.maintenance?.adaptive.interval = $0
             }
         )
-        return IntervalPicker(interval: binding)
+        return IntervalPicker(
+            interval: binding,
+            periods: [.day, .week],
+            ranges: [
+                .day: 3...6
+            ]
+        )
     }
+    
     var intervalSection_: some View {
         
         var stepper: some View {

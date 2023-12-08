@@ -4,6 +4,18 @@ import PrepShared
 struct IntervalPicker: View {
     
     @Binding var interval: HealthInterval
+    let periods: [HealthPeriod]?
+    let ranges: [HealthPeriod: ClosedRange<Int>]?
+    
+    init(
+        interval: Binding<HealthInterval>,
+        periods: [HealthPeriod]? = nil,
+        ranges: [HealthPeriod: ClosedRange<Int>]? = nil
+    ) {
+        _interval = interval
+        self.periods = periods
+        self.ranges = ranges
+    }
     
     var value: some View {
         Text("\(interval.value)")
@@ -11,17 +23,56 @@ struct IntervalPicker: View {
             .contentTransition(.numericText(value: Double(interval.value)))
     }
     
+    func range(for period: HealthPeriod) -> ClosedRange<Int> {
+        ranges?[period] ?? 1...period.maxValue
+    }
+    
     var stepper: some View {
-        Stepper(
+        
+        return Stepper(
             "",
             value: $interval.value,
-            in: interval.period.range
+            in: range(for: interval.period)
         )
         .fixedSize()
     }
     
+    var periodBinding: Binding<HealthPeriod> {
+        Binding<HealthPeriod>(
+            get: {
+                interval.period
+            },
+            set: { newValue in
+                interval.period = newValue
+
+                /// If  a range for this period was provided
+                let range = range(for: newValue)
+
+                /// Ensure the value is within the range
+                if interval.value < range.lowerBound {
+                    interval.value = range.lowerBound
+                }
+                if interval.value > range.upperBound {
+                    interval.value = range.upperBound
+                }
+            }
+        )
+    }
+    
+    @ViewBuilder
     var periodPicker: some View {
-        MenuPicker($interval.period, isPlural: interval.value != 1)
+        if let periods {
+            MenuPicker(
+                periods,
+                periodBinding,
+                isPlural: interval.value != 1
+            )
+        } else {
+            MenuPicker(
+                $interval.period,
+                isPlural: interval.value != 1
+            )
+        }
     }
     
     var body: some View {
@@ -36,11 +87,24 @@ struct IntervalPicker: View {
     }
 }
 
-#Preview {
-    @State var interval: HealthInterval = .init(1, .week)
-    return NavigationStack {
-        Form {
-            IntervalPicker(interval: $interval)
+struct HealthIntervalTest: View {
+    @State var interval: HealthInterval = .init(2, .week)
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                IntervalPicker(
+                    interval: $interval,
+                    periods: [.day, .week],
+                    ranges: [
+                        .day: 3...6
+                    ]
+                )
+            }
         }
     }
+}
+
+#Preview {
+    HealthIntervalTest()
 }
