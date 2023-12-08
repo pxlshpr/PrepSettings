@@ -28,13 +28,11 @@ struct WeightCell: View {
                     .font(NumberFont)
                     .animation(.default, value: value)
                     .contentTransition(.numericText(value: value))
-                    .foregroundStyle(Color(.secondaryLabel))
                 Text(settingsStore.bodyMassUnit.abbreviation)
-                    .foregroundStyle(.secondary)
             }
         } else {
             Text("Not Set")
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
     }
     

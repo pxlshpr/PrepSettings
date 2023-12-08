@@ -77,6 +77,10 @@ extension WeightSections {
 extension WeightSections.Model {
     
     func fetchValues() {
+        guard !isPreview else {
+            return
+        }
+        
         Task {
             switch formType {
             case .healthDetails:
@@ -132,7 +136,14 @@ extension WeightSections.Model {
         }
         
         withAnimation {
-            healthModel.health.weight?.quantity = quantity
+            switch formType {
+            case .healthDetails:
+                healthModel.health.weight?.quantity = quantity
+            case .adaptiveSample:
+                sample?.value = quantity?.value
+            case .adaptiveSampleAverageComponent:
+                self.value = quantity?.value
+            }
         }
     }
     
@@ -246,6 +257,7 @@ extension WeightSections.Model {
             false
         case .adaptiveSample:
             sampleSource == .healthKit
+            && useDailyAverage
         }
     }
     
@@ -307,13 +319,22 @@ extension WeightSections.Model {
             get: { self.sampleSource ?? .userEntered },
             set: { newValue in
                 /// [ ] If we switch to `.movingAverage` – fetch the values for the dates from the backend (whatever value we have stored for each date)
-                /// [ ] If we switch to `.healthKit` – use the values we would have fetched depending on if we're using average day's entires or not
+                /// [x] If we switch to `.healthKit` – use the values we would have fetched depending on if we're using average day's entires or not
                 
                 withAnimation {
                     self.sampleSource = newValue
                 }
                 
-                // Change source for the day this pertains to
+                switch newValue {
+                case .healthKit:
+                    self.setHealthKitQuantity()
+                case .movingAverage:
+                    self.setMovingAverageValue()
+                default:
+                    break
+                }
+                
+                /// [ ]  Change source for the day this pertains to
                 Task {
 //                    if let quantity = self.quantity {
 //                        try await self.healthModel.delegate.updateBackendWeight(
@@ -327,6 +348,15 @@ extension WeightSections.Model {
         )
     }
     
+    func setMovingAverageValue() {
+        guard let values = sample?.movingAverageValues,
+              let average = Array(values.values).averageValue
+        else {
+            self.sample?.value = nil
+            return
+        }
+        self.sample?.value = average
+    }
     
     var useDailyAverage: Bool {
         get {
@@ -335,8 +365,8 @@ extension WeightSections.Model {
                 healthModel.health.weight?.isDailyAverage ?? false
             case .adaptiveSampleAverageComponent:
                 false
-            default:
-                false
+            case .adaptiveSample:
+                sample?.isDailyAverage == true
             }
         }
         set {
@@ -348,8 +378,11 @@ extension WeightSections.Model {
                 setHealthKitQuantity()
             case .adaptiveSampleAverageComponent:
                 break
-            default:
-                break
+            case .adaptiveSample:
+                withAnimation {
+                    sample?.isDailyAverage = newValue
+                }
+                setHealthKitQuantity()
             }
         }
     }

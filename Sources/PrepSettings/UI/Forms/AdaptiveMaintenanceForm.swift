@@ -68,7 +68,8 @@ struct AdaptiveMaintenanceForm: View {
             periods: [.day, .week],
             ranges: [
                 .day: 3...6
-            ]
+            ],
+            title: "Calculated Over"
         )
     }
     

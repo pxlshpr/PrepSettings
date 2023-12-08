@@ -12,12 +12,12 @@ import SwiftHaptics
 /// [ ] Make sure changes are saved in real time in the backend
 
 /// **Adaptive Sample**
-/// [ ] Don't show Apple Health (or disable it), if there aren't values for it
+/// [x] Don't show Apple Health (or disable it), if there aren't values for it
 /// [ ] Link "Use Daily Average" to binding
 /// [ ] Don't averaged values if "use daily average" is off
 /// [ ] Any changes with Apple Health or Custom selected should be sent and saved to the backend immediately in addition to changing it in WeightChange
 /// [ ] Fetch the values for the current interval too
-/// [ ] Use new interval picker
+/// [x] Use new interval picker
 /// [ ] Removing value should only remove the value in Maintenance, not in backend
 /// [ ] Change in custom value should be immediately saved
 /// [ ] Loading form should select correct source
@@ -202,9 +202,27 @@ extension WeightSections {
             }
         }
         
+        let intervalBinding = Binding<HealthInterval>(
+            get: {
+                model.sample?.movingAverageInterval ?? .default
+            },
+            set: {
+                model.sample?.movingAverageInterval = $0
+            }
+        )
+        
         return Group {
             if shouldShow {
-                section
+                IntervalPicker(
+                    interval: intervalBinding,
+                    periods: [.day, .week],
+                    ranges: [
+                        .day: 2...6,
+                        .week: 1...2
+                    ],
+                    title: "Moving Average Over"
+                )
+//                section
             }
         }
     }
@@ -416,6 +434,36 @@ extension WeightSections {
     
     var valueSection: some View {
         
+        var adaptiveSampleValue: some View {
+            
+            var sampleSource: WeightSampleSource {
+                model.sampleSource ?? .default
+            }
+            
+            var sampleValue: Double? {
+                guard let value = model.sample?.value else { return nil }
+                return BodyMassUnit.kg.convert(value, to: .kg)
+            }
+            
+            return Group {
+                switch sampleSource {
+                case .userEntered:
+                    manualValue
+                default:
+                    if let sampleValue {
+                        LargeHealthValue(
+                            value: sampleValue,
+                            valueString: sampleValue.clean,
+                            unitString: settingsStore.bodyMassUnit.abbreviation
+                        )
+                    } else {
+                        Text("Not Set")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        
         @ViewBuilder
         var weightText: some View {
             switch model.formType {
@@ -439,18 +487,7 @@ extension WeightSections {
             case .adaptiveSampleAverageComponent:
                 EmptyView()
             case .adaptiveSample:
-                if let sampleSource = model.sampleSource {
-                    switch sampleSource {
-                    case .movingAverage:
-                        Text("Not Set")
-                            .foregroundStyle(.secondary)
-                    case .healthKit:
-                        Text("No Data")
-                            .foregroundStyle(.secondary)
-                    case .userEntered:
-                        manualValue
-                    }
-                }
+                adaptiveSampleValue
             }
         }
         

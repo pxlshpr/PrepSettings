@@ -2,18 +2,25 @@ import PrepShared
 
 public struct WeightSample: Hashable, Codable {
     var value: Double?
+    
+    var source: WeightSampleSource
+    var isDailyAverage: Bool
+    
     var movingAverageInterval: HealthInterval?
     var movingAverageValues: [Int: Double]?
 
     public init(
         movingAverageInterval: HealthInterval? = nil,
-//        movingAverageInterval: HealthInterval? = nil,
         movingAverageValues: [Int: Double]? = nil,
-        value: Double? = nil
+        value: Double? = nil,
+        source: WeightSampleSource = .movingAverage,
+        isDailyAverage: Bool = false
     ) {
         self.movingAverageInterval = movingAverageInterval
         self.movingAverageValues = movingAverageValues
         self.value = value
+        self.source = source
+        self.isDailyAverage = isDailyAverage
     }
 }
 

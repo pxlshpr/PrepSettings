@@ -6,15 +6,18 @@ struct IntervalPicker: View {
     @Binding var interval: HealthInterval
     let periods: [HealthPeriod]?
     let ranges: [HealthPeriod: ClosedRange<Int>]?
+    let title: String?
     
     init(
         interval: Binding<HealthInterval>,
         periods: [HealthPeriod]? = nil,
-        ranges: [HealthPeriod: ClosedRange<Int>]? = nil
+        ranges: [HealthPeriod: ClosedRange<Int>]? = nil,
+        title: String? = nil
     ) {
         _interval = interval
         self.periods = periods
         self.ranges = ranges
+        self.title = title
     }
     
     var value: some View {
@@ -75,8 +78,15 @@ struct IntervalPicker: View {
         }
     }
     
+    @ViewBuilder
+    var header: some View {
+        if let title {
+            Text(title)
+        }
+    }
+    
     var body: some View {
-        Section("Calculated over") {
+        Section(header: header) {
             HStack {
                 value
                 stepper
