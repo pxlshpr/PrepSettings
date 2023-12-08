@@ -55,8 +55,17 @@ struct AdaptiveMaintenanceForm: View {
             }
         }
     }
-    
+
     var intervalSection: some View {
+        let binding = Binding<HealthInterval>(
+            get: { healthModel.health.maintenance?.adaptive.interval ?? .init(1, .week) },
+            set: {
+                healthModel.health.maintenance?.adaptive.interval = $0
+            }
+        )
+        return IntervalPicker(interval: binding)
+    }
+    var intervalSection_: some View {
         
         var stepper: some View {
             Stepper(
@@ -91,8 +100,38 @@ struct AdaptiveMaintenanceForm: View {
         var footer: some View {
             Text("The change in your weight over the past \(intervalString).")
         }
+        
+        var bodyMassUnit: BodyMassUnit {
+            settingsStore.bodyMassUnit
+        }
+        
+        var delta: Double? {
+            healthModel.health.maintenance?.adaptive.weightChange.delta(in: bodyMassUnit)
+        }
+        
+        @ViewBuilder
+        var value: some View {
+            if let delta {
+                HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
+                    Text("\(delta.cleanAmount)")
+                        .font(NumberFont)
+                        .contentTransition(.numericText(value: Double(delta)))
+                    Text(bodyMassUnit.abbreviation)
+                }
+            } else {
+                Text("Not Set")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        
         return Section(footer: footer) {
-            weightChangeRow
+            NavigationLink(value: Route.weightSamples) {
+                HStack {
+                    Text("Weight Change")
+                    Spacer()
+                    value
+                }
+            }
         }
     }
     
@@ -101,61 +140,18 @@ struct AdaptiveMaintenanceForm: View {
             Text("The total dietary energy that was consumed over the past \(intervalString).")
         }
         return Section(footer: footer) {
-            dietaryEnergyRow
-        }
-    }
-    
-    var weightChangeRow: some View {
-        NavigationLink(value: Route.weightSamples) {
-            HStack {
-                Text("Weight Change")
-                Spacer()
-                maintenance.adaptive.weightChangeValueText(bodyMassUnit: settingsStore.bodyMassUnit)
-            }
-        }
-    }
-    
-    var dietaryEnergyRow: some View {
-        NavigationLink(value: Route.dietaryEnergySamples) {
-            HStack {
-                Text("Dietary Energy")
-                Spacer()
-                if let total = maintenance.adaptive.dietaryEnergy.total {
-                    Text("\(total.formattedEnergy) kcal")
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Not set")
-                        .foregroundStyle(.tertiary)
+            NavigationLink(value: Route.dietaryEnergySamples) {
+                HStack {
+                    Text("Dietary Energy")
+                    Spacer()
+                    if let total = maintenance.adaptive.dietaryEnergy.total {
+                        Text("\(total.formattedEnergy) kcal")
+                    } else {
+                        Text("Not Set")
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
-        }
-    }
-    
-    var paramsSection: some View {
-        var footer: some View {
-            Text("Your weight change will be compared to the total dietary energy you consumed over the specified period to determine your maintenance energy.")
-        }
-        
-        var periodRow: some View {
-            HStack {
-                Text("Period")
-                Spacer()
-                Stepper("", value: healthModel.intervalValueBinding, in: healthModel.intervalPeriod.range)
-                    .fixedSize()
-                HStack(spacing: UnitSpacing) {
-                    Text("\(healthModel.intervalValue)")
-                        .font(NumberFont)
-                        .contentTransition(.numericText(value: Double(healthModel.intervalValue)))
-                        .foregroundStyle(.secondary)
-                    MenuPicker<HealthPeriod>([.day, .week], healthModel.intervalPeriodBinding)
-                }
-            }
-        }
-        
-        return Section(footer: footer) {
-//            periodRow
-            weightChangeRow
-            dietaryEnergyRow
         }
     }
     

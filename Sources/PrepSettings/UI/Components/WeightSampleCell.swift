@@ -24,7 +24,7 @@ struct WeightSampleCell: View {
             }
             .foregroundStyle(.secondary)
         } else {
-            Text("Not set")
+            Text("Not Set")
                 .foregroundStyle(.tertiary)
         }
     }

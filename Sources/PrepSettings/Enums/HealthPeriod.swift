@@ -17,9 +17,9 @@ public extension HealthPeriod {
     
     var name: String {
         switch self {
-        case .day:      "Day"
-        case .week:     "Week"
-        case .month:    "Month"
+        case .day:      "day"
+        case .week:     "week"
+        case .month:    "month"
         }
     }
     

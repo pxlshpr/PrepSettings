@@ -11,7 +11,7 @@ extension GenericSource {
     var placeholder: String {
         switch isHealth {
         case true:  "Unavailable"
-        case false: "Not set"
+        case false: "Not Set"
         }
     }
 }
@@ -38,7 +38,7 @@ extension ActiveEnergySource: GenericSource {
         switch self {
         case .healthKit:        "Unavailable"
         case .activityLevel:    "Requires resting energy"
-        case .userEntered:      "Not set"
+        case .userEntered:      "Not Set"
         }
     }
 }
@@ -49,7 +49,7 @@ extension LeanBodyMassSource: GenericSource {
     var placeholder: String {
         switch self {
         case .healthKit:        "Unavailable"
-        case .userEntered:      "Not set"
+        case .userEntered:      "Not Set"
         case .equation:         "Unable to calculate" //"Requires health details"
         case .fatPercentage:    "Requires fat percentage"
         }

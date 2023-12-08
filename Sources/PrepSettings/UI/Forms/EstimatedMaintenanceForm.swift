@@ -79,7 +79,7 @@ public struct EstimatedMaintenanceForm: View {
                 if let value {
                     content(value)
                 } else {
-                    Text("Not set")
+                    Text("Not Set")
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -113,7 +113,7 @@ struct HealthLink: View {
                     Text(string)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("Not set")
+                    Text("Not Set")
                         .foregroundStyle(.tertiary)
                 }
             }

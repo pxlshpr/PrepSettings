@@ -206,7 +206,7 @@ public struct HealthSummary: View {
 //                    Text(string)
 //                        .foregroundStyle(.secondary)
 //                } else {
-//                    Text("Not set")
+//                    Text("Not Set")
 //                        .foregroundStyle(.tertiary)
 //                }
 //            }

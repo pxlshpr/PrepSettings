@@ -31,7 +31,7 @@ struct MaintenanceEstimateText: View {
 //                    .font(.system(.body, design: .default, weight: .semibold))
             }
         } else {
-            Text("Not set")
+            Text("Not Set")
                 .foregroundStyle(.tertiary)
         }
     }

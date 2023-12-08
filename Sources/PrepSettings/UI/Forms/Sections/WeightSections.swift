@@ -405,7 +405,7 @@ extension WeightSections {
                 if let sampleSource = model.sampleSource {
                     switch sampleSource {
                     case .movingAverage:
-                        Text("Not set")
+                        Text("Not Set")
                             .foregroundStyle(.tertiary)
                     case .healthKit:
                         Text("No data")

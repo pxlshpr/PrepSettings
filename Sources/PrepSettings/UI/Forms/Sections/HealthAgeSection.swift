@@ -79,7 +79,7 @@ struct HealthAgeSection: View {
             case .userEnteredDateOfBirth:
                 "Choose your date of birth"
             case .userEnteredAge:
-                "Not set"
+                "Not Set"
             }
         }
         

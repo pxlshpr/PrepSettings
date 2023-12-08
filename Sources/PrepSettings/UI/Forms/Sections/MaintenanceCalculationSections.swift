@@ -31,7 +31,7 @@ struct MaintenanceAdaptiveSection: View {
                     Text("\(value.formattedEnergy) \(settingsStore.energyUnit.abbreviation)")
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("Not set")
+                    Text("Not Set")
                         .foregroundStyle(.tertiary)
                 }
             }

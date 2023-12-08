@@ -3,43 +3,28 @@ import PrepShared
 
 extension Health.Maintenance.Adaptive {
     
-    @ViewBuilder
-    func weightChangeValueText(bodyMassUnit: BodyMassUnit) -> some View {
-        if let delta = weightChange.delta(in: bodyMassUnit) {
-            HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                Text("\(delta.cleanAmount)")
-                    .font(NumberFont)
-                    .contentTransition(.numericText(value: Double(delta)))
-                Text(bodyMassUnit.abbreviation)
-            }
-            .foregroundStyle(.secondary)
-        } else {
-            Text("Not set")
-//            Text("Set weights")
-//            switch (weightChange.previous.value == nil, weightChange.current.value == nil) {
-//            case (true, true):
-//                Text("Set weights")
-                    .foregroundStyle(.tertiary)
-//            case (false, true):
-//                Text("Set current weight")
-//                    .foregroundStyle(.tertiary)
-//            case (true, false):
-//                Text("Set previous weight")
-//                    .foregroundStyle(.tertiary)
-//            case (false, false):
-//                Text("Not set")
-//                    .foregroundStyle(.tertiary)
+//    @ViewBuilder
+//    func weightChangeValueText(bodyMassUnit: BodyMassUnit) -> some View {
+//        if let delta = weightChange.delta(in: bodyMassUnit) {
+//            HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
+//                Text("\(delta.cleanAmount)")
+//                    .font(NumberFont)
+//                    .contentTransition(.numericText(value: Double(delta)))
+//                Text(bodyMassUnit.abbreviation)
 //            }
-        }
-    }
-    
-    func weightChangeRow(bodyMassUnit: BodyMassUnit) -> some View {
-        HStack {
-            Text("Change")
-            Spacer()
-            weightChangeValueText(bodyMassUnit: bodyMassUnit)
-        }
-    }
+//        } else {
+//            Text("Not Set")
+//                .foregroundStyle(.secondary)
+//        }
+//    }
+//    
+//    func weightChangeRow(bodyMassUnit: BodyMassUnit) -> some View {
+//        HStack {
+//            Text("Change")
+//            Spacer()
+//            weightChangeValueText(bodyMassUnit: bodyMassUnit)
+//        }
+//    }
     
     func equivalentEnergyRow(energyUnit: EnergyUnit) -> some View {
         HStack {
@@ -54,7 +39,7 @@ extension Health.Maintenance.Adaptive {
                 }
                 .foregroundStyle(.secondary)
             } else {
-                Text("Not set")
+                Text("Not Set")
                     .foregroundStyle(.tertiary)
             }
         }
