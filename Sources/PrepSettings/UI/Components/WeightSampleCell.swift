@@ -22,10 +22,9 @@ struct WeightSampleCell: View {
                     .contentTransition(.numericText(value: Double(value)))
                 Text(settingsStore.bodyMassUnit.abbreviation)
             }
-            .foregroundStyle(.secondary)
         } else {
             Text("Not Set")
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
     }
     

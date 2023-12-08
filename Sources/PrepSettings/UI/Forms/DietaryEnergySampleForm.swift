@@ -253,7 +253,7 @@ struct DietaryEnergySampleForm: View {
                 }
                 .foregroundStyle(Color(.secondaryLabel))
             } else {
-                Text("No data")
+                Text("No Data")
                     .foregroundStyle(Color(.tertiaryLabel))
             }
         }

@@ -15,7 +15,7 @@ extension WeightSections {
         let initialSample: WeightSample?
         var sample: WeightSample?
         
-        var healthKitLatestDayQuantities: [Quantity]?
+        var healthKitQuantities: [Quantity]?
         var healthKitValueForDate: Double?
         
         /// Health init
@@ -83,23 +83,31 @@ extension WeightSections.Model {
                 /// [ ] Fetch the latest day's values from HealthKit
                 /// [ ] Keep this stored in the model
                 /// [ ] If this value exists (ie is stored), only then show the Apple Health option in source
-                let healthKitValue = try await healthModel.healthKitValue(for: .weight)
+                let quantities = try await HealthStore.latestDaysWeights(in: .kg, for: date)
                 
                 await MainActor.run {
-                    self.healthKitLatestDayQuantities = healthKitValue?.quantities
+                    self.healthKitQuantities = quantities
                     if source == .healthKit {
                         setHealthKitQuantity()
                     }
                 }
+
+            case .adaptiveSample:
+                /// [ ] Fetch the date's values, along with the values for all dates within the moving average interval (if sourceType is moving average)
+                /// [ ] Keep them stored in the model
+                /// [ ] If the value for the date exists, only then show the Apple Health option
+                let quantities = try await HealthStore.daysWeights(in: .kg, for: date)
+                await MainActor.run {
+                    self.healthKitQuantities = quantities
+                    if source == .healthKit {
+                        setHealthKitQuantity()
+                    }
+                }
+
             case .adaptiveSampleAverageComponent:
                 /// [ ] Fetch the date's value
                 /// [ ] Keep this stored in the model
                 /// [ ] If this value exists (ie is stored), only then show the Apple Health option
-                break
-            case .adaptiveSample:
-                /// [ ] Fetch the date's value, along with the values for all dates within the moving average interval (if sourceType is moving average)
-                /// [ ] Keep them stored in the model
-                /// [ ] If the value for the date exists, only then show the Apple Health option
                 break
             }
         }
@@ -109,9 +117,9 @@ extension WeightSections.Model {
         let value: Double? = switch useDailyAverage {
         case true:
             /// Set daily average
-            healthKitLatestDayQuantities?.averageValue
+            healthKitQuantities?.averageValue
         case false:
-            healthKitLatestDayQuantities?.last?.value
+            healthKitQuantities?.last?.value
         }
         
         let date = healthKitLatestQuantity?.date
@@ -176,7 +184,7 @@ extension WeightSections.Model {
     }
     
     var healthKitLatestQuantity: Quantity? {
-        healthKitLatestDayQuantities?.last
+        healthKitQuantities?.last
     }
     
     func computedValue(in unit: BodyMassUnit) -> Double? {

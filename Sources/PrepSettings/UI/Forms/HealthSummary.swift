@@ -87,7 +87,6 @@ public struct HealthSummary: View {
                         Text("Date")
                         Spacer()
                         Text(date.adaptiveMaintenanceDateString)
-                            .foregroundStyle(.secondary)
                     }
                 }
             }

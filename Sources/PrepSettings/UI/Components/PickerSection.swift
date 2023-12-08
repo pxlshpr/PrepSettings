@@ -6,29 +6,35 @@ public struct PickerSection<T: Pickable>: View {
     let options: [T]
     let binding: Binding<T>
     let title: String?
+    let disabledOptions: [T]
     
     public init(
         _ options: [T],
         _ binding: Binding<T>,
-        _ title: String? = nil
+        _ title: String? = nil,
+        disabledOptions: [T] = []
     ) {
         self.options = options
         self.binding = binding
         self.title = title
+        self.disabledOptions = disabledOptions
     }
 
     public init(
         _ binding: Binding<T>,
-        _ title: String? = nil
+        _ title: String? = nil,
+        disabledOptions: [T] = []
     ) {
         self.options = T.allCases as! [T]
         self.binding = binding
         self.title = title
+        self.disabledOptions = disabledOptions
     }
 
     public init(
         _ binding: Binding<T?>,
-        _ title: String? = nil
+        _ title: String? = nil,
+        disabledOptions: [T] = []
     ) {
         self.options = T.allCases as! [T]
         self.binding = Binding<T>(
@@ -36,12 +42,14 @@ public struct PickerSection<T: Pickable>: View {
             set: { binding.wrappedValue = $0 }
         )
         self.title = title
+        self.disabledOptions = disabledOptions
     }
 
     public init(
         _ options: [T],
         _ binding: Binding<T?>,
-        _ title: String?
+        _ title: String?,
+        disabledOptions: [T] = []
     ) {
         self.options = options
         self.binding = Binding<T>(
@@ -49,6 +57,7 @@ public struct PickerSection<T: Pickable>: View {
             set: { binding.wrappedValue = $0 }
         )
         self.title = title
+        self.disabledOptions = disabledOptions
     }
     
     public var body: some View {
@@ -65,6 +74,7 @@ public struct PickerSection<T: Pickable>: View {
         } label: {
             label(for: option)
         }
+        .disabled(disabledOptions.contains(option))
     }
     
     func label(for option: T) -> some View {
@@ -73,21 +83,33 @@ public struct PickerSection<T: Pickable>: View {
                 .opacity(binding.wrappedValue == option ? 1 : 0)
         }
         
+        var disabled: Bool {
+            disabledOptions.contains(option)
+        }
+        
+        var primaryColor: Color {
+            disabled ? Color(.tertiaryLabel) : Color(.label)
+        }
+
+        var secondaryColor: Color {
+            disabled ? Color(.quaternaryLabel) : Color(.secondaryLabel)
+        }
+
         var content: some View {
             func withDescription(_ description: String) -> some View {
                 VStack(alignment: .leading) {
                     Text(option.menuTitle)
                         .fontWeight(.semibold)
-                        .foregroundStyle(Color(.label))
+                        .foregroundStyle(primaryColor)
                     Text(description)
                         .font(.subheadline)
-                        .foregroundStyle(Color(.secondaryLabel))
+                        .foregroundStyle(secondaryColor)
                 }
             }
             
             var standard: some View {
                 Text(option.menuTitle)
-                    .foregroundStyle(Color(.label))
+                    .foregroundStyle(primaryColor)
             }
             
             return Group {
@@ -103,7 +125,7 @@ public struct PickerSection<T: Pickable>: View {
         var detail: some View {
             if let detail = option.detail {
                 Text(detail)
-                    .foregroundStyle(Color(.secondaryLabel))
+                    .foregroundStyle(secondaryColor)
             }
         }
         

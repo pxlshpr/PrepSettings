@@ -319,7 +319,7 @@ struct WeightSampleForm: View {
                         ],
                         value: 93.5
                     ),
-                    date: Date(fromDateString: "2021_08_28")!,
+                    date: MockDate,
                     healthModel: MockHealthModel,
                     settingsStore: SettingsStore.shared,
                     didSave: { value in

@@ -25,14 +25,12 @@ struct MaintenanceEstimateText: View {
                     .animation(.default, value: value)
                     .contentTransition(.numericText(value: value))
                     .font(NumberFont)
-                    .foregroundStyle(.secondary)
                 Text(settingsStore.energyUnit.abbreviation)
-                    .foregroundStyle(.secondary)
 //                    .font(.system(.body, design: .default, weight: .semibold))
             }
         } else {
             Text("Not Set")
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
     }
 }

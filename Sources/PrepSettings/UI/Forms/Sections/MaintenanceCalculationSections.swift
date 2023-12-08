@@ -29,10 +29,9 @@ struct MaintenanceAdaptiveSection: View {
                 Spacer()
                 if let value = model.health.adaptiveMaintenanceValue(in: settingsStore.energyUnit) {
                     Text("\(value.formattedEnergy) \(settingsStore.energyUnit.abbreviation)")
-                        .foregroundStyle(.secondary)
                 } else {
                     Text("Not Set")
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
         }

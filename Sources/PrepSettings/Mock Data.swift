@@ -59,7 +59,7 @@ func fetchHealthFromDocuments() async throws -> Health {
         var health = try JSONDecoder().decode(Health.self, from: data)
 //        health.date = Date.now.moveDayBy(-15)
 //        health.date = Date(fromDateString: "2023_02_26")!
-        health.date = Date(fromDateString: "2021_08_28")!
+        health.date = MockDate
         return health
     } catch {
         return .init()
@@ -84,8 +84,8 @@ func fetchSettingsFromDocuments() async throws -> Settings {
 }
 
 let MockMaintenanceValues = [
-    Date(fromDateString: "2021_08_28")!: (93.8, 1800.0),
-    Date(fromDateString: "2021_08_27")!: (93, nil), /// weight
+//    Date(fromDateString: "2021_08_28")!: (93.8, 1800.0),
+    Date(fromDateString: "2021_08_27")!: (93, 1800.0), /// weight
     Date(fromDateString: "2021_08_26")!: (nil, nil), /// weight
     Date(fromDateString: "2021_08_25")!: (nil, nil),
     Date(fromDateString: "2021_08_24")!: (nil, nil),
@@ -100,6 +100,7 @@ let MockMaintenanceValues = [
     Date(fromDateString: "2021_08_16")!: (92.75, 2304), /// weight
     Date(fromDateString: "2021_08_15")!: (nil, 2055),
     Date(fromDateString: "2021_08_14")!: (nil, nil),
+    Date(fromDateString: "2021_08_13")!: (nil, nil),
 ]
 
 func resetMockMaintenanceValues() {

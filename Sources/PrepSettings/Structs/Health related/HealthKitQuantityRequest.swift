@@ -101,10 +101,13 @@ extension HealthKitQuantityRequest {
         guard let latestDate = try await mostRecentOrEarliestAvailable(to: date)?.date else {
             return nil
         }
-        
+        return try await daysQuantities(to: latestDate)
+    }
+    
+    func daysQuantities(to date: Date) async throws -> [Quantity]? {
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "startDate >= %@", latestDate.startOfDay as NSDate),
-            NSPredicate(format: "startDate <= %@", latestDate.endOfDay as NSDate),
+            NSPredicate(format: "startDate >= %@", date.startOfDay as NSDate),
+            NSPredicate(format: "startDate <= %@", date.endOfDay as NSDate),
         ])
         return try await samples(
             matching: predicate,

@@ -111,10 +111,9 @@ struct HealthLink: View {
                 Spacer()
                 if let string = model.health.summaryDetail(for: type) {
                     Text(string)
-                        .foregroundStyle(.secondary)
                 } else {
                     Text("Not Set")
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
         }

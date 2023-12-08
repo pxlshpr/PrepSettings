@@ -11,6 +11,17 @@ import SwiftHaptics
 /// [ ] Make sure we're showing the values correctly
 /// [ ] Make sure changes are saved in real time in the backend
 
+/// **Adaptive Sample**
+/// [ ] Don't show Apple Health (or disable it), if there aren't values for it
+/// [ ] Link "Use Daily Average" to binding
+/// [ ] Don't averaged values if "use daily average" is off
+/// [ ] Any changes with Apple Health or Custom selected should be sent and saved to the backend immediately in addition to changing it in WeightChange
+/// [ ] Fetch the values for the current interval too
+/// [ ] Use new interval picker
+/// [ ] Removing value should only remove the value in Maintenance, not in backend
+/// [ ] Change in custom value should be immediately saved
+/// [ ] Loading form should select correct source
+///
 enum WeightFormType {
     case healthDetails
     case adaptiveSample
@@ -82,6 +93,7 @@ extension WeightSections {
     
     @ViewBuilder
     var content: some View {
+        sampleDateSection
         if model.isRemoved {
             emptyContent
         } else {
@@ -95,6 +107,22 @@ extension WeightSections {
                 valueSection
                 removeSection
             }
+        }
+    }
+    
+    @ViewBuilder
+    var sampleDateSection: some View {
+        switch model.formType {
+        case .adaptiveSample, .adaptiveSampleAverageComponent:
+            Section {
+                HStack {
+                    Text("Date")
+                    Spacer()
+                    Text(model.date.healthDateFormat)
+                }
+            }
+        default:
+            EmptyView()
         }
     }
     
@@ -199,7 +227,6 @@ extension WeightSections {
                     Text("Date")
                     Spacer()
                     Text(model.useDailyAverage ? date.healthDateFormat : date.healthFormat)
-                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -221,17 +248,15 @@ extension WeightSections {
                 ForEach(quantities, id: \.self) { quantity in
                     HStack {
                         Text(quantity.date?.shortTime ?? "")
-                            .foregroundStyle(.secondary)
                         Spacer()
                         Text("\(BodyMassUnit.kg.convert(quantity.value, to: settingsStore.bodyMassUnit).clean) \(settingsStore.bodyMassUnit.abbreviation)")
-                            .foregroundStyle(.secondary)
                     }
                 }
             }
         }
         
         var quantities: [Quantity]? {
-            model.healthKitLatestDayQuantities
+            model.healthKitQuantities
         }
         
         return Group {
@@ -339,7 +364,7 @@ extension WeightSections {
     var sourceSection: some View {
         
         var sampleSourcePicker: some View {
-            PickerSection(Binding<WeightSampleSource>(
+            let binding = Binding<WeightSampleSource>(
                 get: { model.sampleSourceBinding.wrappedValue },
                 set: { newValue in
                     model.sampleSourceBinding.wrappedValue = newValue
@@ -349,7 +374,22 @@ extension WeightSections {
                         unfocusTextField()
                     }
                 }
-            ))
+            )
+            
+            var options: [WeightSampleSource] {
+                if model.healthKitQuantities?.isEmpty == false {
+                    WeightSampleSource.allCases
+                } else {
+                    [.movingAverage, .userEntered]
+                }
+            }
+
+            var disabledOptions: [WeightSampleSource] {
+                model.healthKitQuantities?.isEmpty == false ? [] : [.healthKit]
+            }
+
+//            return PickerSection(options, binding)
+            return PickerSection(binding, disabledOptions: disabledOptions)
         }
         
         var sourcePicker: some View {
@@ -389,11 +429,8 @@ extension WeightSections {
                                 valueString: value.clean,
                                 unitString: settingsStore.bodyMassUnit.abbreviation
                             )
-                            .foregroundStyle(.secondary)
                         } else {
                             HealthKitErrorCell(type: .weight)
-//                            Text("No data")
-//                                .foregroundStyle(.tertiary)
                         }
                     case .userEntered:
                         manualValue
@@ -406,10 +443,10 @@ extension WeightSections {
                     switch sampleSource {
                     case .movingAverage:
                         Text("Not Set")
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                     case .healthKit:
-                        Text("No data")
-                            .foregroundStyle(.tertiary)
+                        Text("No Data")
+                            .foregroundStyle(.secondary)
                     case .userEntered:
                         manualValue
                     }
@@ -423,7 +460,6 @@ extension WeightSections {
                 valueString: "0",
                 unitString: "kg"
             )
-            .foregroundStyle(.secondary)
             .opacity(0)
         }
         
@@ -514,6 +550,8 @@ extension WeightSections {
     }
 }
 
+let MockDate = Date(fromDateString: "2021_08_27")!
+
 #Preview {
     @FocusState var focusedType: HealthType?
     return NavigationStack {
@@ -527,7 +565,7 @@ extension WeightSections {
                     ],
                     value: 93.5
                 ),
-                date: Date(fromDateString: "2021_08_28")!,
+                date: MockDate,
                 healthModel: MockHealthModel,
                 settingsStore: .shared,
                 focusedType: $focusedType

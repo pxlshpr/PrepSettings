@@ -132,7 +132,7 @@ struct RestingEnergySections: View {
                     unitString: settingsStore.energyUnit.abbreviation
                 )
             } else {
-                Text(model.restingEnergySource == .healthKit ? "No data" : "Not Set")
+                Text(model.restingEnergySource == .healthKit ? "No Data" : "Not Set")
                     .foregroundStyle(.tertiary)
             }
         }
