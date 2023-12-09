@@ -32,6 +32,12 @@ struct IntervalPicker: View {
     
     var stepper: some View {
         
+//        let binding = Binding<Int>(
+//            get: { interval.value },
+//            set: { newValue in
+//                
+//            }
+//        )
         return Stepper(
             "",
             value: $interval.value,
@@ -62,20 +68,22 @@ struct IntervalPicker: View {
         )
     }
     
-    @ViewBuilder
     var periodPicker: some View {
-        if let periods {
-            MenuPicker(
-                periods,
-                periodBinding,
-                isPlural: interval.value != 1
-            )
-        } else {
-            MenuPicker(
-                $interval.period,
-                isPlural: interval.value != 1
-            )
+        Group {
+            if let periods {
+                MenuPicker(
+                    periods,
+                    periodBinding,
+                    isPlural: interval.value != 1
+                )
+            } else {
+                MenuPicker(
+                    $interval.period,
+                    isPlural: interval.value != 1
+                )
+            }
         }
+        .fixedSize()
     }
     
     @ViewBuilder
@@ -100,11 +108,22 @@ struct IntervalPicker: View {
 struct HealthIntervalTest: View {
     @State var interval: HealthInterval = .init(2, .week)
     
+    var binding: Binding<HealthInterval> {
+        Binding<HealthInterval>(
+            get: { interval },
+            set: { newValue in
+                withAnimation {
+                    interval = newValue
+                }
+            }
+        )
+    }
+    
     var body: some View {
         NavigationStack {
             Form {
                 IntervalPicker(
-                    interval: $interval,
+                    interval: binding,
                     periods: [.day, .week],
                     ranges: [
                         .day: 3...6

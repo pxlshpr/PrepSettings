@@ -21,16 +21,29 @@ public struct HealthForm: View {
     }
     
     public var body: some View {
-        Form {
-            ForEach(types, id: \.self) {
-                content(for: $0)
+        content
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: focusedType, model.focusedTypeChanged)
+            .toolbar { keyboardToolbarContent }
+    }
+    
+    @ViewBuilder
+    var content: some View {
+        if types == [.weight] {
+            WeightSections(
+                healthModel: model,
+                settingsStore: settingsStore,
+                focusedType: $focusedType
+            )
+        } else {
+            Form {
+                ForEach(types, id: \.self) {
+                    content(for: $0)
+                }
             }
         }
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
-        .scrollDismissesKeyboard(.interactively)
-        .onChange(of: focusedType, model.focusedTypeChanged)
-        .toolbar { keyboardToolbarContent }
     }
     
     var keyboardToolbarContent: some ToolbarContent {

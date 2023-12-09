@@ -37,7 +37,7 @@ struct WeightSampleForm: View {
     }
     
     var body: some View {
-        Form {
+//        Form {
             WeightSections(
                 sample: model.sample,
                 date: model.date,
@@ -45,7 +45,7 @@ struct WeightSampleForm: View {
                 settingsStore: settingsStore,
                 focusedType: $focusedType
             )
-        }
+//        }
         .navigationTitle("Weight")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: focusedType, healthModel.focusedTypeChanged)
@@ -242,8 +242,9 @@ struct WeightSampleForm: View {
     }
 
     func movingAverageValue(at index: Int) -> Double? {
-        guard let value = model.sample.movingAverageValues?[index] else { return nil }
-        return BodyMassUnit.kg.convert(value, to: settingsStore.bodyMassUnit)
+        nil
+//        guard let value = model.sample.movingAverageValues?[index] else { return nil }
+//        return BodyMassUnit.kg.convert(value, to: settingsStore.bodyMassUnit)
     }
 
     @ViewBuilder
@@ -313,10 +314,10 @@ struct WeightSampleForm: View {
                 WeightSampleForm(
                     sample: .init(
                         movingAverageInterval: .init(1, .week),
-                        movingAverageValues: [
-                            1: 93,
-                            5: 94
-                        ],
+//                        movingAverageValues: [
+//                            1: 93,
+//                            5: 94
+//                        ],
                         value: 93.5
                     ),
                     date: MockDate,

@@ -86,27 +86,38 @@ struct WeightSections: View {
         content
             .onAppear(perform: appeared)
             .onChange(of: scenePhase, scenePhaseChanged)
+            .toolbar { bottomToolbarContent }
     }
 }
 
 extension WeightSections {
     
-    @ViewBuilder
     var content: some View {
-        sampleDateSection
-        if model.isRemoved {
-            emptyContent
-        } else {
-            Group {
-                sourceSection
-                dateSection
-                movingAverageIntervalSection
-                movingAverageValuesSection
-                dailyAverageSection
-                dailyAverageValuesSection
-                valueSection
-                removeSection
+        Form {
+            sampleDateSection
+            if model.isRemoved {
+                emptyContent
+            } else {
+                Group {
+                    sourceSection
+                    dateSection
+                    movingAverageIntervalSection
+                    movingAverageValuesSection
+                    dailyAverageSection
+                    dailyAverageValuesSection
+                    errorSection
+                    manualValueSection
+                    removeSection
+                }
             }
+        }
+    }
+    
+    var bottomToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .bottomBar) {
+            Spacer()
+            weightText
+//            adaptiveSampleValue
         }
     }
     
@@ -212,8 +223,11 @@ extension WeightSections {
             get: {
                 model.sample?.movingAverageInterval ?? .default
             },
-            set: {
-                model.sample?.movingAverageInterval = $0
+            set: { newValue in
+                withAnimation {
+                    model.sample?.movingAverageInterval = newValue
+                    model.setMovingAverageValue()
+                }
             }
         )
         
@@ -440,72 +454,102 @@ extension WeightSections {
         }
     }
     
-    var valueSection: some View {
+    var adaptiveSampleValue: some View {
         
-        var adaptiveSampleValue: some View {
-            
-            var sampleSource: WeightSampleSource {
-                model.sampleSource ?? .default
+        var sampleSource: WeightSampleSource {
+            model.sampleSource ?? .default
+        }
+        
+        var sampleValue: Double? {
+            guard let value = model.sample?.value else { return nil }
+            return BodyMassUnit.kg.convert(value, to: .kg)
+        }
+        
+        return Group {
+            switch sampleSource {
+            case .userEntered:
+                EmptyView()
+            default:
+                if let sampleValue {
+                    LargeHealthValue(
+                        value: sampleValue,
+                        valueString: sampleValue.clean,
+                        unitString: settingsStore.bodyMassUnit.abbreviation
+                    )
+                } else {
+                    Text("Not Set")
+                        .foregroundStyle(.secondary)
+                }
             }
-            
-            var sampleValue: Double? {
-                guard let value = model.sample?.value else { return nil }
-                return BodyMassUnit.kg.convert(value, to: .kg)
+        }
+    }
+    
+    var errorSection: some View {
+        var shouldShow: Bool {
+            model.formType == .healthDetails
+            && model.computedValue(in: settingsStore.bodyMassUnit) == nil
+        }
+        return Group {
+            if shouldShow {
+                HealthKitErrorCell(type: .weight)
             }
-            
-            return Group {
-                switch sampleSource {
-                case .userEntered:
-                    manualValue
-                default:
-                    if let sampleValue {
+        }
+    }
+    
+    @ViewBuilder
+    var weightText: some View {
+        switch model.formType {
+        case .healthDetails:
+            if let weight = healthModel.health.weight {
+                switch weight.source {
+                case .healthKit:
+                    if let value = model.computedValue(in: settingsStore.bodyMassUnit) {
                         LargeHealthValue(
-                            value: sampleValue,
-                            valueString: sampleValue.clean,
+                            value: value,
+                            valueString: value.clean,
                             unitString: settingsStore.bodyMassUnit.abbreviation
                         )
                     } else {
-                        Text("Not Set")
+                        Text("No Data")
                             .foregroundStyle(.secondary)
                     }
+                case .userEntered:
+                    EmptyView()
                 }
+            }
+        case .adaptiveSampleAverageComponent:
+            EmptyView()
+        case .adaptiveSample:
+            adaptiveSampleValue
+        }
+    }
+    
+    var manualValueSection: some View {
+        
+        var shouldShow: Bool {
+            switch model.formType {
+            case .healthDetails, .adaptiveSampleAverageComponent:
+                model.source == .userEntered
+            case .adaptiveSample:
+                model.sampleSource == .userEntered
             }
         }
         
-        @ViewBuilder
-        var weightText: some View {
-            switch model.formType {
-            case .healthDetails:
-                if let weight = healthModel.health.weight {
-                    switch weight.source {
-                    case .healthKit:
-                        if let value = model.computedValue(in: settingsStore.bodyMassUnit) {
-                            LargeHealthValue(
-                                value: value,
-                                valueString: value.clean,
-                                unitString: settingsStore.bodyMassUnit.abbreviation
-                            )
-                        } else {
-                            HealthKitErrorCell(type: .weight)
-                        }
-                    case .userEntered:
+        var section: some View {
+            Section {
+                ZStack(alignment: .bottomTrailing) {
+                    HStack {
+                        Spacer()
                         manualValue
                     }
+                    LargePlaceholderText
                 }
-            case .adaptiveSampleAverageComponent:
-                EmptyView()
-            case .adaptiveSample:
-                adaptiveSampleValue
             }
         }
         
-        return Section {
-            ZStack(alignment: .bottomTrailing) {
-                HStack {
-                    Spacer()
-                    weightText
-                }
-                LargePlaceholderText
+        return Group {
+            if shouldShow {
+                section
             }
         }
     }
@@ -574,13 +618,11 @@ extension WeightSections {
 #Preview {
     @FocusState var focusedType: HealthType?
     return NavigationStack {
-        Form {
-            WeightSections(
-                healthModel: MockHealthModel,
-                settingsStore: .shared,
-                focusedType: $focusedType
-            )
-        }
+        WeightSections(
+            healthModel: MockHealthModel,
+            settingsStore: .shared,
+            focusedType: $focusedType
+        )
         .navigationTitle("Weight")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -591,22 +633,16 @@ let MockDate = Date(fromDateString: "2021_08_27")!
 #Preview {
     @FocusState var focusedType: HealthType?
     return NavigationStack {
-        Form {
-            WeightSections(
-                sample: .init(
-                    movingAverageInterval: .init(1, .week),
-                    movingAverageValues: [
-                        1: 93,
-                        5: 94
-                    ],
-                    value: 93.5
-                ),
-                date: MockDate,
-                healthModel: MockHealthModel,
-                settingsStore: .shared,
-                focusedType: $focusedType
-            )
-        }
+        WeightSections(
+            sample: .init(
+                movingAverageInterval: .init(1, .week),
+                value: 93.5
+            ),
+            date: MockDate,
+            healthModel: MockHealthModel,
+            settingsStore: .shared,
+            focusedType: $focusedType
+        )
         .navigationTitle("Weight Sample")
         .navigationBarTitleDisplayMode(.inline)
     }

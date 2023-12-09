@@ -71,7 +71,7 @@ extension WeightChange {
             let value = Array(movingAverageValues.values).averageValue
             return WeightSample(
                 movingAverageInterval: interval,
-                movingAverageValues: movingAverageValues,
+//                movingAverageValues: movingAverageValues,
                 value: value
             )
         }
@@ -79,7 +79,7 @@ extension WeightChange {
         func weightSample(on date: Date) -> WeightSample {
             WeightSample(
                 movingAverageInterval: nil,
-                movingAverageValues: nil,
+//                movingAverageValues: nil,
                 value: values.weightInKg(on: date)
             )
         }

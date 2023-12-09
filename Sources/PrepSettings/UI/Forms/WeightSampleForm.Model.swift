@@ -106,21 +106,21 @@ extension WeightSampleForm.Model {
 extension WeightSampleForm.Model {
     
     func saveWeight(_ weight: Double?, for date: Date) {
-        let index = -date.numberOfDaysFrom(self.date)
-        withAnimation {
-            sample.movingAverageValues?[index] = weight
-            calculateAverage()
-        }
+//        let index = -date.numberOfDaysFrom(self.date)
+//        withAnimation {
+//            sample.movingAverageValues?[index] = weight
+//            calculateAverage()
+//        }
     }
     
     func calculateAverage() {
-        guard let values = sample.movingAverageValues, !values.isEmpty else {
-            sample.value = nil
-            return
-        }
-        let averageInKg = (values.reduce(0) { $0 + $1.value }) / Double(values.count)
-        sample.value = averageInKg
-        displayedValue = BodyMassUnit.kg.convert(averageInKg, to: SettingsStore.shared.bodyMassUnit)
+//        guard let values = sample.movingAverageValues, !values.isEmpty else {
+//            sample.value = nil
+//            return
+//        }
+//        let averageInKg = (values.reduce(0) { $0 + $1.value }) / Double(values.count)
+//        sample.value = averageInKg
+//        displayedValue = BodyMassUnit.kg.convert(averageInKg, to: SettingsStore.shared.bodyMassUnit)
     }
     
     var movingAverageNumberOfDays: Int {
@@ -128,8 +128,8 @@ extension WeightSampleForm.Model {
     }
     
     func setMovingAverageValues(_ values: [Int: Double]) {
-        sample.movingAverageValues = values
-        calculateAverage()
+//        sample.movingAverageValues = values
+//        calculateAverage()
     }
     
     var movingAverageIntervalPeriodBinding: Binding<HealthPeriod> {
@@ -178,7 +178,7 @@ extension WeightSampleForm.Model {
                     /// When turning the calculated moving average off—round the value to 1 decimal place in case we had a more precise value stored
                     self.displayedValue = self.displayedValue?.rounded(toPlaces: 1)
                     withAnimation {
-                        self.sample.movingAverageValues = nil
+//                        self.sample.movingAverageValues = nil
                     }
                 case true:
                     self.setWeightsFromBackend()
@@ -215,7 +215,8 @@ extension WeightSampleForm.Model {
     }
 
     var isUsingMovingAverage: Bool {
-        sample.movingAverageValues != nil
+        false
+//        sample.movingAverageValues != nil
     }
     
     var movingAverageIntervalValue: Int {

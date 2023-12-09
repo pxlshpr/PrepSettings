@@ -183,10 +183,10 @@ struct WeightAveragedSampleForm: View {
                 WeightSampleForm(
                     sample: .init(
                         movingAverageInterval: .init(1, .week),
-                        movingAverageValues: [
-                            1: 93,
-                            5: 94
-                        ],
+//                        movingAverageValues: [
+//                            1: 93,
+//                            5: 94
+//                        ],
                         value: 93.5
                     ),
                     date: Date.now,

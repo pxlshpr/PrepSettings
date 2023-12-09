@@ -7,17 +7,17 @@ public struct WeightSample: Hashable, Codable {
     var isDailyAverage: Bool
     
     var movingAverageInterval: HealthInterval?
-    var movingAverageValues: [Int: Double]?
+//    var movingAverageValues: [Int: Double]?
 
     public init(
         movingAverageInterval: HealthInterval? = .init(1, .week),
-        movingAverageValues: [Int: Double]? = nil,
+//        movingAverageValues: [Int: Double]? = nil,
         value: Double? = nil,
         source: WeightSampleSource = .movingAverage,
         isDailyAverage: Bool = false
     ) {
         self.movingAverageInterval = movingAverageInterval
-        self.movingAverageValues = movingAverageValues
+//        self.movingAverageValues = movingAverageValues
         self.value = value
         self.source = source
         self.isDailyAverage = isDailyAverage
@@ -30,14 +30,14 @@ extension WeightSample {
         return BodyMassUnit.kg.convert(value, to: unit)
     }
     
-    mutating func fill(using request: HealthKitQuantityRequest) async throws {
-        if let sample = try await request.daySample(movingAverageInterval: self.movingAverageInterval)
-        {
-            movingAverageValues = sample.movingAverageValues
-            value = sample.value
-        } else {
-            movingAverageValues = nil
-            value = nil
-        }
-    }
+//    mutating func fill(using request: HealthKitQuantityRequest) async throws {
+//        if let sample = try await request.daySample(movingAverageInterval: self.movingAverageInterval)
+//        {
+//            movingAverageValues = sample.movingAverageValues
+//            value = sample.value
+//        } else {
+//            movingAverageValues = nil
+//            value = nil
+//        }
+//    }
 }

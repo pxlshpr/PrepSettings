@@ -391,13 +391,23 @@ extension WeightSections.Model {
     }
     
     func setMovingAverageValue() {
-        guard let values = sample?.movingAverageValues,
-              let average = Array(values.values).averageValue
-        else {
-            self.sample?.value = nil
-            return
+        guard let interval = sample?.movingAverageInterval else { return }
+        
+        var values: [Double] = []
+        for index in 0..<interval.numberOfDays {
+            guard let value = movingAverageValue(at: index) else { continue }
+            values.append(value)
         }
-        self.sample?.value = average
+        self.sample?.value = values.averageValue
+        
+//        //TODO: Rewrite this
+//        guard let values = sample?.movingAverageValues,
+//              let average = Array(values.values).averageValue
+//        else {
+//            self.sample?.value = nil
+//            return
+//        }
+//        self.sample?.value = average
     }
     
     var useDailyAverage: Bool {

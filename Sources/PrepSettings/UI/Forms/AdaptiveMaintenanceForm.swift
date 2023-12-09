@@ -353,17 +353,17 @@ struct AdaptiveMaintenanceForm: View {
 //    }
 }
 
-let MockMaintenanceSamples: [MaintenanceSample] = [
-    .init(type: .healthKit, value: 96.0),
-    .init(type: .healthKit, value: 101.0),
-    .init(type: .userEntered, value: 96.0),
-    .init(type: .averaged, value: 101.0),
-
-    .init(type: .healthKit, value: 3460),
-    .init(type: .healthKit, value: 2404),
-    .init(type: .userEntered, value: 2781),
-    .init(type: .averaged, value: 1853),
-]
+//let MockMaintenanceSamples: [MaintenanceSample] = [
+//    .init(type: .healthKit, value: 96.0),
+//    .init(type: .healthKit, value: 101.0),
+//    .init(type: .userEntered, value: 96.0),
+//    .init(type: .averaged, value: 101.0),
+//
+//    .init(type: .healthKit, value: 3460),
+//    .init(type: .healthKit, value: 2404),
+//    .init(type: .userEntered, value: 2781),
+//    .init(type: .averaged, value: 1853),
+//]
 
 #Preview {
     Text("Health Details")
