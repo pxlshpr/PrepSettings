@@ -1,5 +1,8 @@
 import SwiftUI
 
+let LargeNumberFont: Font = .system(.largeTitle, design: .rounded, weight: .bold)
+let LargeUnitFont: Font = .system(.body, design: .rounded, weight: .semibold)
+
 struct LargeHealthValue: View {
     
     let value: Double
@@ -13,10 +16,10 @@ struct LargeHealthValue: View {
                 .animation(.default, value: value)
                 .contentTransition(.numericText(value: value))
 //                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
-                .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                .font(LargeNumberFont)
             Text(unitString)
 //                .font(.system(.body, design: .default, weight: .semibold))
-                .font(.system(.body, design: .rounded, weight: .semibold))
+                .font(LargeUnitFont)
                 .foregroundStyle(.secondary)
         }
     }

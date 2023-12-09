@@ -220,13 +220,11 @@ extension Health {
     }
 
     var hasCalculatedMaintenance: Bool {
-        maintenance?.adaptive.value != nil
-        && maintenance?.adaptive.error == nil
+        maintenance?.adaptive.value != nil && maintenance?.adaptive.error == nil
     }
     
     var hasEstimatedMaintenance: Bool {
-        tdeeRequiredString == nil
-        && estimatedMaintenanceInKcal != nil
+        tdeeRequiredString == nil && estimatedMaintenanceInKcal != nil
     }
     
     var hasMaintenanceValue: Bool {

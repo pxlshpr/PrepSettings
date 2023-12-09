@@ -6,7 +6,9 @@ public extension Health {
     
     //MARK: Energy Burn
     var prefersAdaptiveMaintenance: Bool {
-        get { maintenance?.prefersAdaptive ?? false }
+        get {
+            maintenance?.prefersAdaptive ?? false
+        }
         set {
             guard maintenance != nil else {
                 maintenance = .init(prefersAdaptive: newValue)

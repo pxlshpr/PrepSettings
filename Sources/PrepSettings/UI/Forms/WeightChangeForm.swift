@@ -23,6 +23,7 @@ struct WeightChangeForm: View {
     
     var body: some View {
         Form {
+//            descriptionSection
             sourceSection
             weightsSections
             valueSection
@@ -32,6 +33,13 @@ struct WeightChangeForm: View {
 //        .onChange(of: focusedType, healthModel.focusedTypeChanged)
         .onChange(of: focusedType, focusedTypeChanged)
         .toolbar { keyboardToolbarContent }
+    }
+    
+    var descriptionSection: some View {
+        Section {
+            Text("Your weight change will be used to determin")
+                .font(.callout)
+        }
     }
     
     func focusedTypeChanged(old: HealthType?, new: HealthType?) {
@@ -68,11 +76,11 @@ struct WeightChangeForm: View {
     @ViewBuilder
     var weightsSections: some View {
         if type == .usingWeights {
-            Section("Previous") {
-                weightCell(sample: maintenance.adaptive.weightChange.previous, isPrevious: true)
-            }
             Section("Current") {
                 weightCell(sample: maintenance.adaptive.weightChange.current, isPrevious: false)
+            }
+            Section("Previous") {
+                weightCell(sample: maintenance.adaptive.weightChange.previous, isPrevious: true)
             }
         }
     }
@@ -166,9 +174,11 @@ struct WeightChangeForm: View {
     
     var sourceSection: some View {
         
-        func selectedWeightChangeType(_ type: WeightChangeType) {
+        func weightChangeTypeChanged(to type: WeightChangeType) {
+
             if type == .usingWeights {
                 focusedType = nil
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     healthModel.health.maintenance?.adaptive.weightChange.calculateDelta()
                 }
@@ -176,8 +186,9 @@ struct WeightChangeForm: View {
             
             if type == .userEntered {
                 isNegative = healthModel.maintenanceWeightChangeDeltaIsNegative
-                textFieldValue = healthModel.maintenanceWeightChangeDelta
+                textFieldValue = healthModel.maintenanceWeightChangeDelta?.rounded(toPlaces: 2)
             }
+            
             withAnimation {
                 healthModel.maintenanceWeightChangeType = type
             }
@@ -198,7 +209,7 @@ struct WeightChangeForm: View {
                 self.type == type
             }
             return Button {
-                selectedWeightChangeType(type)
+                weightChangeTypeChanged(to: type)
             } label: {
                 HStack {
                     Image(systemName: "checkmark")
@@ -210,11 +221,21 @@ struct WeightChangeForm: View {
             }
         }
         
-        return Section {
-            ForEach(WeightChangeType.allCases, id: \.self) {
-                button(for: $0)
+        let binding = Binding<WeightChangeType>(
+            get: { type },
+            set: { newValue in
+//                self.type = newValue
+                weightChangeTypeChanged(to: newValue)
             }
-        }
+        )
+        
+        return PickerSection(binding)
+        
+//        return Section {
+//            ForEach(WeightChangeType.allCases, id: \.self) {
+//                button(for: $0)
+//            }
+//        }
     }
     
     func weightCell(sample: WeightSample, isPrevious: Bool) -> some View {
@@ -269,8 +290,8 @@ struct WeightChangeForm: View {
 
 #Preview {
     NavigationStack {
-//        WeightChangeForm(MockHealthModel)
-        HealthSummary(model: MockHealthModel)
+        WeightChangeForm(MockHealthModel)
+//        HealthSummary(model: MockHealthModel)
             .environment(SettingsStore.shared)
             .onAppear {
                 SettingsStore.configureAsMock()

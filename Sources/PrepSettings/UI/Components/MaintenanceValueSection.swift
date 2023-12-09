@@ -12,6 +12,8 @@ struct MaintenanceValueSection: View {
 
     let type = HealthType.maintenance
     @Bindable var model: HealthModel
+    
+    @State var isAdaptive: Bool = false
 
     init(_ model: HealthModel) {
         self.model = model
@@ -30,12 +32,33 @@ struct MaintenanceValueSection: View {
                 }
             }
         }
+        .onAppear(perform: appeared)
+        .onChange(of: isAdaptive, isAdaptiveChanged)
+    }
+    
+    func isAdaptiveChanged(old: Bool, new: Bool) {
+        model.maintenanceEnergyIsAdaptive = new
+    }
+    
+    func appeared() {
+        setIsAdaptive()
     }
     
     var footer: some View {
         Text(HealthType.maintenance.reason!)
     }
 
+    func setIsAdaptive() {
+        withAnimation {
+            isAdaptive = switch (model.health.hasCalculatedMaintenance, model.health.hasEstimatedMaintenance) {
+            case (true, true):  model.maintenanceEnergyIsAdaptive
+            case (true, false):     true    /// adaptive
+            case (false, true):     false   /// estimated
+            case (false, false):    true    /// adaptive
+            }
+        }
+    }
+    
     var picker: some View {
         var disabled: Bool {
             !model.health.hasCalculatedAndEstimatedMaintenance
@@ -48,7 +71,6 @@ struct MaintenanceValueSection: View {
                 case (true, false):     true    /// adaptive
                 case (false, true):     false   /// estimated
                 case (false, false):    true    /// adaptive
-                    
                 }
             },
             set: {
@@ -56,14 +78,13 @@ struct MaintenanceValueSection: View {
             }
         )
         
-//        if model.hasCalculatedMaintenance {
-        return Picker("", selection: selection) {
+//        return Picker("", selection: selection) {
+        return Picker("", selection: $isAdaptive) {
             Text("Adaptive").tag(true)
             Text("Estimated").tag(false)
         }
         .pickerStyle(.segmented)
         .disabled(disabled)
-//        }
     }
     
     var topRow_: some View {

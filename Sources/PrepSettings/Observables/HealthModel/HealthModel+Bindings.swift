@@ -5,26 +5,12 @@ public extension HealthModel {
     
     //MARK: Energy Burn
     var maintenanceEnergyIsAdaptive: Bool {
-        get { health.prefersAdaptiveMaintenance }
+        get { 
+            health.prefersAdaptiveMaintenance
+        }
         set {
             withAnimation {
                 health.prefersAdaptiveMaintenance = newValue
-            }
-            Task {
-//                await MainActor.run {
-//                    withAnimation {
-//                        health.maintenanceEnergyIsAdaptive = newValue
-//                    }
-//                }
-                if newValue {
-//                    try await calculateAdaptiveMaintenance()
-                } else {
-//                    await MainActor.run {
-//                        withAnimation {
-//                            health.maintenanceEnergy?.error = nil
-//                        }
-//                    }
-                }
             }
         }
     }

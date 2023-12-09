@@ -1,7 +1,8 @@
 import SwiftUI
 import PrepShared
 
-let LargeNumberFont = Font.system(.largeTitle, design: .monospaced, weight: .bold)
+//let LargeNumberFont = Font.system(.largeTitle, design: .monospaced, weight: .bold)
+
 struct HealthNumberField<Unit: HealthUnit>: View {
     
     let unitBinding: Binding<Unit>
@@ -50,7 +51,7 @@ struct HealthNumberField<Unit: HealthUnit>: View {
                 if let string = Unit.secondaryUnit {
                     Text(string)
                         .foregroundStyle(.secondary)
-                        .font(.system(.body, design: .default, weight: .semibold))
+                        .font(LargeUnitFont)
                 }
             case false:
                 NumberField(
@@ -70,7 +71,7 @@ struct HealthNumberField<Unit: HealthUnit>: View {
         
         Text(unitBinding.wrappedValue.abbreviation)
             .foregroundStyle(.secondary)
-            .font(.system(.body, design: .default, weight: .semibold))
+            .font(LargeUnitFont)
     }
 }
 
