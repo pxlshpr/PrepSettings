@@ -1,7 +1,23 @@
 import Foundation
 
-enum WeightFormType {
+enum WeightFormType: Equatable {
     case healthDetails
-    case adaptiveSample
+    case adaptiveSample(isPrevious: Bool)
     case adaptiveSampleAverageComponent
+}
+
+extension WeightFormType {
+    var isPreviousSample: Bool? {
+        switch self {
+        case .adaptiveSample(let isPrevious):   isPrevious
+        default:                                nil
+        }
+    }
+    
+    var isAdaptiveSample: Bool {
+        switch self {
+        case .adaptiveSample:   true
+        default:                false
+        }
+    }
 }

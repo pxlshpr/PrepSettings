@@ -1,9 +1,6 @@
 import SwiftUI
 import PrepShared
 
-/// [ ] Embed isPrevious into `formType` itself
-/// [ ] remove `sample`, `initialSample`, `sampleSource`, and manipulate the same directly instead with helpers based on if its previous or current
-/// [ ] We should also remove `value`, `source` etc
 extension WeightForm {
     @Observable class Model {
         
@@ -15,11 +12,10 @@ extension WeightForm {
 
         var source: HealthSource?
 
-        var sampleSource: WeightSampleSource?
-        let isPreviousSample: Bool
-        let initialSample: WeightSample?
+        /// Used for `.adaptiveSample`
         var sample: WeightSample?
-        
+        var sampleSource: WeightSampleSource?
+
         var healthKitQuantities: [Quantity]?
         var healthKitValueForDate: Double?
         
@@ -36,10 +32,6 @@ extension WeightForm {
             let weight = healthModel.health.weight
             self.value = weight?.quantity?.value
             self.source = weight?.source
-            
-            self.initialSample = nil
-            self.sample = nil
-            self.isPreviousSample = false
         }
         
         /// Weight Sample init
@@ -49,18 +41,14 @@ extension WeightForm {
             isPrevious: Bool,
             healthModel: HealthModel
         ) {
-            self.formType = .adaptiveSample
+            self.formType = .adaptiveSample(isPrevious: isPrevious)
             self.healthModel = healthModel
             self.date = date
             
             self.value = sample.value
-            self.source = nil
             self.sampleSource = sample.source
             
-            
-            self.initialSample = sample
             self.sample = sample
-            self.isPreviousSample = isPrevious
         }
         
         /// Average Component init
@@ -69,17 +57,12 @@ extension WeightForm {
             date: Date,
             healthModel: HealthModel
         ) {
-            self.formType = .adaptiveSample
+            self.formType = .adaptiveSampleAverageComponent
             self.healthModel = healthModel
             self.date = date
             
             self.value = value
             self.source = .userEntered
-            
-            self.sampleSource = nil
-            self.initialSample = nil
-            self.sample = nil
-            self.isPreviousSample = false
         }
 
     }
@@ -172,7 +155,7 @@ extension WeightForm.Model {
         let value: Double? = switch useDailyAverage {
         case true:
             /// Set daily average
-            healthKitQuantities?.averageValue
+            healthKitQuantities?.averageValue?.rounded(toPlaces: 2)
         case false:
             healthKitQuantities?.last?.value
         }
@@ -200,11 +183,13 @@ extension WeightForm.Model {
     
     func setSampleValue(_ value: Double?) {
         sample?.value = value
-        switch isPreviousSample {
+        switch formType.isPreviousSample {
         case true:
             healthModel.health.maintenance?.adaptive.weightChange.previous.value = value
         case false:
             healthModel.health.maintenance?.adaptive.weightChange.current.value = value
+        default:
+            break
         }
     }
     
@@ -229,10 +214,46 @@ extension WeightForm.Model {
 
 extension WeightForm.Model {
     
+//    var weightChange: WeightChange? {
+//        get {
+//            healthModel.health.maintenance?.adaptive.weightChange
+//        }
+//        set {
+//            guard let newValue else { return }
+//            healthModel.health.maintenance?.adaptive.weightChange = newValue
+//        }
+//    }
+//    
+//    var newSample: WeightSample? {
+//        get {
+//            switch formType {
+//            case .adaptiveSample(let isPrevious):
+//                isPrevious ? weightChange?.previous : weightChange?.current
+//            default:
+//                nil
+//            }
+//        }
+//        set {
+//            guard let newValue else { return }
+//            switch formType {
+//            case .adaptiveSample(let isPrevious):
+//                if isPrevious {
+//                    weightChange?.previous = newValue
+//                } else {
+//                    weightChange?.current = newValue
+//                }
+//            default:
+//                break
+//            }
+//        }
+//    }
+    
     var isUserEntered: Bool {
         switch formType {
-        case .adaptiveSample:   sampleSource == .userEntered
-        default:                source == .userEntered
+        case .adaptiveSample:
+            sampleSource == .userEntered
+        default:
+            source == .userEntered
         }
     }
     var footerString: String? {
@@ -299,6 +320,20 @@ extension WeightForm.Model {
 }
 
 extension WeightForm.Model {
+    
+    var shouldShowTextFieldSection: Bool {
+        switch formType {
+        case .healthDetails, .adaptiveSampleAverageComponent:
+            source == .userEntered
+        case .adaptiveSample:
+            sampleSource == .userEntered
+        }
+    }
+    
+    var shouldShowMovingAverageSections: Bool {
+        formType.isAdaptiveSample
+        && sampleSource == .movingAverage
+    }
     
     var shouldShowDailyAverageSection: Bool {
         switch formType {
@@ -377,11 +412,14 @@ extension WeightForm.Model {
     
     var sampleSourceBinding: Binding<WeightSampleSource> {
         Binding<WeightSampleSource>(
-            get: { self.sampleSource ?? .userEntered },
+            get: { 
+                self.sampleSource ?? .userEntered
+            },
             set: { newValue in
                 
                 withAnimation {
                     self.sampleSource = newValue
+//                    self.sampleSource = newValue
                 }
                 
                 switch newValue {
@@ -418,7 +456,7 @@ extension WeightForm.Model {
             guard let value = movingAverageValue(at: index) else { continue }
             values.append(value)
         }
-        setSampleValue(values.averageValue)
+        setSampleValue(values.averageValue?.rounded(toPlaces: 2))
 //        //TODO: Rewrite this
 //        guard let values = sample?.movingAverageValues,
 //              let average = Array(values.values).averageValue
@@ -497,20 +535,13 @@ extension WeightForm.Model {
         sample?.movingAverageInterval?.numberOfDays ?? DefaultNumberOfDaysForMovingAverage
     }
     
-//    func movingAverageValue(at index: Int) -> Double? {
-//        guard let value = sample?.movingAverageValues?[index]
-//        else { return nil }
-//        return BodyMassUnit.kg.convert(value, to: SettingsStore.bodyMassUnit)
-//    }
+    func movingAverageQuantity(at index: Int) -> Quantity? {
+        let date = self.date.moveDayBy(-index)
+        return backendQuantities?[date]?.quantity
+    }
     
     func movingAverageValue(at index: Int) -> Double? {
-        let date = self.date.moveDayBy(-index)
-        guard let value = backendQuantities?[date]?.quantity?.value
-        else { return nil }
-        return BodyMassUnit.kg.convert(value, to: SettingsStore.bodyMassUnit)
-
-//        guard let value = sample?.movingAverageValues?[index]
-//        else { return nil }
-//        return BodyMassUnit.kg.convert(value, to: SettingsStore.bodyMassUnit)
+        guard let quantity = movingAverageQuantity(at: index) else { return nil }
+        return BodyMassUnit.kg.convert(quantity.value, to: SettingsStore.bodyMassUnit)
     }
 }

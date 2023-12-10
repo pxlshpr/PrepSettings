@@ -31,17 +31,14 @@ struct WeightForm: View {
     @Bindable var healthModel: HealthModel
     @State var model: Model
     
-//    var focusedType: FocusState<HealthType?>.Binding
     @FocusState var focusedType: HealthType?
 
     init(
         healthModel: HealthModel,
         settingsStore: SettingsStore
-//        focusedType: FocusState<HealthType?>.Binding
     ) {
         self.healthModel = healthModel
         self.settingsStore = settingsStore
-//        self.focusedType = focusedType
         _model = State(initialValue: Model(healthModel: healthModel))
     }
     
@@ -51,11 +48,9 @@ struct WeightForm: View {
         isPrevious: Bool,
         healthModel: HealthModel,
         settingsStore: SettingsStore
-//        focusedType: FocusState<HealthType?>.Binding
     ) {
         self.healthModel = healthModel
         self.settingsStore = settingsStore
-//        self.focusedType = focusedType
         _model = State(initialValue: Model(
             sample: sample,
             date: date,
@@ -69,11 +64,9 @@ struct WeightForm: View {
         date: Date,
         healthModel: HealthModel,
         settingsStore: SettingsStore
-//        focusedType: FocusState<HealthType?>.Binding
     ) {
         self.healthModel = healthModel
         self.settingsStore = settingsStore
-//        self.focusedType = focusedType
         _model = State(initialValue: Model(
             value: value,
             date: date,
@@ -208,11 +201,6 @@ extension WeightForm {
     
     var movingAverageIntervalSection: some View {
         
-        var shouldShow: Bool {
-            model.formType == .adaptiveSample &&
-            model.sampleSource == .movingAverage
-        }
-        
         var stepper: some View {
             Stepper(
                 "",
@@ -252,7 +240,7 @@ extension WeightForm {
         )
         
         return Group {
-            if shouldShow {
+            if model.shouldShowMovingAverageSections {
                 IntervalPicker(
                     interval: intervalBinding,
                     periods: [.day, .week],
@@ -348,40 +336,40 @@ extension WeightForm {
 //    }
     
     var movingAverageValuesSection: some View {
-        var shouldShow: Bool {
-            model.formType == .adaptiveSample
-            && model.sampleSource == .movingAverage
-        }
-        
         func cell(weight: DatedWeight) -> some View {
             NavigationLink(value: weight) {
                 WeightCell(weight: weight)
                     .environment(settingsStore)
             }
             .navigationDestination(for: DatedWeight.self) { weight in
-                WeightAveragedSampleForm(
+                WeightForm(
                     value: weight.value,
                     date: weight.date,
                     healthModel: healthModel,
-                    settingsStore: settingsStore,
-                    didSaveWeight: { _ in
-                        
-                    }
+                    settingsStore: settingsStore
                 )
-                .environment(healthModel)
+//                WeightAveragedSampleForm(
+//                    value: weight.value,
+//                    date: weight.date,
+//                    healthModel: healthModel,
+//                    settingsStore: settingsStore,
+//                    didSaveWeight: { _ in
+//                        
+//                    }
+//                )
             }
         }
 
         return Group {
-            if shouldShow {
+            if model.shouldShowMovingAverageSections {
                 Section {
                     ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) {
-                        cell(weight: DatedWeight(
-                            value: model.movingAverageValue(at: $0),
-                            date: model.date.moveDayBy(-$0)
-//                            value: 0,
-//                            date: Date.now
-                        ))
+                        cell(
+                            weight: DatedWeight(
+                                value: model.movingAverageValue(at: $0),
+                                date: model.date.moveDayBy(-$0)
+                            )
+                        )
                     }
                 }
             }
@@ -409,7 +397,7 @@ extension WeightForm {
     
     func focusTextField() {
 //        Haptics.selectionFeedback()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             focusedType = .weight
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 sendSelectAllTextAction()
@@ -546,15 +534,6 @@ extension WeightForm {
     
     var textFieldSection: some View {
         
-        var shouldShow: Bool {
-            switch model.formType {
-            case .healthDetails, .adaptiveSampleAverageComponent:
-                model.source == .userEntered
-            case .adaptiveSample:
-                model.sampleSource == .userEntered
-            }
-        }
-        
         let binding = Binding<Double?>(
             get: {
                 switch model.formType {
@@ -599,7 +578,7 @@ extension WeightForm {
         }
         
         return Group {
-            if shouldShow {
+            if model.shouldShowTextFieldSection {
                 section
             }
         }
