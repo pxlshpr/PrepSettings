@@ -349,7 +349,7 @@ extension WeightSections.Model {
                         }
                     }
                 case .adaptiveSample:
-                    /// Not handled here (we use `sampleBinding` instead
+                    /// Not handled here (we use `sampleSourceBinding` instead
                     break
                 }
             }
@@ -360,8 +360,6 @@ extension WeightSections.Model {
         Binding<WeightSampleSource>(
             get: { self.sampleSource ?? .userEntered },
             set: { newValue in
-                /// [ ] If we switch to `.movingAverage` – fetch the values for the dates from the backend (whatever value we have stored for each date)
-                /// [x] If we switch to `.healthKit` – use the values we would have fetched depending on if we're using average day's entires or not
                 
                 withAnimation {
                     self.sampleSource = newValue
@@ -376,7 +374,10 @@ extension WeightSections.Model {
                     break
                 }
                 
-                /// [ ]  Change source for the day this pertains to
+                //TODO: Actually change the value now
+                /// [ ] Update the actual `WeightSample`
+                /// [ ] If we've set a manual or HealthKit value, update the backend with the new value too
+
                 Task {
 //                    if let quantity = self.quantity {
 //                        try await self.healthModel.delegate.updateBackendWeight(
