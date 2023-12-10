@@ -286,3 +286,64 @@ public extension HealthModel {
         set { }
     }
 }
+
+extension HealthModel {
+    var intervalValueBinding: Binding<Int> {
+        Binding<Int>(
+            get: { self.intervalValue },
+            set: { newValue in
+                withAnimation {
+                    self.health.maintenance?.adaptive.interval = .init(newValue, self.intervalPeriod)
+                }
+                Task {
+                    try await self.fetchBackendValuesForAdaptiveMaintenance()
+                }
+            }
+        )
+    }
+    
+    var intervalPeriodBinding: Binding<HealthPeriod> {
+        Binding<HealthPeriod>(
+            get: { self.intervalPeriod },
+            set: { newValue in
+                withAnimation {
+                    var value = self.intervalValue
+                    switch newValue {
+                    case .day:
+                        value = max(2, value)
+                    default:
+                        break
+                    }
+                    self.health.maintenance?.adaptive.interval = .init(value, newValue)
+                }
+                Task {
+                    try await self.fetchBackendValuesForAdaptiveMaintenance()
+                }
+            }
+        )
+    }
+    
+    var maintenance: Health.Maintenance {
+        health.maintenance ?? .init()
+    }
+    
+    var hasCalculatedMaintenance: Bool {
+        health.hasCalculatedMaintenance
+    }
+    
+    var hasEstimatedMaintenance: Bool {
+        health.hasEstimatedMaintenance
+    }
+    
+    var hasMaintenanceValue: Bool {
+        health.hasMaintenanceValue
+    }
+    
+    var intervalPeriod: HealthPeriod {
+        maintenance.adaptive.interval.period
+    }
+
+    var intervalValue: Int {
+        maintenance.adaptive.interval.value
+    }
+}

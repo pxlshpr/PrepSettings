@@ -175,36 +175,3 @@ struct WeightAveragedSampleForm: View {
         }
     }
 }
-
-#Preview {
-    Text("")
-        .sheet(isPresented: .constant(true)) {
-            NavigationStack {
-                WeightSampleForm(
-                    sample: .init(
-                        movingAverageInterval: .init(1, .week),
-//                        movingAverageValues: [
-//                            1: 93,
-//                            5: 94
-//                        ],
-                        value: 93.5
-                    ),
-                    date: Date.now,
-                    healthModel: MockHealthModel,
-                    settingsStore: SettingsStore.shared,
-                    didSave: { value in
-                        
-                    }
-                )
-                
-//                WeightMovingAverageComponentForm(
-//                    value: 93.5,
-//                    date: Date.now,
-//                    healthModel: MockHealthModel,
-//                    settingsStore: SettingsStore.shared,
-//                    didSaveWeight: { weight in
-//                    }
-//                )
-            }
-        }
-}

@@ -22,45 +22,44 @@ import SwiftHaptics
 /// [ ] Change in custom value should be immediately saved
 /// [ ] Loading form should select correct source
 ///
-enum WeightFormType {
-    case healthDetails
-    case adaptiveSample
-    case adaptiveSampleAverageComponent
-}
 
-struct WeightSections: View {
+struct WeightForm: View {
 
     @Environment(\.scenePhase) var scenePhase: ScenePhase
     
     @Bindable var settingsStore: SettingsStore
     @Bindable var healthModel: HealthModel
     @State var model: Model
-    var focusedType: FocusState<HealthType?>.Binding
     
+//    var focusedType: FocusState<HealthType?>.Binding
+    @FocusState var focusedType: HealthType?
+
     init(
         healthModel: HealthModel,
-        settingsStore: SettingsStore,
-        focusedType: FocusState<HealthType?>.Binding
+        settingsStore: SettingsStore
+//        focusedType: FocusState<HealthType?>.Binding
     ) {
         self.healthModel = healthModel
         self.settingsStore = settingsStore
-        self.focusedType = focusedType
+//        self.focusedType = focusedType
         _model = State(initialValue: Model(healthModel: healthModel))
     }
     
     init(
         sample: WeightSample,
         date: Date,
+        isPrevious: Bool,
         healthModel: HealthModel,
-        settingsStore: SettingsStore,
-        focusedType: FocusState<HealthType?>.Binding
+        settingsStore: SettingsStore
+//        focusedType: FocusState<HealthType?>.Binding
     ) {
         self.healthModel = healthModel
         self.settingsStore = settingsStore
-        self.focusedType = focusedType
+//        self.focusedType = focusedType
         _model = State(initialValue: Model(
             sample: sample,
             date: date,
+            isPrevious: isPrevious,
             healthModel: healthModel
         ))
     }
@@ -69,12 +68,12 @@ struct WeightSections: View {
         value: Double?,
         date: Date,
         healthModel: HealthModel,
-        settingsStore: SettingsStore,
-        focusedType: FocusState<HealthType?>.Binding
+        settingsStore: SettingsStore
+//        focusedType: FocusState<HealthType?>.Binding
     ) {
         self.healthModel = healthModel
         self.settingsStore = settingsStore
-        self.focusedType = focusedType
+//        self.focusedType = focusedType
         _model = State(initialValue: Model(
             value: value,
             date: date,
@@ -87,10 +86,15 @@ struct WeightSections: View {
             .onAppear(perform: appeared)
             .onChange(of: scenePhase, scenePhaseChanged)
             .toolbar { bottomToolbarContent }
+
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: focusedType, healthModel.focusedTypeChanged)
+            .toolbar { keyboardToolbarContent }
     }
 }
 
-extension WeightSections {
+extension WeightForm {
     
     var content: some View {
         Form {
@@ -106,9 +110,25 @@ extension WeightSections {
                     dailyAverageSection
                     dailyAverageValuesSection
                     errorSection
-                    manualValueSection
+                    textFieldSection
                     removeSection
                 }
+            }
+        }
+    }
+    
+    var title: String {
+        "Weight"
+    }
+    
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
             }
         }
     }
@@ -390,7 +410,7 @@ extension WeightSections {
     func focusTextField() {
 //        Haptics.selectionFeedback()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            focusedType.wrappedValue = .weight
+            focusedType = .weight
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 sendSelectAllTextAction()
             }
@@ -398,7 +418,7 @@ extension WeightSections {
     }
 
     func unfocusTextField() {
-        focusedType.wrappedValue = nil
+        focusedType = nil
     }
 
     var sourceSection: some View {
@@ -524,7 +544,7 @@ extension WeightSections {
         }
     }
     
-    var manualValueSection: some View {
+    var textFieldSection: some View {
         
         var shouldShow: Bool {
             switch model.formType {
@@ -535,12 +555,43 @@ extension WeightSections {
             }
         }
         
+        let binding = Binding<Double?>(
+            get: {
+                switch model.formType {
+                case .healthDetails:                    healthModel.weightValue
+                case .adaptiveSample:                   model.sample?.value
+                case .adaptiveSampleAverageComponent:   model.value
+                }
+            },
+            set: {
+                switch model.formType {
+                case .healthDetails:                    
+                    healthModel.weightValue = $0
+
+                case .adaptiveSample:
+                    model.setSampleValue($0)
+
+                case .adaptiveSampleAverageComponent:
+                    model.value = $0
+                }
+            }
+        )
+        
+        var textField: some View {
+            BodyMassField(
+                unit: $settingsStore.bodyMassUnit,
+                valueInKg: binding,
+                focusedType: $focusedType,
+                healthType: .weight
+            )
+        }
+        
         var section: some View {
             Section {
                 ZStack(alignment: .bottomTrailing) {
                     HStack {
                         Spacer()
-                        manualValue
+                        textField
                     }
                     LargePlaceholderText
                 }
@@ -562,88 +613,80 @@ extension WeightSections {
         )
     }
      
-    var manualValue: some View {
-        BodyMassField(
-            unit: $settingsStore.bodyMassUnit,
-            valueInKg: $healthModel.weightValue,
-            focusedType: focusedType,
-            healthType: .weight
-        )
-    }
-    
     //MARK: - Legacy
 
-    @ViewBuilder
-    var valueRow: some View {
-        if let weight = healthModel.health.weight {
-            HStack {
-                Spacer()
-                if healthModel.isSettingTypeFromHealthKit(.weight) {
-                    ProgressView()
-                } else {
-                    switch weight.source {
-                    case .healthKit:
-                        healthValue
-                    case .userEntered:
-                        manualValue
-                    }
-                }
-            }
-        }
-    }
-    var body_ : some View {
-        Section(footer: footer) {
-            HealthTopRow(type: .weight, model: healthModel)
-            valueRow
-            healthKitErrorCell
-        }
-    }
-    
-    var footer: some View {
-        HealthFooter(
-            source: healthModel.weightSource,
-            type: .weight,
-            hasQuantity: healthModel.health.weightQuantity != nil
-        )
-    }
-    
-    @ViewBuilder
-    var healthKitErrorCell: some View {
-        if healthModel.shouldShowHealthKitError(for: .weight) {
-            HealthKitErrorCell(type: .weight)
-        }
-    }
+//    @ViewBuilder
+//    var valueRow: some View {
+//        if let weight = healthModel.health.weight {
+//            HStack {
+//                Spacer()
+//                if healthModel.isSettingTypeFromHealthKit(.weight) {
+//                    ProgressView()
+//                } else {
+//                    switch weight.source {
+//                    case .healthKit:
+//                        healthValue
+//                    case .userEntered:
+//                        textField
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    var body_ : some View {
+//        Section(footer: footer) {
+//            HealthTopRow(type: .weight, model: healthModel)
+//            valueRow
+//            healthKitErrorCell
+//        }
+//    }
+//    
+//    var footer: some View {
+//        HealthFooter(
+//            source: healthModel.weightSource,
+//            type: .weight,
+//            hasQuantity: healthModel.health.weightQuantity != nil
+//        )
+//    }
+//    
+//    @ViewBuilder
+//    var healthKitErrorCell: some View {
+//        if healthModel.shouldShowHealthKitError(for: .weight) {
+//            HealthKitErrorCell(type: .weight)
+//        }
+//    }
 }
 
 #Preview {
     @FocusState var focusedType: HealthType?
     return NavigationStack {
-        WeightSections(
+        WeightForm(
             healthModel: MockHealthModel,
-            settingsStore: .shared,
-            focusedType: $focusedType
+            settingsStore: .shared
+//            focusedType: $focusedType
         )
-        .navigationTitle("Weight")
-        .navigationBarTitleDisplayMode(.inline)
+//        .navigationTitle("Weight")
+//        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 let MockDate = Date(fromDateString: "2021_08_27")!
 
 #Preview {
-    @FocusState var focusedType: HealthType?
+//    @FocusState var focusedType: HealthType?
     return NavigationStack {
-        WeightSections(
+        WeightForm(
             sample: .init(
                 movingAverageInterval: .init(1, .week),
                 value: 93.5
             ),
             date: MockDate,
+            isPrevious: true,
             healthModel: MockHealthModel,
-            settingsStore: .shared,
-            focusedType: $focusedType
+            settingsStore: .shared
+//            focusedType: $focusedType
         )
-        .navigationTitle("Weight Sample")
-        .navigationBarTitleDisplayMode(.inline)
+//        .navigationTitle("Weight Sample")
+//        .navigationBarTitleDisplayMode(.inline)
     }
 }

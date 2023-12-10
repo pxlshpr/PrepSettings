@@ -260,12 +260,15 @@ struct WeightChangeForm: View {
             healthModel.setWeightSample(sample, isPrevious: route.isPrevious)
         }
         
-        return WeightSampleForm(
+        
+        
+        return WeightForm(
             sample: route.sample,
             date: route.date,
+            isPrevious: route.isPrevious,
             healthModel: healthModel,
-            settingsStore: settingsStore,
-            didSave: didSaveWeight
+            settingsStore: settingsStore
+//            didSave: didSaveWeight
         )        
     }
     

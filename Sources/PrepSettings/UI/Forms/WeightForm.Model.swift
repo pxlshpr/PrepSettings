@@ -1,17 +1,22 @@
 import SwiftUI
 import PrepShared
 
-extension WeightSections {
+/// [ ] Embed isPrevious into `formType` itself
+/// [ ] remove `sample`, `initialSample`, `sampleSource`, and manipulate the same directly instead with helpers based on if its previous or current
+/// [ ] We should also remove `value`, `source` etc
+extension WeightForm {
     @Observable class Model {
         
         let formType: WeightFormType
         let healthModel: HealthModel
         var date: Date
+
         var value: Double?
 
         var source: HealthSource?
 
         var sampleSource: WeightSampleSource?
+        let isPreviousSample: Bool
         let initialSample: WeightSample?
         var sample: WeightSample?
         
@@ -34,12 +39,14 @@ extension WeightSections {
             
             self.initialSample = nil
             self.sample = nil
+            self.isPreviousSample = false
         }
         
         /// Weight Sample init
         init(
             sample: WeightSample,
             date: Date,
+            isPrevious: Bool,
             healthModel: HealthModel
         ) {
             self.formType = .adaptiveSample
@@ -48,11 +55,12 @@ extension WeightSections {
             
             self.value = sample.value
             self.source = nil
-//            self.sampleSource = sample.source
-            self.sampleSource = .movingAverage
+            self.sampleSource = sample.source
+            
             
             self.initialSample = sample
             self.sample = sample
+            self.isPreviousSample = isPrevious
         }
         
         /// Average Component init
@@ -71,6 +79,7 @@ extension WeightSections {
             self.sampleSource = nil
             self.initialSample = nil
             self.sample = nil
+            self.isPreviousSample = false
         }
 
     }
@@ -95,7 +104,7 @@ extension Quantity {
         )
     }
 }
-extension WeightSections.Model {
+extension WeightForm.Model {
     
     func fetchBackendData() async throws {
         switch formType {
@@ -182,10 +191,20 @@ extension WeightSections.Model {
             case .healthDetails:
                 healthModel.health.weight?.quantity = quantity
             case .adaptiveSample:
-                sample?.value = quantity?.value
+                setSampleValue(quantity?.value)
             case .adaptiveSampleAverageComponent:
                 self.value = quantity?.value
             }
+        }
+    }
+    
+    func setSampleValue(_ value: Double?) {
+        sample?.value = value
+        switch isPreviousSample {
+        case true:
+            healthModel.health.maintenance?.adaptive.weightChange.previous.value = value
+        case false:
+            healthModel.health.maintenance?.adaptive.weightChange.current.value = value
         }
     }
     
@@ -208,7 +227,7 @@ extension WeightSections.Model {
     }
 }
 
-extension WeightSections.Model {
+extension WeightForm.Model {
     
     var isUserEntered: Bool {
         switch formType {
@@ -279,7 +298,7 @@ extension WeightSections.Model {
     }
 }
 
-extension WeightSections.Model {
+extension WeightForm.Model {
     
     var shouldShowDailyAverageSection: Bool {
         switch formType {
@@ -313,7 +332,7 @@ extension WeightSections.Model {
     }
 }
 
-extension WeightSections.Model {
+extension WeightForm.Model {
     
     var sourceBinding: Binding<HealthSource> {
         Binding<HealthSource>(
@@ -377,7 +396,7 @@ extension WeightSections.Model {
                 //TODO: Actually change the value now
                 /// [ ] Update the actual `WeightSample`
                 /// [ ] If we've set a manual or HealthKit value, update the backend with the new value too
-
+                
                 Task {
 //                    if let quantity = self.quantity {
 //                        try await self.healthModel.delegate.updateBackendWeight(
@@ -399,8 +418,7 @@ extension WeightSections.Model {
             guard let value = movingAverageValue(at: index) else { continue }
             values.append(value)
         }
-        self.sample?.value = values.averageValue
-        
+        setSampleValue(values.averageValue)
 //        //TODO: Rewrite this
 //        guard let values = sample?.movingAverageValues,
 //              let average = Array(values.values).averageValue

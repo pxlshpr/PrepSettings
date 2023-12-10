@@ -22,20 +22,15 @@ public struct HealthForm: View {
     
     public var body: some View {
         content
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .scrollDismissesKeyboard(.interactively)
-            .onChange(of: focusedType, model.focusedTypeChanged)
-            .toolbar { keyboardToolbarContent }
     }
     
     @ViewBuilder
     var content: some View {
         if types == [.weight] {
-            WeightSections(
+            WeightForm(
                 healthModel: model,
-                settingsStore: settingsStore,
-                focusedType: $focusedType
+                settingsStore: settingsStore
+//                focusedType: $focusedType
             )
         } else {
             Form {
@@ -43,6 +38,11 @@ public struct HealthForm: View {
                     content(for: $0)
                 }
             }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: focusedType, model.focusedTypeChanged)
+            .toolbar { keyboardToolbarContent }
         }
     }
     
@@ -87,12 +87,12 @@ public struct HealthForm: View {
                 HealthSexSection(model)
             case .age:
                 HealthAgeSection(model, $focusedType)
-            case .weight:
-                WeightSections(
-                    healthModel: model,
-                    settingsStore: settingsStore,
-                    focusedType: $focusedType
-                )
+//            case .weight:
+//                WeightSections(
+//                    healthModel: model,
+//                    settingsStore: settingsStore,
+//                    focusedType: $focusedType
+//                )
             case .leanBodyMass:
                 HealthLeanBodyMassSection(model, settingsStore, $focusedType)
             case .height:

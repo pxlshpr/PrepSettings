@@ -17,7 +17,7 @@ struct WeightSampleCell: View {
     var value: some View {
         if let value = sample.value(in: settingsStore.bodyMassUnit) {
             HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
-                Text("\(value.rounded(toPlaces: 1).cleanAmount)")
+                Text("\(value.clean)")
                     .font(NumberFont)
                     .contentTransition(.numericText(value: Double(value)))
                 Text(settingsStore.bodyMassUnit.abbreviation)
