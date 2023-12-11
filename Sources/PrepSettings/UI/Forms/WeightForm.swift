@@ -138,19 +138,41 @@ extension WeightForm {
         }
     }
     
-    @ViewBuilder
     var sampleDateSection: some View {
-        switch model.formType {
-        case .adaptiveSample, .specificDate:
-            Section {
-                HStack {
-                    Text("Date")
-                    Spacer()
-                    Text(model.date.healthDateFormat)
-                }
+        var dateString: String? {
+            switch model.formType {
+            case .adaptiveSample:
+                model.date.healthDateFormat
+            case .specificDate:
+                model.useDailyAverage 
+                ? model.date.healthFormat
+                : model.healthKitLatestQuantity?.date?.healthFormat
+            default:
+                nil
             }
-        default:
-            EmptyView()
+        }
+        
+        var labelString: String {
+            switch model.formType {
+            case .adaptiveSample(let isPrevious):
+                "\(isPrevious ? "Previous" : "Current") Date"
+            default:
+                "Date"
+            }
+        }
+        return Group {
+            switch model.formType {
+            case .adaptiveSample, .specificDate:
+                Section {
+                    HStack {
+                        Text(labelString)
+                        Spacer()
+                        Text(dateString ?? "")
+                    }
+                }
+            default:
+                EmptyView()
+            }
         }
     }
     
@@ -522,9 +544,9 @@ extension WeightForm {
     @ViewBuilder
     var weightText: some View {
         switch model.formType {
-        case .healthDetails:
-            if let weight = healthModel.health.weight {
-                switch weight.source {
+        case .healthDetails, .specificDate:
+//            if let weight = healthModel.health.weight {
+            switch model.source {
                 case .healthKit:
                     if let value = model.computedValue(in: settingsStore.bodyMassUnit) {
                         LargeHealthValue(
@@ -536,12 +558,19 @@ extension WeightForm {
                         Text("No Data")
                             .foregroundStyle(.secondary)
                     }
-                case .userEntered:
+                default:
                     EmptyView()
                 }
-            }
-        case .specificDate:
-            EmptyView()
+//            }
+//        case .specificDate:
+//            switch model.source {
+//            case .healthKit:
+//                if let value = model.computedValue(in: settingsStore.bodyMassUnit) {
+//                    
+//                }
+//            case .userEntered:
+//                EmptyView()
+//            }
         case .adaptiveSample:
             adaptiveSampleValue
         }
@@ -652,22 +681,17 @@ extension WeightForm {
 }
 
 #Preview {
-    @FocusState var focusedType: HealthType?
     return NavigationStack {
         WeightForm(
             healthModel: MockHealthModel,
             settingsStore: .shared
-//            focusedType: $focusedType
         )
-//        .navigationTitle("Weight")
-//        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 let MockDate = Date(fromDateString: "2021_08_27")!
 
 #Preview {
-//    @FocusState var focusedType: HealthType?
     return NavigationStack {
         WeightForm(
             sample: .init(
@@ -678,9 +702,19 @@ let MockDate = Date(fromDateString: "2021_08_27")!
             isPrevious: true,
             healthModel: MockHealthModel,
             settingsStore: .shared
-//            focusedType: $focusedType
         )
-//        .navigationTitle("Weight Sample")
-//        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+#Preview {
+    return NavigationStack {
+        WeightForm(
+            date: MockDate,
+            value: 93.5,
+            source: .userEntered,
+            isDailyAverage: false,
+            healthModel: MockHealthModel,
+            settingsStore: .shared
+        )
     }
 }

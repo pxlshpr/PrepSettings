@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-/// [ ] See why change in `.sampleSource` for `.adaptiveSample` case isn't being persisted
+/// [x] See why change in `.sampleSource` for `.adaptiveSample` case isn't being persisted
 /// [ ] See why change to Apple Health in `.specificDate` isn't updating value
 /// [ ] Add `isDailyAverage` bool to this as well
 /// [ ] Pass it in from backend value, consider passing in HealthQuantity itself instead of value, date, source etc on their own
@@ -297,7 +297,8 @@ extension WeightForm.Model {
         case .adaptiveSample:
             switch sampleSource {
             case .healthKit:
-                guard let value = healthKitValueForDate else { return nil }
+                guard let value else { return nil }
+//                guard let value = healthKitValueForDate else { return nil }
                 return BodyMassUnit.kg.convert(value, to: unit)
             case .movingAverage:
                 return 69.0
@@ -308,7 +309,8 @@ extension WeightForm.Model {
         case .specificDate:
             switch source {
             case .healthKit:
-                guard let value = healthKitValueForDate else { return nil }
+                guard let value else { return nil }
+//                guard let value = healthKitValueForDate else { return nil }
                 return BodyMassUnit.kg.convert(value, to: unit)
             default:
                 return nil
@@ -472,7 +474,7 @@ extension WeightForm.Model {
                     self.healthModel.health.maintenance?.adaptive.weightChange.current.source = newValue
                 default:
                     break
-                }                
+                }
             }
         )
     }
@@ -502,8 +504,7 @@ extension WeightForm.Model {
             case .healthDetails:
                 healthModel.health.weight?.isDailyAverage ?? false
             case .specificDate:
-                
-                false
+                isDailyAverage == true
             case .adaptiveSample:
                 sample?.isDailyAverage == true
             }
@@ -516,7 +517,10 @@ extension WeightForm.Model {
                 }
                 setHealthKitQuantity()
             case .specificDate:
-                break
+                withAnimation {
+                    isDailyAverage = newValue
+                }
+                setHealthKitQuantity()
             case .adaptiveSample:
                 withAnimation {
                     sample?.isDailyAverage = newValue
