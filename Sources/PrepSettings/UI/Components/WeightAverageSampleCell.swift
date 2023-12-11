@@ -2,8 +2,9 @@ import SwiftUI
 import PrepShared
 
 struct DatedWeight: Hashable {
-    let value: Double?
     let date: Date
+    let value: Double?
+    let source: HealthSource?
 }
 
 struct WeightCell: View {

@@ -3,7 +3,7 @@ import Foundation
 enum WeightFormType: Equatable {
     case healthDetails
     case adaptiveSample(isPrevious: Bool)
-    case adaptiveSampleAverageComponent
+    case specificDate
 }
 
 extension WeightFormType {

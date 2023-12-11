@@ -55,14 +55,15 @@ extension WeightForm {
         init(
             value: Double?,
             date: Date,
+            source: HealthSource?,
             healthModel: HealthModel
         ) {
-            self.formType = .adaptiveSampleAverageComponent
+            self.formType = .specificDate
             self.healthModel = healthModel
             self.date = date
             
             self.value = value
-            self.source = .userEntered
+            self.source = source ?? .userEntered
         }
 
     }
@@ -126,15 +127,9 @@ extension WeightForm.Model {
                 }
             }
 
-        case .adaptiveSample:
-            /// [ ] Fetch the date's values, along with the values for all dates within the moving average interval (if sourceType is moving average)
-            /// [ ] Keep them stored in the model
-            /// [ ] If the value for the date exists, only then show the Apple Health option
-
+        case .adaptiveSample, .specificDate:
             let quantities = try await HealthStore.daysWeights(in: .kg, for: date)?
                 .removingDuplicateQuantities()
-            
-            print("We here")
             
             await MainActor.run {
                 self.healthKitQuantities = quantities
@@ -143,11 +138,6 @@ extension WeightForm.Model {
                 }
             }
 
-        case .adaptiveSampleAverageComponent:
-            /// [ ] Fetch the date's value
-            /// [ ] Keep this stored in the model
-            /// [ ] If this value exists (ie is stored), only then show the Apple Health option
-            break
         }
     }
     
@@ -175,7 +165,7 @@ extension WeightForm.Model {
                 healthModel.health.weight?.quantity = quantity
             case .adaptiveSample:
                 setSampleValue(quantity?.value)
-            case .adaptiveSampleAverageComponent:
+            case .specificDate:
                 self.value = quantity?.value
             }
         }
@@ -271,7 +261,7 @@ extension WeightForm.Model {
             healthModel.health.weight == nil
         case .adaptiveSample:
             false
-        case .adaptiveSampleAverageComponent:
+        case .specificDate:
             false
         }
     }
@@ -302,7 +292,7 @@ extension WeightForm.Model {
                 return nil
             }
             
-        case .adaptiveSampleAverageComponent:
+        case .specificDate:
             switch source {
             case .healthKit:
                 guard let value = healthKitValueForDate else { return nil }
@@ -323,7 +313,7 @@ extension WeightForm.Model {
     
     var shouldShowTextFieldSection: Bool {
         switch formType {
-        case .healthDetails, .adaptiveSampleAverageComponent:
+        case .healthDetails, .specificDate:
             source == .userEntered
         case .adaptiveSample:
             sampleSource == .userEntered
@@ -337,7 +327,7 @@ extension WeightForm.Model {
     
     var shouldShowDailyAverageSection: Bool {
         switch formType {
-        case .healthDetails, .adaptiveSampleAverageComponent:
+        case .healthDetails, .specificDate:
             source == .healthKit
         case .adaptiveSample:
             sampleSource == .healthKit
@@ -349,7 +339,7 @@ extension WeightForm.Model {
         case .healthDetails:
             source == .healthKit
             && useDailyAverage
-        case .adaptiveSampleAverageComponent:
+        case .specificDate:
             false
         case .adaptiveSample:
             sampleSource == .healthKit
@@ -379,10 +369,7 @@ extension WeightForm.Model {
                 
                 switch self.formType {
                 case .healthDetails:
-                    /// [ ] Directly set the source instead of using the binding
-                    /// [ ] If we switch to HealthKit, simply use the value that we would have fetched (this option shouldn't be available otherwise)
                     /// [ ] We might have to stop syncing weight from healthKit whenever biometrics change since we're doing it in the form
-//                    self.healthModel.weightSource = newValue
                     self.healthModel.health.weight?.source = newValue
                     switch newValue {
                     case .healthKit:
@@ -390,9 +377,21 @@ extension WeightForm.Model {
                     case .userEntered:
                         break
                     }
-                case .adaptiveSampleAverageComponent:
-                    /// [ ] We can only set to HealthKit if there is a value available—and if we do this, change the Health details for that date only
-                    /// [ ] If we switch to custom, change the average component and also the health details weight by updating the 'backend weight
+                case .specificDate:
+                    switch newValue {
+                    case .healthKit:
+                        self.setHealthKitQuantity()
+                    case .userEntered:
+                        break
+                    }
+                    
+                    /// In either case, update the backend and send a notification so that the form for the sample can update itself
+                    
+                    /// [ ] Send a notification
+                    /// [ ] Receive notification HealthModel and update itself if date pertains to it (is the date itself or the date that its using)
+                    /// [ ] Receive notification in WeightForm, and if date pertains to it (if its an average component or its health details uses it—actually this should be handled by HealthModel itself receiving the notification—then update itself)
+                   
+                    /// [ ] Modify the update backend function or at least add notes to imply that we'll be triggering changes in all the Health structs that the weight pertains to (in Health.Weight or as adaptive sample), and if we have a change there, updating the plan if its dependent on those components too;
                     Task {
                         if let quantity = self.quantity {
                             try await self.healthModel.delegate.updateBackendWeight(
@@ -402,6 +401,7 @@ extension WeightForm.Model {
                             )
                         }
                     }
+                    
                 case .adaptiveSample:
                     /// Not handled here (we use `sampleSourceBinding` instead
                     break
@@ -453,7 +453,7 @@ extension WeightForm.Model {
         
         var values: [Double] = []
         for index in 0..<interval.numberOfDays {
-            guard let value = movingAverageValue(at: index) else { continue }
+            guard let value = backendValue(at: index) else { continue }
             values.append(value)
         }
         setSampleValue(values.averageValue?.rounded(toPlaces: 2))
@@ -472,7 +472,7 @@ extension WeightForm.Model {
             switch formType {
             case .healthDetails:
                 healthModel.health.weight?.isDailyAverage ?? false
-            case .adaptiveSampleAverageComponent:
+            case .specificDate:
                 false
             case .adaptiveSample:
                 sample?.isDailyAverage == true
@@ -485,7 +485,7 @@ extension WeightForm.Model {
                     healthModel.health.weight?.isDailyAverage = newValue
                 }
                 setHealthKitQuantity()
-            case .adaptiveSampleAverageComponent:
+            case .specificDate:
                 break
             case .adaptiveSample:
                 withAnimation {
@@ -534,14 +534,22 @@ extension WeightForm.Model {
     var movingAverageNumberOfDays: Int {
         sample?.movingAverageInterval?.numberOfDays ?? DefaultNumberOfDaysForMovingAverage
     }
-    
-    func movingAverageQuantity(at index: Int) -> Quantity? {
+
+    func backendHealthQuantity(at index: Int) -> HealthQuantity? {
         let date = self.date.moveDayBy(-index)
-        return backendQuantities?[date]?.quantity
+        return backendQuantities?[date]
     }
     
-    func movingAverageValue(at index: Int) -> Double? {
-        guard let quantity = movingAverageQuantity(at: index) else { return nil }
+    func backendQuantity(at index: Int) -> Quantity? {
+        backendHealthQuantity(at: index)?.quantity
+    }
+    
+    func backendSource(at index: Int) -> HealthSource? {
+        backendHealthQuantity(at: index)?.source
+    }
+    
+    func backendValue(at index: Int) -> Double? {
+        guard let quantity = backendQuantity(at: index) else { return nil }
         return BodyMassUnit.kg.convert(quantity.value, to: SettingsStore.bodyMassUnit)
     }
 }

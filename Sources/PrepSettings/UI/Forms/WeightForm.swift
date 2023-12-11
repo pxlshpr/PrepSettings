@@ -62,6 +62,7 @@ struct WeightForm: View {
     init(
         value: Double?,
         date: Date,
+        source: HealthSource?,
         healthModel: HealthModel,
         settingsStore: SettingsStore
     ) {
@@ -70,6 +71,7 @@ struct WeightForm: View {
         _model = State(initialValue: Model(
             value: value,
             date: date,
+            source: source,
             healthModel: healthModel
         ))
     }
@@ -137,7 +139,7 @@ extension WeightForm {
     @ViewBuilder
     var sampleDateSection: some View {
         switch model.formType {
-        case .adaptiveSample, .adaptiveSampleAverageComponent:
+        case .adaptiveSample, .specificDate:
             Section {
                 HStack {
                     Text("Date")
@@ -345,6 +347,7 @@ extension WeightForm {
                 WeightForm(
                     value: weight.value,
                     date: weight.date,
+                    source: weight.source,
                     healthModel: healthModel,
                     settingsStore: settingsStore
                 )
@@ -366,8 +369,9 @@ extension WeightForm {
                     ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) {
                         cell(
                             weight: DatedWeight(
-                                value: model.movingAverageValue(at: $0),
-                                date: model.date.moveDayBy(-$0)
+                                date: model.date.moveDayBy(-$0),
+                                value: model.backendValue(at: $0),
+                                source: model.backendSource(at: $0)
                             )
                         )
                     }
@@ -525,7 +529,7 @@ extension WeightForm {
                     EmptyView()
                 }
             }
-        case .adaptiveSampleAverageComponent:
+        case .specificDate:
             EmptyView()
         case .adaptiveSample:
             adaptiveSampleValue
@@ -539,7 +543,7 @@ extension WeightForm {
                 switch model.formType {
                 case .healthDetails:                    healthModel.weightValue
                 case .adaptiveSample:                   model.sample?.value
-                case .adaptiveSampleAverageComponent:   model.value
+                case .specificDate:   model.value
                 }
             },
             set: {
@@ -550,7 +554,7 @@ extension WeightForm {
                 case .adaptiveSample:
                     model.setSampleValue($0)
 
-                case .adaptiveSampleAverageComponent:
+                case .specificDate:
                     model.value = $0
                 }
             }
