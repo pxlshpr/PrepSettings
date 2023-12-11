@@ -6,7 +6,9 @@ import PrepShared
 /// [ ] Add `isDailyAverage` bool to this as well
 /// [ ] Pass it in from backend value, consider passing in HealthQuantity itself instead of value, date, source etc on their own
 /// [ ] Connect isDailyAverage to toggle, also passing that information (along with source etc—possibly in a HealthQuantity struct) to notification
-/// 
+///
+/// [ ] Consider having different units, by first renaming `value` to `valueInKg`, then addressing every place we use it
+/// [ ] Also consider different units for the two other form types
 extension WeightForm {
     @Observable class Model {
         
@@ -14,9 +16,12 @@ extension WeightForm {
         let healthModel: HealthModel
         var date: Date
 
-        var value: Double?
-
+        /// Used for `.healthDetails` and `.specificDate`
         var source: HealthSource?
+
+        /// Used for `.specificDate`
+        var value: Double?
+        var isDailyAverage: Bool?
 
         /// Used for `.adaptiveSample`
         var sample: WeightSample?
@@ -59,9 +64,10 @@ extension WeightForm {
         
         /// Average Component init
         init(
-            value: Double?,
             date: Date,
+            value: Double?,
             source: HealthSource?,
+            isDailyAverage: Bool?,
             healthModel: HealthModel
         ) {
             self.formType = .specificDate
@@ -70,6 +76,7 @@ extension WeightForm {
             
             self.value = value
             self.source = source ?? .userEntered
+            self.isDailyAverage = isDailyAverage
         }
 
     }
@@ -380,11 +387,14 @@ extension WeightForm.Model {
                         break
                     }
                 case .specificDate:
+                    
                     switch newValue {
                     case .healthKit:
                         self.setHealthKitQuantity()
+                        self.updateBackendWithHealthKitValue()
+
                     case .userEntered:
-                        break
+                        self.updateBackendWithUserEnteredValue()
                     }
                     
                     /// In either case, update the backend and send a notification so that the form for the sample can update itself
@@ -394,22 +404,38 @@ extension WeightForm.Model {
                     /// [ ] Receive notification in WeightForm, and if date pertains to it (if its an average component or its health details uses it—actually this should be handled by HealthModel itself receiving the notification—then update itself)
                    
                     /// [ ] Modify the update backend function or at least add notes to imply that we'll be triggering changes in all the Health structs that the weight pertains to (in Health.Weight or as adaptive sample), and if we have a change there, updating the plan if its dependent on those components too;
-                    Task {
-                        if let quantity = self.quantity {
-                            try await self.healthModel.delegate.updateBackendWeight(
-                                for: self.date,
-                                with: quantity,
-                                source: newValue
-                            )
-                        }
-                    }
-                    
+
                 case .adaptiveSample:
                     /// Not handled here (we use `sampleSourceBinding` instead
                     break
                 }
             }
         )
+    }
+    
+    func updateBackend(with healthQuantity: HealthQuantity) {
+        Task {
+            try await self.healthModel.delegate.updateBackendWeight(
+                for: self.date,
+                with: healthQuantity
+            )
+        }
+    }
+    
+    func updateBackendWithHealthKitValue() {
+        updateBackend(with: HealthQuantity(
+            source: .healthKit,
+            isDailyAverage: self.isDailyAverage ?? false,
+            quantity: self.healthKitLatestQuantity
+        ))
+    }
+    
+    func updateBackendWithUserEnteredValue() {
+        updateBackend(with: HealthQuantity(
+            source: .userEntered,
+            isDailyAverage: false,
+            quantity: .init(value: self.value)
+        ))
     }
     
     var sampleSourceBinding: Binding<WeightSampleSource> {
@@ -427,25 +453,26 @@ extension WeightForm.Model {
                 switch newValue {
                 case .healthKit:
                     self.setHealthKitQuantity()
+                    self.updateBackendWithHealthKitValue()
+
                 case .movingAverage:
                     self.setMovingAverageValue()
-                default:
-                    break
+
+                case .userEntered:
+                    self.updateBackendWithUserEnteredValue()
                 }
                 
                 //TODO: Actually change the value now
-                /// [ ] Update the actual `WeightSample`
-                /// [ ] If we've set a manual or HealthKit value, update the backend with the new value too
-                
-                Task {
-//                    if let quantity = self.quantity {
-//                        try await self.healthModel.delegate.updateBackendWeight(
-//                            for: self.date,
-//                            with: quantity,
-//                            source: newValue
-//                        )
-//                    }
-                }
+                /// [x] Update the actual `WeightSample`
+
+                switch self.formType.isPreviousSample {
+                case true:
+                    self.healthModel.health.maintenance?.adaptive.weightChange.previous.source = newValue
+                case false:
+                    self.healthModel.health.maintenance?.adaptive.weightChange.current.source = newValue
+                default:
+                    break
+                }                
             }
         )
     }

@@ -40,12 +40,17 @@ struct MockHealthModelDelegate: HealthModelDelegate {
         ]
     }
     
-    func updateBackendWeight(for date: Date, with quantity: Quantity?, source: HealthSource) async throws {
+    func updateBackendWeight(
+        for date: Date,
+        with healthQuantity: HealthQuantity?
+//        with quantity: Quantity?,
+//        source: HealthSource
+    ) async throws {
         /// [ ] Load the struct from documents—simply amend the value we have, and then save it so that we can test the persistencen
         var values = try await fetchMaintenanceValuesFromDocuments()
         let value = values.values[date]
         values.values[date] = .init(
-            weightInKg: quantity?.value,
+            weightInKg: healthQuantity?.quantity?.value,
             dietaryEnergyInKcal: value?.dietaryEnergyInKcal,
             dietaryEnergyType: value?.dietaryEnergyType ?? .userEntered
         )

@@ -60,18 +60,20 @@ struct WeightForm: View {
     }
     
     init(
-        value: Double?,
         date: Date,
+        value: Double?,
         source: HealthSource?,
+        isDailyAverage: Bool?,
         healthModel: HealthModel,
         settingsStore: SettingsStore
     ) {
         self.healthModel = healthModel
         self.settingsStore = settingsStore
         _model = State(initialValue: Model(
-            value: value,
             date: date,
+            value: value,
             source: source,
+            isDailyAverage: isDailyAverage,
             healthModel: healthModel
         ))
     }
@@ -345,9 +347,10 @@ extension WeightForm {
             }
             .navigationDestination(for: DatedWeight.self) { weight in
                 WeightForm(
-                    value: weight.value,
                     date: weight.date,
+                    value: weight.value,
                     source: weight.source,
+                    isDailyAverage: weight.isDailyAverage,
                     healthModel: healthModel,
                     settingsStore: settingsStore
                 )
@@ -371,7 +374,8 @@ extension WeightForm {
                             weight: DatedWeight(
                                 date: model.date.moveDayBy(-$0),
                                 value: model.backendValue(at: $0),
-                                source: model.backendSource(at: $0)
+                                source: model.backendSource(at: $0),
+                                isDailyAverage: model.backendHealthQuantity(at: $0)?.isDailyAverage
                             )
                         )
                     }

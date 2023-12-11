@@ -5,6 +5,7 @@ struct DatedWeight: Hashable {
     let date: Date
     let value: Double?
     let source: HealthSource?
+    let isDailyAverage: Bool?
 }
 
 struct WeightCell: View {

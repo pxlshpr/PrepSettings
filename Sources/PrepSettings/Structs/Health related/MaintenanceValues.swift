@@ -88,32 +88,32 @@ extension MaintenanceValues {
 }
 
 extension MaintenanceValues {
-    mutating func fillInMissingWeightsFromHealthKit(healthModel: HealthModel) async throws {
-
-        /// Get the range of days that are missing weight data and query them from HealthKit
-        guard let datesWithoutWeights else { return }
-
-        let healthKitValues = try await HealthKitQuantityRequest.weight
-            .quantities(for: datesWithoutWeights)
-            .valuesGroupedByDate
-        
-        for (date, quantities) in healthKitValues {
-            guard
-                let averageValue = quantities.averageValue,
-                let lastQuantity = quantities.sortedByDate.last
-            else { continue }
-            
-            /// Set the fetched value
-            setWeightInKg(averageValue, for: date)
-            
-            //TODO: Consider sending this to another parallel task so we don't have to wait for it (first test how long this takes in practice)
-            try await healthModel.delegate.updateBackendWeight(
-                for: date,
-                with: lastQuantity,
-                source: .healthKit
-            )
-        }
-    }
+//    mutating func fillInMissingWeightsFromHealthKit(healthModel: HealthModel) async throws {
+//
+//        /// Get the range of days that are missing weight data and query them from HealthKit
+//        guard let datesWithoutWeights else { return }
+//
+//        let healthKitValues = try await HealthKitQuantityRequest.weight
+//            .quantities(for: datesWithoutWeights)
+//            .valuesGroupedByDate
+//        
+//        for (date, quantities) in healthKitValues {
+//            guard
+//                let averageValue = quantities.averageValue,
+//                let lastQuantity = quantities.sortedByDate.last
+//            else { continue }
+//            
+//            /// Set the fetched value
+//            setWeightInKg(averageValue, for: date)
+//            
+//            //TODO: Consider sending this to another parallel task so we don't have to wait for it (first test how long this takes in practice)
+//            try await healthModel.delegate.updateBackendWeight(
+//                for: date,
+//                with: lastQuantity,
+//                source: .healthKit
+//            )
+//        }
+//    }
     
     mutating func fillInMissingDietaryEnergyFromHealthKit() async throws {
         
