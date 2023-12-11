@@ -115,7 +115,12 @@ extension WeightForm {
     }
     
     var title: String {
-        "Weight"
+        switch model.formType {
+        case .adaptiveSample(let isPrevious):
+            "\(isPrevious ? "Previous" : "Current") Weight"
+        default:
+            "Weight"
+        }
     }
     
     var keyboardToolbarContent: some ToolbarContent {
