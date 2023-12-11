@@ -138,41 +138,19 @@ extension WeightForm {
         }
     }
     
+    @ViewBuilder
     var sampleDateSection: some View {
-        var dateString: String? {
-            switch model.formType {
-            case .adaptiveSample:
-                model.date.healthDateFormat
-            case .specificDate:
-                model.useDailyAverage 
-                ? model.date.healthFormat
-                : model.healthKitLatestQuantity?.date?.healthFormat
-            default:
-                nil
-            }
-        }
-        
-        var labelString: String {
-            switch model.formType {
-            case .adaptiveSample(let isPrevious):
-                "\(isPrevious ? "Previous" : "Current") Date"
-            default:
-                "Date"
-            }
-        }
-        return Group {
-            switch model.formType {
-            case .adaptiveSample, .specificDate:
-                Section {
-                    HStack {
-                        Text(labelString)
-                        Spacer()
-                        Text(dateString ?? "")
-                    }
+        switch model.formType {
+        case .adaptiveSample, .specificDate:
+            Section {
+                HStack {
+                    Text("Date")
+                    Spacer()
+                    Text(model.date.healthDateFormat)
                 }
-            default:
-                EmptyView()
             }
+        default:
+            EmptyView()
         }
     }
     
@@ -287,18 +265,46 @@ extension WeightForm {
     
     var dateSection: some View {
         var footer: some View {
-            let string = model.useDailyAverage
-            ? "This is the most recent date with weight data in Apple Health."
-            : "This is the most recent weight data in Apple Health."
-            return Text(string)
+            let string: String? = switch model.formType {
+            case .healthDetails:
+                model.useDailyAverage
+                ? "This is the most recent date with weight data in Apple Health."
+                : "This is the most recent weight data in Apple Health."
+            default: nil
+            }
+            return Group {
+                if let string {
+                    Text(string)
+                } else {
+                    EmptyView()
+                }
+            }
         }
         
         func section(_ date: Date) -> some View {
-            Section(footer: footer) {
+            var dateString: String {
+                switch model.formType {
+                case .healthDetails:
+                    model.useDailyAverage ? date.healthDateFormat : date.healthFormat
+                case .specificDate:
+                    date.healthTimeFormat
+                default: ""
+                }
+            }
+            
+            var label: String {
+                switch model.formType {
+                case .healthDetails:    "Date"
+                case .specificDate:     "Time"
+                default: ""
+                }
+            }
+            
+            return Section(footer: footer) {
                 HStack {
-                    Text("Date")
+                    Text(label)
                     Spacer()
-                    Text(model.useDailyAverage ? date.healthDateFormat : date.healthFormat)
+                    Text(dateString)
                 }
             }
         }

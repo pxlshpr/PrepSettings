@@ -44,23 +44,21 @@ public extension Date {
     }
     
     var healthFormat: String {
-        let dayString: String
-        var timeString = shortTime
-        if Calendar.current.isDateInToday(self) { dayString = "Today" }
-        else if Calendar.current.isDateInYesterday(self) { dayString = "Yesterday" }
-        else if Calendar.current.isDateInTomorrow(self) { dayString = "Tomorrow" }
-        else {
-            let formatter = DateFormatter()
-            let sameYear = year == Date().year
-            formatter.dateFormat = sameYear ? "d MMM" : "d MMM yy"
-            dayString = formatter.string(from: self)
-//            timeString = ""
-        }
-        if timeString.isEmpty {
-            return dayString
-        } else {
-            return dayString + ", " + timeString
-        }
+        
+        let timeString = healthTimeFormat
+        
+        let dateFormatter = DateFormatter()
+        let sameYear = year == Date().year
+        dateFormatter.dateFormat = sameYear ? "d MMM" : "d MMM yy"
+        let dayString = dateFormatter.string(from: self)
+
+        return dayString + ", " + timeString
+    }
+    
+    var healthTimeFormat: String {
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "h:mm a"
+        return timeFormatter.string(from: self).lowercased()
     }
     
     var healthEnergyFormat: String {

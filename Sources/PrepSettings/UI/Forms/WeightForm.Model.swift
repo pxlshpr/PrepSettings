@@ -362,6 +362,8 @@ extension WeightForm.Model {
         switch formType {
         case .healthDetails:
             source == .healthKit
+        case .specificDate:
+            source == .healthKit && !useDailyAverage
         default:
             false
         }
