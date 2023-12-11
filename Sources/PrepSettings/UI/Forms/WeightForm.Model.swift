@@ -1,14 +1,9 @@
 import SwiftUI
 import PrepShared
 
-/// [x] See why change in `.sampleSource` for `.adaptiveSample` case isn't being persisted
-/// [ ] See why change to Apple Health in `.specificDate` isn't updating value
-/// [ ] Add `isDailyAverage` bool to this as well
-/// [ ] Pass it in from backend value, consider passing in HealthQuantity itself instead of value, date, source etc on their own
-/// [ ] Connect isDailyAverage to toggle, also passing that information (along with source etc—possibly in a HealthQuantity struct) to notification
-///
 /// [ ] Consider having different units, by first renaming `value` to `valueInKg`, then addressing every place we use it
 /// [ ] Also consider different units for the two other form types
+
 extension WeightForm {
     @Observable class Model {
         
