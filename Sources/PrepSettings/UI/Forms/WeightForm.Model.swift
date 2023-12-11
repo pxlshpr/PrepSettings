@@ -1,6 +1,12 @@
 import SwiftUI
 import PrepShared
 
+/// [ ] See why change in `.sampleSource` for `.adaptiveSample` case isn't being persisted
+/// [ ] See why change to Apple Health in `.specificDate` isn't updating value
+/// [ ] Add `isDailyAverage` bool to this as well
+/// [ ] Pass it in from backend value, consider passing in HealthQuantity itself instead of value, date, source etc on their own
+/// [ ] Connect isDailyAverage to toggle, also passing that information (along with source etc—possibly in a HealthQuantity struct) to notification
+/// 
 extension WeightForm {
     @Observable class Model {
         
@@ -336,14 +342,10 @@ extension WeightForm.Model {
     
     var shouldShowDailyAverageValuesSection: Bool {
         switch formType {
-        case .healthDetails:
-            source == .healthKit
-            && useDailyAverage
-        case .specificDate:
-            false
+        case .healthDetails, .specificDate:
+            source == .healthKit && useDailyAverage
         case .adaptiveSample:
-            sampleSource == .healthKit
-            && useDailyAverage
+            sampleSource == .healthKit && useDailyAverage
         }
     }
     
@@ -473,6 +475,7 @@ extension WeightForm.Model {
             case .healthDetails:
                 healthModel.health.weight?.isDailyAverage ?? false
             case .specificDate:
+                
                 false
             case .adaptiveSample:
                 sample?.isDailyAverage == true

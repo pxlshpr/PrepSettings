@@ -440,12 +440,12 @@ extension WeightForm {
                 model.healthKitQuantities?.isEmpty == false ? [] : [.healthKit]
             }
 
-//            return PickerSection(options, binding)
             return PickerSection(binding, disabledOptions: disabledOptions)
         }
         
         var sourcePicker: some View {
-            PickerSection(Binding<HealthSource>(
+            
+            let binding = Binding<HealthSource>(
                 get: { model.sourceBinding.wrappedValue },
                 set: { newValue in
                     model.sourceBinding.wrappedValue = newValue
@@ -455,7 +455,14 @@ extension WeightForm {
                         unfocusTextField()
                     }
                 }
-            ))
+            )
+            
+            var disabledOptions: [HealthSource] {
+                guard model.formType != .healthDetails else { return [] }
+                return model.healthKitQuantities?.isEmpty == false ? [] : [.healthKit]
+            }
+
+            return PickerSection(binding, disabledOptions: disabledOptions)
         }
         
         return Group {
