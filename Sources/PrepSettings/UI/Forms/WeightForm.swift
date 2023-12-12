@@ -33,6 +33,8 @@ struct WeightForm: View {
     
     @FocusState var focusedType: HealthType?
 
+    let didUpdateWeight = NotificationCenter.default.publisher(for: .didUpdateWeight)
+    
     init(
         healthModel: HealthModel,
         settingsStore: SettingsStore
@@ -88,6 +90,7 @@ struct WeightForm: View {
             .navigationBarTitleDisplayMode(.inline)
             .onChange(of: focusedType, healthModel.focusedTypeChanged)
             .toolbar { keyboardToolbarContent }
+            .onReceive(didUpdateWeight, perform: model.didUpdateWeight)
     }
 }
 
@@ -402,16 +405,19 @@ extension WeightForm {
         return Group {
             if model.shouldShowMovingAverageSections {
                 Section {
-                    ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) {
-                        cell(
-                            weight: DatedWeight(
-                                date: model.date.moveDayBy(-$0),
-                                value: model.backendValue(at: $0),
-                                source: model.backendSource(at: $0),
-                                isDailyAverage: model.backendHealthQuantity(at: $0)?.isDailyAverage
-                            )
-                        )
+                    ForEach(model.movingAverageDatedWeights, id: \.self) {
+                        cell(weight: $0)
                     }
+//                    ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) {
+//                        cell(
+//                            weight: DatedWeight(
+//                                date: model.date.moveDayBy(-$0),
+//                                value: model.backendValue(at: $0),
+//                                source: model.backendSource(at: $0),
+//                                isDailyAverage: model.backendHealthQuantity(at: $0)?.isDailyAverage
+//                            )
+//                        )
+//                    }
                 }
             }
         }

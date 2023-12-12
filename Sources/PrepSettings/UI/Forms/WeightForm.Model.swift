@@ -25,7 +25,11 @@ extension WeightForm {
         var healthKitQuantities: [Quantity]?
         var healthKitValueForDate: Double?
         
+        /// Reference values kept so that when changing interval we're able to display values quickly without re-querying for them
         var backendQuantities: [Date: HealthQuantity]?
+        
+        /// List of moving average weights that are displayed based on the current interval
+        var movingAverageDatedWeights: [DatedWeight] = []
         
         /// Health init
         init(
@@ -55,6 +59,14 @@ extension WeightForm {
             self.sampleSource = sample.source
             
             self.sample = sample
+            
+            /// Initialize movingAverageDatedWeights with empty placeholders
+            if let dayCount = sample.movingAverageInterval?.numberOfDays {
+                for i in 0..<dayCount {
+                    let date = date.moveDayBy(-i)
+                    self.movingAverageDatedWeights.append(.init(date: date))
+                }
+            }
         }
         
         /// Average Component init
@@ -74,6 +86,33 @@ extension WeightForm {
             self.isDailyAverage = isDailyAverage
         }
 
+    }
+}
+
+extension WeightForm.Model {
+    func didUpdateWeight(notification: Notification) {
+        
+        /// We're only interested in external weight changes if we're the adaptive weight form using a moving average
+        guard formType.isAdaptiveSample, sampleSource == .movingAverage else {
+            return
+        }
+        
+        /// Make sure we have the date, the actual weight data, and the array of healthKit quantities
+        guard let date = notification.date,
+              let healthQuantity = notification.weightHealthQuantity
+        else { return }
+        
+        /// [ ] Only continue if the date pertains to this form (guard that the date lies within the date range for the moving average interval)
+
+        /// If the array of quantities isn't initialized yet, do so with this quantity
+        guard backendQuantities != nil else {
+            backendQuantities?[date] = healthQuantity
+            return
+        }
+        
+        /// If the quantity for this date already exists, replace it with this, otherwise simply set it
+        backendQuantities?[date] = healthQuantity
+        setMovingAverageDatedWeights()
     }
 }
 
@@ -108,10 +147,28 @@ extension WeightForm.Model {
             
             await MainActor.run {
                 self.backendQuantities = quantities
+                self.setMovingAverageDatedWeights()
             }
             
         default:
             break
+        }
+    }
+    
+    func setMovingAverageDatedWeights() {
+        guard let dayCount = sample?.movingAverageInterval?.numberOfDays else {
+            movingAverageDatedWeights = []
+            return
+        }
+        
+        for i in 0..<dayCount {
+            let date = date.moveDayBy(-i)
+            let datedWeight: DatedWeight = if let healthQuantity = backendQuantities?[date] {
+                .init(date: date, healthQuantity: healthQuantity)
+            } else {
+                .init(date: date)
+            }
+            movingAverageDatedWeights[i] = datedWeight
         }
     }
     
@@ -387,18 +444,27 @@ extension WeightForm.Model {
                     }
                 case .specificDate:
                     
+                    /// Update the backend and send a notification so that the form for the sample can update itself
+
+                    let healthQuantity: HealthQuantity
                     switch newValue {
                     case .healthKit:
                         self.setHealthKitQuantity()
-                        self.updateBackendWithHealthKitValue()
-
+                        healthQuantity = self.healthKitHealthQuantity
+                        
                     case .userEntered:
-                        self.updateBackendWithUserEnteredValue()
+                        healthQuantity = self.customHealthQuantity
                     }
                     
-                    /// In either case, update the backend and send a notification so that the form for the sample can update itself
-                    
+                    self.updateBackend(with: healthQuantity)
+                    let userInfo: [Notification.PrepSettingsKeys : Any] = [
+                        .date: self.date,
+                        .weightHealthQuantity: healthQuantity
+                    ]
+
                     /// [ ] Send a notification
+                    post(.didUpdateWeight, userInfo)
+                    
                     /// [ ] Receive notification HealthModel and update itself if date pertains to it (is the date itself or the date that its using)
                     /// [ ] Receive notification in WeightForm, and if date pertains to it (if its an average component or its health details uses it—actually this should be handled by HealthModel itself receiving the notification—then update itself)
                    
@@ -421,20 +487,20 @@ extension WeightForm.Model {
         }
     }
     
-    func updateBackendWithHealthKitValue() {
-        updateBackend(with: HealthQuantity(
+    var healthKitHealthQuantity: HealthQuantity {
+        HealthQuantity(
             source: .healthKit,
             isDailyAverage: self.isDailyAverage ?? false,
             quantity: self.healthKitLatestQuantity
-        ))
+        )
     }
     
-    func updateBackendWithUserEnteredValue() {
-        updateBackend(with: HealthQuantity(
+    var customHealthQuantity: HealthQuantity {
+        HealthQuantity(
             source: .userEntered,
             isDailyAverage: false,
             quantity: .init(value: self.value)
-        ))
+        )
     }
     
     var sampleSourceBinding: Binding<WeightSampleSource> {
@@ -452,13 +518,13 @@ extension WeightForm.Model {
                 switch newValue {
                 case .healthKit:
                     self.setHealthKitQuantity()
-                    self.updateBackendWithHealthKitValue()
+                    self.updateBackend(with: self.healthKitHealthQuantity)
 
                 case .movingAverage:
                     self.setMovingAverageValue()
 
                 case .userEntered:
-                    self.updateBackendWithUserEnteredValue()
+                    self.updateBackend(with: self.customHealthQuantity)
                 }
                 
                 //TODO: Actually change the value now
@@ -533,6 +599,7 @@ extension WeightForm.Model {
             guard let sample else { return }
             var interval = sample.movingAverageInterval ?? .default
             interval.period = newValue
+            setMovingAverageDatedWeights()
             withAnimation {
                 self.sample?.movingAverageInterval = interval
                 self.sample?.movingAverageInterval?.correctIfNeeded()

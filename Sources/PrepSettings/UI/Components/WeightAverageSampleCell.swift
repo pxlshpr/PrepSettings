@@ -6,6 +6,25 @@ struct DatedWeight: Hashable {
     let value: Double?
     let source: HealthSource?
     let isDailyAverage: Bool?
+    
+    init(
+        date: Date,
+        value: Double? = nil,
+        source: HealthSource? = nil,
+        isDailyAverage: Bool? = nil
+    ) {
+        self.date = date
+        self.value = value
+        self.source = source
+        self.isDailyAverage = isDailyAverage
+    }
+    
+    init(date: Date, healthQuantity: HealthQuantity) {
+        self.date = date
+        self.value = healthQuantity.quantity?.value
+        self.source = healthQuantity.source
+        self.isDailyAverage = healthQuantity.isDailyAverage
+    }
 }
 
 struct WeightCell: View {

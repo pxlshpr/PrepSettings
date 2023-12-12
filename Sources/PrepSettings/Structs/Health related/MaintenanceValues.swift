@@ -1,9 +1,21 @@
 import Foundation
 
+public struct WeightValues: Codable {
+    public var values: [Date: HealthQuantity] = [:]
+}
+
+public struct DietaryEnergyValues: Codable {
+    public var values: [Date: Value] = [:]
+
+    public struct Value: Codable {
+        public var dietaryEnergyInKcal: Double?
+        public var dietaryEnergyType: DietaryEnergySampleType
+    }
+}
 
 public struct MaintenanceValues: Codable {
     
-    public var values: [Date: Value]
+    public var values: [Date : Value]
     
     public struct Value: Codable {
         public var weightInKg: Double?
@@ -19,6 +31,29 @@ public struct MaintenanceValues: Codable {
             self.dietaryEnergyInKcal = dietaryEnergyInKcal
             self.dietaryEnergyType = dietaryEnergyType
         }
+    }
+    
+    public init(
+        dateRange: ClosedRange<Date>,
+        weightValues: WeightValues,
+        dietaryEnergyValues: DietaryEnergyValues
+    ) {
+        let dayDurationInSeconds: TimeInterval = 60*60*24
+        var values: [Date : Value] = [:]
+        for date in stride(
+            from: dateRange.lowerBound,
+            to: dateRange.upperBound,
+            by: dayDurationInSeconds
+        ) {
+            let weightInKg = weightValues.values[date]?.quantity?.value
+            let dietaryEnergyValue = dietaryEnergyValues.values[date]
+            values[date] = .init(
+                weightInKg: weightInKg,
+                dietaryEnergyInKcal: dietaryEnergyValue?.dietaryEnergyInKcal,
+                dietaryEnergyType: dietaryEnergyValue?.dietaryEnergyType ?? .userEntered
+            )
+        }
+        self.values = values
     }
     
     public init(values: [Date : Value]) {
