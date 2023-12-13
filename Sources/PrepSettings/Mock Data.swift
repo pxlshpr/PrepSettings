@@ -26,8 +26,8 @@ struct MockHealthModelDelegate: HealthModelDelegate {
     }
     
     func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthQuantity] {
-        let weights: WeightValues = try await fetchFromBackend(.weight)
-        return weights.values
+        let weightValues: WeightValues = try await fetchFromBackend(.weight)
+        return weightValues.values
     }
     
     func handleWeightChange(
@@ -38,7 +38,12 @@ struct MockHealthModelDelegate: HealthModelDelegate {
     ) async throws {
         
         /// [ ] Load weightValues from backend, amend the value, save it
+        var weightValues: WeightValues = try await fetchFromBackend(.weight)
+        weightValues.values[date] = healthQuantity
+        try await saveInBackend(.weight, weightValues)
         
+        /// **Note: ** In Prep we'll do stuff here like grab all the days that this weight might pertain to, update the HealthDetails (weight and/or adaptive maintenance), Plans, etc
+
 //        var values = try await fetchMaintenanceValuesFromDocuments()
 //        let value = values.values[date]
 //        values.values[date] = .init(
