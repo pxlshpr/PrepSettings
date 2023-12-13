@@ -90,6 +90,22 @@ extension WeightForm {
 }
 
 extension WeightForm.Model {
+    
+    func didRemoveWeight(notification: Notification) {
+        /// We're only interested in external weight changes if we're the adaptive weight form using a moving average
+        guard 
+            formType.isAdaptiveSample,
+            sampleSource == .movingAverage,
+            let date = notification.date
+        else {
+            return
+        }
+        
+        /// If the quantity for this date already exists, replace it with this, otherwise simply set it
+        backendQuantities?[date] = nil
+        setMovingAverageDatedWeights()
+    }
+    
     func didUpdateWeight(notification: Notification) {
         
         /// We're only interested in external weight changes if we're the adaptive weight form using a moving average
@@ -468,13 +484,6 @@ extension WeightForm.Model {
                     }
                     
                     self.updateBackend(with: healthQuantity)
-                    let userInfo: [Notification.PrepSettingsKeys : Any] = [
-                        .date: self.date,
-                        .weightHealthQuantity: healthQuantity
-                    ]
-
-                    /// [ ] Send a notification
-                    post(.didUpdateWeight, userInfo)
                     
                     /// [ ] Receive notification HealthModel and update itself if date pertains to it (is the date itself or the date that its using)
                     /// [ ] Receive notification in WeightForm, and if date pertains to it (if its an average component or its health details uses it—actually this should be handled by HealthModel itself receiving the notification—then update itself)
@@ -489,7 +498,7 @@ extension WeightForm.Model {
         )
     }
     
-    func updateBackend(with healthQuantity: HealthQuantity) {
+    func updateBackend(with healthQuantity: HealthQuantity?) {
         Task {
             try await self.healthModel.delegate.handleWeightChange(
                 for: self.date,
@@ -507,10 +516,19 @@ extension WeightForm.Model {
     }
     
     var userEnteredHealthQuantity: HealthQuantity {
-        HealthQuantity(
+        let value = switch formType {
+        case .healthDetails:
+            healthModel.health.weight?.quantity?.value
+        case .adaptiveSample:
+            sample?.value
+        case .specificDate:
+            self.value
+        }
+        
+        return HealthQuantity(
             source: .userEntered,
             isDailyAverage: false,
-            quantity: .init(value: self.value)
+            quantity: .init(value: value)
         )
     }
     

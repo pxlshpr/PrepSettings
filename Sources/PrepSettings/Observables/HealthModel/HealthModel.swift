@@ -43,6 +43,7 @@ public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
         self.health = Health()
         self.isCurrent = true
         loadCurrentHealth(fetchCurrentHealthHandler)
+        addObservers()
     }
     
     /// Past Health
@@ -56,6 +57,7 @@ public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
         self.delegate = delegate
         self.health = health
         self.isCurrent = false
+        addObservers()
     }
 
     public func loadCurrentHealth(_ handler: @escaping FetchCurrentHealthHandler) {
@@ -69,6 +71,45 @@ public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
                 post(.didLoadCurrentHealth)
             }
         }
+    }
+}
+
+extension HealthModel {
+    func addObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didUpdateWeight),
+            name: .didUpdateWeight,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didRemoveWeight),
+            name: .didRemoveWeight,
+            object: nil
+        )
+    }
+    
+    @objc func didUpdateWeight(notification: Notification) {
+        guard let date = notification.date,
+              let healthQuantity = notification.weightHealthQuantity,
+              health.date == date
+        else {
+            return
+        }
+        
+        health.weight = healthQuantity
+    }
+    
+    @objc func didRemoveWeight(notification: Notification) {
+        guard let date = notification.date,
+              health.date == date,
+              health.weight?.source == .userEntered
+        else {
+            return
+        }
+        
+        health.weight = nil
     }
 }
 

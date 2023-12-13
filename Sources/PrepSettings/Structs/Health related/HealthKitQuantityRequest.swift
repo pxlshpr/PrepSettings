@@ -91,6 +91,12 @@ extension HealthKitQuantityRequest {
 extension HealthKitQuantityRequest {
 
     func mostRecentOrEarliestAvailable(to date: Date) async throws -> Quantity? {
+        var date = date
+        if date.isToday {
+            date = date.startOfDay
+        } else {
+            date = date.endOfDay
+        }
         guard let mostRecent = try await mostRecent(to: date) else {
             return try await earliestAvailable()
         }

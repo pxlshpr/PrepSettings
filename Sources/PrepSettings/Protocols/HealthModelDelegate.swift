@@ -20,11 +20,9 @@ public protocol HealthModelDelegate {
      1. During the initial toggle of adaptive maintenance, when we fetch any HealthKit values that we don’t have weights for (in the backend), and update the backend with those (they will be set as HealthKit types)—in this case Prep will be creating the Day and/or Health and/or Weight if required and inserting that weight that didn't exist
      2. When the user manually changes a weight in the WeightSampleForm and confirms that they want to save it—in this case Prep would be updating the value that exists, and possibly recalculating the plan if it was dependent on it in any way
      */
-    func handleWeightChange(
-        for date: Date,
-        with healthQuantity: HealthQuantity?
-//        with quantity: Quantity?,
-//        source: HealthSource
+    func updateBackendWithWeight(
+        _ healthQuantity: HealthQuantity?,
+        for date: Date
     ) async throws
     
     /**
@@ -41,3 +39,21 @@ public protocol HealthModelDelegate {
      */
     func dietaryEnergyInKcal(on date: Date) async throws -> Double?
 }
+
+public extension HealthModelDelegate {
+    func handleWeightChange(
+        for date: Date,
+        with healthQuantity: HealthQuantity?
+    ) async throws {
+        try await updateBackendWithWeight(healthQuantity, for: date)
+        
+        var userInfo: [Notification.PrepSettingsKeys : Any] = [.date: date]
+        if let healthQuantity {
+            userInfo[.weightHealthQuantity] = healthQuantity
+            post(.didUpdateWeight, userInfo)
+        } else {
+            post(.didRemoveWeight, userInfo)
+        }
+    }
+}
+

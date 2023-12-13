@@ -34,7 +34,8 @@ struct WeightForm: View {
     @FocusState var focusedType: HealthType?
 
     let didUpdateWeight = NotificationCenter.default.publisher(for: .didUpdateWeight)
-    
+    let didRemoveWeight = NotificationCenter.default.publisher(for: .didRemoveWeight)
+
     init(
         healthModel: HealthModel,
         settingsStore: SettingsStore
@@ -91,6 +92,7 @@ struct WeightForm: View {
             .onChange(of: focusedType, model.focusedTypeChanged)
             .toolbar { keyboardToolbarContent }
             .onReceive(didUpdateWeight, perform: model.didUpdateWeight)
+            .onReceive(didRemoveWeight, perform: model.didRemoveWeight)
     }
 }
 

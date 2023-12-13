@@ -256,20 +256,13 @@ struct WeightChangeForm: View {
     }
     
     func sampleForm(for route: WeightSampleRoute) -> some View {
-        func didSaveWeight(_ sample: WeightSample) {
-            healthModel.setWeightSample(sample, isPrevious: route.isPrevious)
-        }
-        
-        
-        
-        return WeightForm(
+        WeightForm(
             sample: route.sample,
             date: route.date,
             isPrevious: route.isPrevious,
             healthModel: healthModel,
             settingsStore: settingsStore
-//            didSave: didSaveWeight
-        )        
+        )
     }
     
     struct WeightSampleRoute: Hashable {

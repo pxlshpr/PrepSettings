@@ -5,6 +5,7 @@ public extension Notification.Name {
     static var didSaveHealth: Notification.Name { .init("didSaveHealth") }
     
     static var didUpdateWeight: Notification.Name { .init("didUpdateWeight") }
+    static var didRemoveWeight: Notification.Name { .init("didRemoveWeight") }
 }
 
 public extension Notification {
