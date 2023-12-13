@@ -256,9 +256,9 @@ extension WeightForm.Model {
             }
         }
         
-        /// If we're not using daily average, and the date of the quantity matches the date of the form, update the backend with it
-        if quantity?.date == self.date, !useDailyAverage {
-            updateBackend(with: .init(source: .healthKit, isDailyAverage: false, quantity: quantity))
+        /// If the date of the quantity matches the date of the form, update the backend with it
+        if quantity?.date == self.date {
+            updateBackend(with: healthKitHealthQuantity)
         }
     }
     
@@ -556,9 +556,6 @@ extension WeightForm.Model {
                     self.updateBackend(with: self.userEnteredHealthQuantity)
                 }
                 
-                //TODO: Actually change the value now
-                /// [x] Update the actual `WeightSample`
-
                 switch self.formType.isPreviousSample {
                 case true:
                     self.healthModel.health.maintenance?.adaptive.weightChange.previous.source = newValue

@@ -47,12 +47,14 @@ public extension HealthModelDelegate {
     ) async throws {
         try await updateBackendWithWeight(healthQuantity, for: date)
         
-        var userInfo: [Notification.PrepSettingsKeys : Any] = [.date: date]
-        if let healthQuantity {
-            userInfo[.weightHealthQuantity] = healthQuantity
-            post(.didUpdateWeight, userInfo)
-        } else {
-            post(.didRemoveWeight, userInfo)
+        await MainActor.run {
+            var userInfo: [Notification.PrepSettingsKeys : Any] = [.date: date]
+            if let healthQuantity {
+                userInfo[.weightHealthQuantity] = healthQuantity
+                post(.didUpdateWeight, userInfo)
+            } else {
+                post(.didRemoveWeight, userInfo)
+            }
         }
     }
 }

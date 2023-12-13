@@ -99,6 +99,7 @@ extension HealthModel {
         }
         
         health.weight = healthQuantity
+        //TODO: Handle re-calculating stuff in Health?
     }
     
     @objc func didRemoveWeight(notification: Notification) {
@@ -110,6 +111,7 @@ extension HealthModel {
         }
         
         health.weight = nil
+        //TODO: Handle re-calculating stuff in Health?
     }
 }
 
