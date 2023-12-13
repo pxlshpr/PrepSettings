@@ -88,7 +88,7 @@ struct WeightForm: View {
 
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
-            .onChange(of: focusedType, healthModel.focusedTypeChanged)
+            .onChange(of: focusedType, model.focusedTypeChanged)
             .toolbar { keyboardToolbarContent }
             .onReceive(didUpdateWeight, perform: model.didUpdateWeight)
     }

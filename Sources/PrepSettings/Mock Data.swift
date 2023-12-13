@@ -1,12 +1,6 @@
 import Foundation
 import PrepShared
 
-/// [ ] Toggling Use Daily Average should update backend (its currently not saving it, but saving value)
-/// [ ] Update backend func should include the thing sending the notification
-/// [ ] Updating weight sample should recalculate delta and hence maintenance
-/// [ ] Starting to swipe back from WeightFrom back to WeightChange and then cancelling midway through has navigation bar incorrectly set. Apparently this could be due to stuff happening in onAppear, so check on that (first with WeightChange, then with WeightForm)
-/// [ ]
-
 public let MockHealthModel = HealthModel(
     delegate: MockHealthModelDelegate(),
     fetchCurrentHealthHandler: {
@@ -36,7 +30,7 @@ struct MockHealthModelDelegate: HealthModelDelegate {
         return weights.values
     }
     
-    func updateBackendWeight(
+    func handleWeightChange(
         for date: Date,
         with healthQuantity: HealthQuantity?
 //        with quantity: Quantity?,
