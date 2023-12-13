@@ -256,8 +256,8 @@ extension WeightForm.Model {
             }
         }
         
-        /// If the date of the quantity matches the date of the form, update the backend with it
-        if quantity?.date == self.date {
+        /// If the date of the quantity is on the same day as the date of the form, update the backend with it
+        if date?.startOfDay == self.date.startOfDay {
             updateBackend(with: healthKitHealthQuantity)
         }
     }
@@ -508,9 +508,14 @@ extension WeightForm.Model {
     }
     
     var healthKitHealthQuantity: HealthQuantity {
-        HealthQuantity(
+        let isDailyAverage = switch formType {
+        case .healthDetails:    healthModel.health.weight?.isDailyAverage
+        case .specificDate:     isDailyAverage
+        case .adaptiveSample:   sample?.isDailyAverage
+        }
+        return HealthQuantity(
             source: .healthKit,
-            isDailyAverage: self.isDailyAverage ?? false,
+            isDailyAverage: isDailyAverage ?? false,
             quantity: self.healthKitLatestQuantity
         )
     }
@@ -608,7 +613,15 @@ extension WeightForm.Model {
                 withAnimation {
                     isDailyAverage = newValue
                 }
-            case .adaptiveSample:
+            case .adaptiveSample(let isPrevious):
+                //TODO: Make accessors for previous and current easier to read
+                if isPrevious {
+                    healthModel.health.maintenance?.adaptive.weightChange.previous.isDailyAverage = newValue
+                    healthModel.health.maintenance?.adaptive.weightChange.previous.movingAverageInterval = newValue ? .default : nil
+                } else {
+                    healthModel.health.maintenance?.adaptive.weightChange.current.isDailyAverage = newValue
+                    healthModel.health.maintenance?.adaptive.weightChange.current.movingAverageInterval = newValue ? .default : nil
+                }
                 withAnimation {
                     sample?.isDailyAverage = newValue
                 }
