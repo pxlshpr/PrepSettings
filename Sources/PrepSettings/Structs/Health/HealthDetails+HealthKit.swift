@@ -1,6 +1,6 @@
 import Foundation
 
-public extension Health {
+public extension HealthDetails {
 
     mutating func initializeHealthKitValues() {
         weight = .init(source: .healthKit)
@@ -35,12 +35,12 @@ public extension Health {
     }
 }
 
-public extension Health {
+public extension HealthDetails {
     func isMissingHealthKitValue(for type: HealthType) -> Bool {
         sourceIsHealthKit(for: type) && valueIsNil(for: type)
     }
     
-    func typeToFetchFromHealthKit(from old: Health) -> HealthType? {
+    func typeToFetchFromHealthKit(from old: HealthDetails) -> HealthType? {
 //        if old.weightSource != .healthKit, weightSource == .healthKit {
 //            return .weight
 //        }
@@ -66,7 +66,7 @@ public extension Health {
     }
 }
 
-public extension Health {
+public extension HealthDetails {
     var usesHealthKit: Bool {
         restingEnergy?.source == .healthKit
         || activeEnergy?.source == .healthKit
@@ -110,7 +110,7 @@ public extension Health {
         }
     }
 }
-public extension Health {
+public extension HealthDetails {
     var shouldShowSyncAllTip: Bool {
         doesNotHaveAnyHealthKitBasedTypesSet
         && skipSyncAll == false

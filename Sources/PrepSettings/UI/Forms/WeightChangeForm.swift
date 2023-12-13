@@ -279,7 +279,7 @@ struct WeightChangeForm: View {
         maintenance.adaptive.interval.startDate(with: currentDate)
     }
 
-    var maintenance: Health.Maintenance {
+    var maintenance: HealthDetails.Maintenance {
         healthModel.health.maintenance ?? .init()
     }
 }

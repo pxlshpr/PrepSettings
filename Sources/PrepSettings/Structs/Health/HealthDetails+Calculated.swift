@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-public extension Health {
+public extension HealthDetails {
 
     //MARK: Recalculators
     

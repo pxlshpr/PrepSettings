@@ -60,7 +60,7 @@ struct HealthLeanBodyMassSection: View {
         )
     }
     
-    var leanBodyMass: Health.LeanBodyMass? {
+    var leanBodyMass: HealthDetails.LeanBodyMass? {
         model.health.leanBodyMass
     }
     

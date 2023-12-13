@@ -98,7 +98,7 @@ public struct HealthSummary: View {
             Menu {
                 Button("Clear Health Details") {
                     withAnimation {
-                        model.health = Health()
+                        model.health = HealthDetails()
                         model.typesBeingSetFromHealthKit = []
                     }
                 }

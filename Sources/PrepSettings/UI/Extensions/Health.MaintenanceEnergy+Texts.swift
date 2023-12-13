@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-extension Health.Maintenance.Adaptive {
+extension HealthDetails.Maintenance.Adaptive {
     
 //    @ViewBuilder
 //    func weightChangeValueText(bodyMassUnit: BodyMassUnit) -> some View {

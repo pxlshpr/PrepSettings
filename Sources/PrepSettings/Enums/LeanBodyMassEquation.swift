@@ -29,7 +29,7 @@ extension LeanBodyMassEquation: Pickable {
 }
 
 public extension LeanBodyMassEquation {
-    func usesHealthKit(in health: Health) -> Bool {
+    func usesHealthKit(in health: HealthDetails) -> Bool {
         for param in self.params {
             switch param {
             case .sex:

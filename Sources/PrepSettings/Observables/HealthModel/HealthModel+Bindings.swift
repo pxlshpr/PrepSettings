@@ -323,7 +323,7 @@ extension HealthModel {
         )
     }
     
-    var maintenance: Health.Maintenance {
+    var maintenance: HealthDetails.Maintenance {
         health.maintenance ?? .init()
     }
     

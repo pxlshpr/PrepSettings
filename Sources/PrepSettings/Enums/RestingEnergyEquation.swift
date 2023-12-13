@@ -90,7 +90,7 @@ public extension RestingEnergyEquation {
 }
 
 public extension RestingEnergyEquation {
-    func usesHealthKit(in health: Health) -> Bool {
+    func usesHealthKit(in health: HealthDetails) -> Bool {
         for param in self.params {
             switch param {
             case .sex:          if health.usesHealthKitForSex { return true }

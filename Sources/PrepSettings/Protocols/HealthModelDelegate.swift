@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol HealthModelDelegate {
-    func saveHealth(_ health: Health, isCurrent: Bool) async throws
+    func saveHealth(_ health: HealthDetails, isCurrent: Bool) async throws
     
     /**
      Takes in a date range and provides a dict of the dates as keys with the weight and dietary energy (both optional) for that day as values.

@@ -10,7 +10,7 @@ public enum HealthKitValue {
     case restingEnergy(Double?)
     case activeEnergy(Double?)
     
-    case adaptiveMaintenance(Health.Maintenance.Adaptive)
+    case adaptiveMaintenance(HealthDetails.Maintenance.Adaptive)
 
     case sex(HKBiologicalSex?)
     case age(DateComponents?)
@@ -65,7 +65,7 @@ public extension HealthKitValue {
         }
     }
 
-    var adaptiveMaintenance: Health.Maintenance.Adaptive? {
+    var adaptiveMaintenance: HealthDetails.Maintenance.Adaptive? {
         switch self {
         case .adaptiveMaintenance(let adaptiveMaintenance): adaptiveMaintenance
         default: nil

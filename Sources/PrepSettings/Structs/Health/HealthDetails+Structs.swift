@@ -2,7 +2,7 @@ import Foundation
 import HealthKit
 import PrepShared
 
-public extension Health {
+public extension HealthDetails {
     
     //MARK: New
     struct Maintenance: Hashable, Codable {

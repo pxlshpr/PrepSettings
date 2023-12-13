@@ -3,7 +3,7 @@ import PrepShared
 
 public extension HealthModel {
     
-    func handleChanges(from old: Health) {
+    func handleChanges(from old: HealthDetails) {
         guard !old.matches(health) else {
             logger.debug("Health set but did not change, ignoring")
             return
@@ -34,7 +34,7 @@ public extension HealthModel {
     }
     
     /// This is supposed to handle single changes only (eg. when we change the weight source), and not multiple different changes
-    func handleChanges(from old: Health) async throws {
+    func handleChanges(from old: HealthDetails) async throws {
         
 //        typesBeingSetFromHealthKit = []
         
@@ -84,7 +84,7 @@ public extension HealthType {
     }
 }
 
-extension Health {
+extension HealthDetails {
     
     func sourceIsHealthKit(for type: HealthType) -> Bool {
         switch type {

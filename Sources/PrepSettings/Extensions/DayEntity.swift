@@ -2,11 +2,11 @@ import Foundation
 import PrepShared
 
 public extension DayEntity {
-    var health: Health? {
+    var health: HealthDetails? {
         get {
             guard let healthData else { return nil }
             do {
-                return try JSONDecoder().decode(Health.self, from: healthData)
+                return try JSONDecoder().decode(HealthDetails.self, from: healthData)
             } catch {
                 /// Error decoding, so set to nil
                 self.healthData = nil

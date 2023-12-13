@@ -4,14 +4,14 @@ import PrepShared
 public let MockHealthModel = HealthModel(
     delegate: MockHealthModelDelegate(),
     fetchCurrentHealthHandler: {
-        let healthDetails: Health = try await fetchFromBackend(.healthDetails)
+        let healthDetails: HealthDetails = try await fetchFromBackend(.healthDetails)
         return healthDetails
     }
 //    saveHandler: saveHealthInDocuments
 )
 
 struct MockHealthModelDelegate: HealthModelDelegate {
-    func saveHealth(_ healthDetails: Health, isCurrent: Bool) async throws {
+    func saveHealth(_ healthDetails: HealthDetails, isCurrent: Bool) async throws {
         try await saveInBackend(.healthDetails, healthDetails)
     }
     
@@ -126,7 +126,7 @@ enum MockType: String {
     
     var mockValue: Codable {
         switch self {
-        case .healthDetails: Health.init(date: MockDate)
+        case .healthDetails: HealthDetails.init(date: MockDate)
         case .settings: Settings.default
         case .weight: WeightValues.mock
         case .dietaryEnergy: DietaryEnergyValues.mock

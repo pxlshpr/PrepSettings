@@ -87,7 +87,7 @@ public extension HealthModel {
         case .age:              .age(DefaultDateOfBirth.dateComponentsWithoutTime)
         
         case .maintenance:
-                .adaptiveMaintenance(Health.Maintenance.Adaptive())
+                .adaptiveMaintenance(HealthDetails.Maintenance.Adaptive())
 
         default: nil
         }

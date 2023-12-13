@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-public extension Health {
+public extension HealthDetails {
     
     var restingEnergy: RestingEnergy? {
         get {
@@ -56,7 +56,7 @@ public extension Health {
     }
 }
 
-extension Health {
+extension HealthDetails {
     
     mutating func add(_ type: HealthType) {
         switch type {
@@ -102,7 +102,7 @@ extension Health {
     }
 }
 
-extension Health {
+extension HealthDetails {
     func hasType(_ type: HealthType) -> Bool {
         switch type {
         case .maintenance:    restingEnergy != nil && activeEnergy != nil
@@ -232,7 +232,7 @@ extension Health {
     }
 }
 
-extension Health {
+extension HealthDetails {
     func bodyMassValue(for type: BodyMassType, in unit: BodyMassUnit? = nil) -> Double? {
         let value: Double? = switch type {
         case .weight:   weight?.quantity?.value

@@ -5,8 +5,8 @@ import CoreData
 
 import PrepShared
 
-public typealias FetchCurrentHealthHandler = (() async throws -> Health)
-public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
+public typealias FetchCurrentHealthHandler = (() async throws -> HealthDetails)
+public typealias SaveHealthHandler = ((HealthDetails, Bool) async throws -> ())
 
 @Observable public class HealthModel {
 
@@ -20,7 +20,7 @@ public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
 //    let saveHandler: SaveHealthHandler
     let delegate: HealthModelDelegate
     
-    public var health: Health {
+    public var health: HealthDetails {
         didSet {
             guard !ignoreChanges else {
                 return
@@ -40,7 +40,7 @@ public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
 //        self.fetchCurrentHealthHandler = fetchCurrentHealthHandler
 //        self.saveHandler = saveHandler
         self.delegate = delegate
-        self.health = Health()
+        self.health = HealthDetails()
         self.isCurrent = true
         loadCurrentHealth(fetchCurrentHealthHandler)
         addObservers()
@@ -49,7 +49,7 @@ public typealias SaveHealthHandler = ((Health, Bool) async throws -> ())
     /// Past Health
     public init(
         delegate: HealthModelDelegate,
-        health: Health
+        health: HealthDetails
 //        saveHandler: @escaping SaveHealthHandler
     ) {
 //        self.fetchCurrentHealthHandler = nil

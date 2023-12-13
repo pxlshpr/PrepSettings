@@ -23,7 +23,7 @@ extension HealthModel {
             /// Don't touch HealthKit if we've in a preview
         }
         
-        let adaptive = Health.Maintenance.Adaptive(
+        let adaptive = HealthDetails.Maintenance.Adaptive(
             interval: health.maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval,
             weightChange: weightChange(from: values),
             dietaryEnergy: dietaryEnergy(from: values)
@@ -64,7 +64,7 @@ extension HealthModel {
         dietaryEnergy.samples[index] = sample
         dietaryEnergy.fillEmptyValuesWithAverages()
         
-        let adaptive = Health.Maintenance.Adaptive(
+        let adaptive = HealthDetails.Maintenance.Adaptive(
             interval: health.maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval,
             weightChange: health.maintenance?.adaptive.weightChange ?? .init(),
             dietaryEnergy: dietaryEnergy
@@ -82,7 +82,7 @@ extension HealthModel {
         }
         weightChange.calculateDelta()
         
-        let adaptive = Health.Maintenance.Adaptive(
+        let adaptive = HealthDetails.Maintenance.Adaptive(
             interval: health.maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval,
             weightChange: weightChange,
             dietaryEnergy: health.maintenance?.adaptive.dietaryEnergy ?? .init()

@@ -3,7 +3,7 @@ import HealthKit
 import PrepShared
 
 
-public struct Health: Hashable, Codable {
+public struct HealthDetails: Hashable, Codable {
     
     public var date: Date
     
@@ -67,9 +67,9 @@ public struct Health: Hashable, Codable {
     }
 }
 
-public extension Health {
+public extension HealthDetails {
     /// Checks that everything except `date` and `updatedAt` match
-    func matches(_ other: Health) -> Bool {
+    func matches(_ other: HealthDetails) -> Bool {
         date == other.date
 //        && energyUnit == other.energyUnit
 //        && heightUnit == other.heightUnit
@@ -94,7 +94,7 @@ public extension Health {
     }
 }
 
-public extension Health {
+public extension HealthDetails {
     var weightValue: Double? {
         weight?.quantity?.value
     }

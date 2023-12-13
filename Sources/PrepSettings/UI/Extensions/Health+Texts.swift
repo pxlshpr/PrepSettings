@@ -3,26 +3,26 @@ import PrepShared
 
 struct HealthTexts {
     
-    let health: Health
+    let health: HealthDetails
     let energyUnit: EnergyUnit
     let heightUnit: HeightUnit
     let bodyMassUnit: BodyMassUnit
     
-    init(_ health: Health, _ settingsStore: SettingsStore) {
+    init(_ health: HealthDetails, _ settingsStore: SettingsStore) {
         self.health = health
         self.energyUnit = settingsStore.energyUnit
         self.heightUnit = settingsStore.heightUnit
         self.bodyMassUnit = settingsStore.bodyMassUnit
     }
     
-    var maintenance: Health.Maintenance? { health.maintenance }
-    var restingEnergy: Health.RestingEnergy? { health.restingEnergy }
-    var activeEnergy: Health.ActiveEnergy? { health.activeEnergy }
+    var maintenance: HealthDetails.Maintenance? { health.maintenance }
+    var restingEnergy: HealthDetails.RestingEnergy? { health.restingEnergy }
+    var activeEnergy: HealthDetails.ActiveEnergy? { health.activeEnergy }
     var weight: HealthQuantity? { health.weight }
-    var leanBodyMass: Health.LeanBodyMass? { health.leanBodyMass }
+    var leanBodyMass: HealthDetails.LeanBodyMass? { health.leanBodyMass }
     var height: HealthQuantity? { health.height }
-    var age: Health.Age? { health.age }
-    var sex: Health.BiologicalSex? { health.sex }
+    var age: HealthDetails.Age? { health.age }
+    var sex: HealthDetails.BiologicalSex? { health.sex }
     var fatPercentage: Double? { health.fatPercentage }
     var pregnancyStatus: PregnancyStatus? { health.pregnancyStatus }
     var isSmoker: Bool? { health.isSmoker }

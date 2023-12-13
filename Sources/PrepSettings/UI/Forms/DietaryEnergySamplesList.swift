@@ -49,7 +49,7 @@ struct DietaryEnergySamplesList: View {
         }
     }
     
-    var maintenance: Health.Maintenance {
+    var maintenance: HealthDetails.Maintenance {
         healthModel.health.maintenance ?? .init()
     }
     

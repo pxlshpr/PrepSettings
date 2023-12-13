@@ -56,7 +56,7 @@ struct MaintenanceAdaptiveSection: View {
         }
     }
 
-    var health: Health {
+    var health: HealthDetails {
         model.health
     }
     

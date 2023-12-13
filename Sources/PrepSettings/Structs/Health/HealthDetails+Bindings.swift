@@ -2,7 +2,7 @@ import Foundation
 import HealthKit
 import PrepShared
 
-public extension Health {
+public extension HealthDetails {
     
     //MARK: Energy Burn
     var prefersAdaptiveMaintenance: Bool {
@@ -232,7 +232,7 @@ public extension Health {
 
 //MARK: Values
 
-extension Health {
+extension HealthDetails {
     mutating func handleFocusLoss(for type: HealthType) {
         
         let typesToRemoveIfNil: [HealthType] = []
@@ -264,7 +264,7 @@ extension Health {
     }
 }
 
-public extension Health {
+public extension HealthDetails {
     
 //    var maintenanceEnergyAdaptiveValue: Double? {
 //        get { maintenanceEnergy?.adaptiveValue }

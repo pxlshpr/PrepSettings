@@ -4,7 +4,7 @@ import PrepShared
 public let DefaultMaintenanceEnergyInterval: HealthInterval = .init(1, .week)
 public let DefaultWeightMovingAverageInterval: HealthInterval = .init(1, .week)
 
-extension Health {
+extension HealthDetails {
     var dateRangeForMaintenanceBackendValues: ClosedRange<Date> {
         let interval = maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval
         let previousWeightMovingAverageInterval = maintenance?.adaptive.weightChange.previous.movingAverageInterval ?? DefaultWeightMovingAverageInterval
@@ -121,7 +121,7 @@ extension Health {
 //    }
 //}
 
-extension Health.Maintenance.Adaptive {
+extension HealthDetails.Maintenance.Adaptive {
     static func calculate(
         weightChange: WeightChange,
         dietaryEnergy: DietaryEnergy,
@@ -148,7 +148,7 @@ extension Health.Maintenance.Adaptive {
     }
 }
 
-public extension Health {
+public extension HealthDetails {
     /// Estimate of maintenance energy calculated by adding estimated active and resting energies
     var estimatedMaintenanceInKcal: Double? {
         guard let activeEnergyValue, let restingEnergyValue else {
