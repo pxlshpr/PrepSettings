@@ -59,7 +59,8 @@ struct HealthTopRow: View {
         case .age:
             MenuPicker($model.ageSource)
         case .weight:
-            MenuPicker($model.weightSource)
+            EmptyView()
+//            MenuPicker($model.weightSource)
         case .leanBodyMass:
             MenuPicker($model.leanBodyMassSource)
         case .height:

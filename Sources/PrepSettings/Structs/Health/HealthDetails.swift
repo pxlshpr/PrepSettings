@@ -14,7 +14,7 @@ public struct HealthDetails: Hashable, Codable {
 //    public var activeEnergy: ActiveEnergy?
     
     /// Stored in `kg`
-    public var weight: HealthQuantity?
+    public var weight: Weight?
     public var leanBodyMass: LeanBodyMass?
     
     /// Stored in `cm`
@@ -39,7 +39,7 @@ public struct HealthDetails: Hashable, Codable {
 //        activeEnergy: ActiveEnergy? = nil,
         age: Age? = nil,
         sex: BiologicalSex? = nil,
-        weight: HealthQuantity? = nil,
+        weight: Weight? = nil,
         height: HealthQuantity? = nil,
         leanBodyMass: LeanBodyMass? = nil,
         fatPercentage: Double? = nil,
@@ -88,16 +88,9 @@ public extension HealthDetails {
         && isSmoker == other.isSmoker
         && skipSyncAll == other.skipSyncAll
     }
-
-    mutating func cleanup() {
-        weight?.removeDateIfNotNeeded()
-    }
 }
 
 public extension HealthDetails {
-    var weightValue: Double? {
-        weight?.quantity?.value
-    }
 
     var leanBodyMassValue: Double? {
         leanBodyMass?.quantity?.value

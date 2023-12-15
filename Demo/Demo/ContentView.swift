@@ -37,6 +37,7 @@ struct ContentView: View {
                     showingPastHealthDetails = true
                 }
             }
+            .navigationTitle("Health Details Demo")
         }
         .sheet(isPresented: $showingCurrentHealthDetails) { currentHealthSummary }
         .sheet(isPresented: $showingPastHealthDetails) { pastHealthSummary }

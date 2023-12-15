@@ -2,15 +2,17 @@ import Foundation
 
 extension HealthDetails {
     
-    mutating func update(with weightQuantity: HealthQuantity?, for date: Date) {
+    mutating func update(with weight: Weight?, for date: Date) {
         
         /// If the provided `date` matches the internal one, set `weightQuantity` as `weight` (setting it to nil if need be)
         let isSameDate = date.startOfDay == self.date.startOfDay
         
         /// Otherwise, if this a healthKit sourced weight, check if `HealthDetails.weight` uses healthKit and this is a more recent quantity for it
-        let isHealthKit = weight?.source == .healthKit && weightQuantity?.source == .healthKit
+        let isHealthKit = weight?.source == .healthKit 
+        && weight?.source == .healthKit
+        
         let isRelevant = date.startOfDay <= self.date.startOfDay /// date is on or before this date
-        let isMoreRecent = if let existingDate = weight?.quantity?.date {
+        let isMoreRecent = if let existingDate = weight?.healthKitQuantities?.last?.date?.startOfDay {
             date.startOfDay >= existingDate.startOfDay
         } else {
             true
@@ -19,7 +21,7 @@ extension HealthDetails {
 
         let shouldReplaceWeight = isSameDate || isMoreRecentHealthKitDate
         if shouldReplaceWeight {
-            self.weight = weightQuantity
+            self.weight = weight
         }
 
         /// [ ] Now update anything dependent on the weight by recalculating

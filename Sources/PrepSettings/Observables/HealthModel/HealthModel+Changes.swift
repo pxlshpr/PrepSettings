@@ -88,7 +88,7 @@ extension HealthDetails {
     
     func sourceIsHealthKit(for type: HealthType) -> Bool {
         switch type {
-        case .weight:           weightSource == .healthKit
+        case .weight:           weight?.source == .healthKit
         case .height:           heightSource == .healthKit
         case .age:              ageSource == .healthKit
         case .sex:              sexSource == .healthKit
@@ -101,7 +101,7 @@ extension HealthDetails {
     
     func valueIsNil(for type: HealthType) -> Bool {
         switch type {
-        case .weight:               weight?.quantity == nil
+        case .weight:               weight?.valueInKg == nil
         case .height:               height?.quantity == nil
         case .age:                  age?.value == nil
         case .sex:                  sex?.value == nil

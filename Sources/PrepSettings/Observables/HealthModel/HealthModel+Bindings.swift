@@ -153,10 +153,10 @@ public extension HealthModel {
         set { health.sexSource = newValue }
     }
 
-    var weightSource: HealthSource {
-        get { health.weightSource }
-        set { health.weightSource = newValue }
-    }
+//    var weightSource: HealthSource {
+//        get { health.weightSource }
+//        set { health.weightSource = newValue }
+//    }
 
     var heightSource: HealthSource {
         get { health.heightSource }
@@ -260,10 +260,10 @@ public extension HealthModel {
         set { health.fatPercentage = newValue }
     }
 
-    var weightValue: Double? {
-        get { health.weightQuantity?.value }
-        set { health.weightQuantity = .init(value: newValue) }
-    }
+//    var weightValue: Double? {
+//        get { health.weightQuantity?.value }
+//        set { health.weightQuantity = .init(value: newValue) }
+//    }
     
     var leanBodyMassValue: Double? {
         get { health.leanBodyMassQuantity?.value }

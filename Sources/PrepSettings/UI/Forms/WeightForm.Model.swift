@@ -1,7 +1,7 @@
 import SwiftUI
 import PrepShared
 
-/// [ ] We need to have a temporary value in the form itself that is computed so that we can display it while editing until user taps done (unless we're in the current health model in which case it happens immediately)
+/// [ ] Store healthKit quantities along with weight when saving (to account for averages) – do this in HealthQuantity struct itself maybe
 /// [ ] Revisit the updateBackend thing with our current thinking, and maybe treat past health details differently
 
 /// [ ] Consider having different units, by first renaming `value` to `valueInKg`, then addressing every place we use it
@@ -14,27 +14,20 @@ extension WeightForm {
         let healthModel: HealthModel
         var date: Date
 
-        /// Used for `.healthDetails` and `.specificDate`
-        var source: HealthSource?
-
-        /// Used for `.specificDate`
         var value: Double?
-        var isDailyAverage: Bool?
-
-        /// Used for `.adaptiveSample`
         var sample: WeightSample?
+        var isDailyAverage: Bool?
         var sampleSource: WeightSampleSource?
+        var source: HealthSource?
+        var isRemoved: Bool
 
         var healthKitQuantities: [Quantity]?
-        var healthKitValueForDate: Double?
         
         /// Reference values kept so that when changing interval we're able to display values quickly without re-querying for them
         var backendQuantities: [Date: HealthQuantity]?
         
         /// List of moving average weights that are displayed based on the current interval
         var movingAverageDatedWeights: [DatedWeight] = []
-        
-        var showingTextField: Bool = false
         
         /// HealthDetails init
         init(
@@ -45,10 +38,11 @@ extension WeightForm {
             self.date = healthModel.health.date
             
             let weight = healthModel.health.weight
-            self.value = weight?.quantity?.value
+            self.value = weight?.valueInKg
             self.source = weight?.source
+            self.isDailyAverage = weight?.isDailyAverage
             
-            self.showingTextField = weight?.source == .userEntered
+            self.isRemoved = weight == nil
         }
         
         /// Weight Sample init
@@ -66,7 +60,8 @@ extension WeightForm {
             self.sampleSource = sample.source
             
             self.sample = sample
-            
+            self.isRemoved = false
+
             /// Initialize movingAverageDatedWeights with empty placeholders
             if let dayCount = sample.movingAverageInterval?.numberOfDays {
                 for i in 0..<dayCount {
@@ -74,8 +69,6 @@ extension WeightForm {
                     self.movingAverageDatedWeights.append(.init(date: date))
                 }
             }
-            
-            self.showingTextField = sample.source == .userEntered
         }
         
         /// Average Component init
@@ -93,14 +86,150 @@ extension WeightForm {
             self.value = value
             self.source = source ?? .userEntered
             self.isDailyAverage = isDailyAverage
-
-            self.showingTextField = source == .userEntered
+            
+            self.isRemoved = false
         }
     }
 }
 
+extension WeightForm.Model {
+    
+    func cancelEditing() {
+        switch formType {
+        case .healthDetails:
+            let weight = healthModel.health.weight
+            self.value = weight?.valueInKg
+            self.source = weight?.source
+            self.isDailyAverage = weight?.isDailyAverage
+            self.isRemoved = healthModel.health.weight == nil
+        default:
+            break
+        }
+    }
+    
+    func doneEditing() {
+        switch formType {
+        case .healthDetails:
+            if isRemoved {
+                healthModel.health.weight = nil
+            } else {
+                healthModel.health.weight = weight
+            }
+        default:
+            break
+        }
+    }
+    
+    func startEditing() {
+        switch formType {
+        case .healthDetails:
+            switch source {
+            case .healthKit:
+                /// Recalculate average
+                setHealthKitQuantity()
+            default:
+                break
+            }
+        default:
+            break
+        }
+    }
+}
 
 extension WeightForm.Model {
+    
+    var weight: HealthDetails.Weight {
+        .init(
+            source: source ?? .userEntered,
+            isDailyAverage: source == .healthKit ? isDailyAverage ?? false : false,
+            healthKitQuantities: source == .healthKit ? healthKitQuantities : nil,
+            valueInKg: valueInKg
+        )
+    }
+    
+    var valueInKg: Double? {
+        guard let value else { return nil }
+        return SettingsStore.bodyMassUnit.convert(value, to: .kg)
+    }
+    
+    
+    func textFieldValueChanged(to value: Double?) {
+        self.value = value
+        
+        if healthModel.isCurrent {
+            switch formType {
+            case .healthDetails:
+                healthModel.health.weight?.valueInKg = value
+
+            case .adaptiveSample:
+                setSampleValue(value)
+
+            case .specificDate:
+                self.value = value
+            }
+        }
+    }
+    
+    func handleNewSource(_ source: HealthSource) {
+        withAnimation {
+            self.source = source
+        }
+        
+        switch formType {
+        case .healthDetails:
+            /// [ ] We might have to stop syncing weight from healthKit whenever biometrics change since we're doing it in the form
+            if healthModel.isCurrent {
+                healthModel.health.weight?.source = source
+            }
+            
+            switch source {
+            case .healthKit:
+                self.setHealthKitQuantity()
+            case .userEntered:
+                break
+            }
+
+        case .specificDate:
+            
+            /// Update the backend and send a notification so that the form for the sample can update itself
+
+            let healthQuantity: HealthQuantity
+            switch source {
+            case .healthKit:
+                self.setHealthKitQuantity()
+//                healthQuantity = healthKitHealthQuantity
+                
+            case .userEntered:
+                break
+//                healthQuantity = userEnteredHealthQuantity
+            }
+            
+//            updateBackend(with: healthQuantity)
+            
+            /// [ ] Receive notification HealthModel and update itself if date pertains to it (is the date itself or the date that its using)
+            /// [ ] Receive notification in WeightForm, and if date pertains to it (if its an average component or its health details uses it—actually this should be handled by HealthModel itself receiving the notification—then update itself)
+           
+            /// [ ] Modify the update backend function or at least add notes to imply that we'll be triggering changes in all the Health structs that the weight pertains to (in Health.Weight or as adaptive sample), and if we have a change there, updating the plan if its dependent on those components too;
+
+        case .adaptiveSample:
+            /// Not handled here (we use `sampleSourceBinding` instead
+            break
+        }
+    }
+}
+
+extension WeightForm.Model {
+    var disabledSampleSources: [WeightSampleSource] {
+        guard !healthModel.isLocked else {
+            return WeightSampleSource.allCases
+        }
+        return if healthKitQuantities?.isEmpty == false {
+            []
+        } else {
+            [.healthKit]
+        }
+    }
+    
     var disabledSources: [HealthSource] {
         
         if healthModel.isLocked {
@@ -160,10 +289,10 @@ extension WeightForm.Model {
         setMovingAverageDatedWeights()
     }
     
-    func focusedTypeChanged(old: HealthType?, new: HealthType?) {
-        guard old == .weight, new == nil else { return }
-        updateBackend(with: userEnteredHealthQuantity)
-    }
+//    func focusedTypeChanged(old: HealthType?, new: HealthType?) {
+//        guard old == .weight, new == nil else { return }
+//        updateBackend(with: userEnteredHealthQuantity)
+//    }
 }
 
 public extension Array where Element == Quantity {
@@ -228,10 +357,16 @@ extension WeightForm.Model {
         /// [ ] Calculations are wrong
         guard !isPreview else {
             await MainActor.run {
+//                self.healthKitQuantities = [
+//                    .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
+//                    .init(value: 94.8, date: date.startOfDay.addingTimeInterval(56520)),
+//                ]
+                
                 self.healthKitQuantities = [
-                    .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
-                    .init(value: 94.8, date: date.startOfDay.addingTimeInterval(56520)),
+                    .init(value: 92.5, date: date.startOfDay.addingTimeInterval(14560)),
+                    .init(value: 93.15, date: date.startOfDay.addingTimeInterval(46520)),
                 ]
+
 //                self.healthKitQuantities = [
 //                    .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
 //                ]
@@ -269,6 +404,20 @@ extension WeightForm.Model {
         }
     }
     
+    var isHealthKit: Bool {
+        switch formType {
+        case .adaptiveSample:   sampleSource == .healthKit
+        default:                source == .healthKit
+        }
+    }
+
+    var isUserEntered: Bool {
+        switch formType {
+        case .adaptiveSample:   sampleSource == .userEntered
+        default:                source == .userEntered
+        }
+    }
+
     func setHealthKitQuantity() {
         let value: Double? = switch useDailyAverage {
         case true:
@@ -288,19 +437,30 @@ extension WeightForm.Model {
         }
         
         withAnimation {
+            self.value = if let quantity, isHealthKit {
+                BodyMassUnit.kg.convert(quantity.value, to: SettingsStore.bodyMassUnit)
+            } else {
+                quantity?.value
+            }
+            sample?.value = value
+        }
+
+        /// Persist value
+        if healthModel.isCurrent {
             switch formType {
             case .healthDetails:
-                healthModel.health.weight?.quantity = quantity
+                healthModel.health.weight = weight
             case .adaptiveSample:
                 setSampleValue(quantity?.value)
             case .specificDate:
-                self.value = quantity?.value
+                break
             }
-        }
-        
-        /// If the date of the quantity is on the same day as the date of the form, update the backend with it
-        if date?.startOfDay == self.date.startOfDay {
-            updateBackend(with: healthKitHealthQuantity)
+            
+            //TODO: Revisit this
+            /// If the date of the quantity is on the same day as the date of the form, update the backend with it
+//            if date?.startOfDay == self.date.startOfDay {
+//                updateBackend(with: healthKitHealthQuantity)
+//            }
         }
     }
     
@@ -317,19 +477,36 @@ extension WeightForm.Model {
     }
     
     func setWeight() {
-        switch formType {
-        case .healthDetails:
-            healthModel.add(.weight)
-        default:
-            break
+        withAnimation {
+            switch formType {
+            case .healthDetails:
+                isRemoved = false
+                if healthModel.isCurrent {
+                    healthModel.health.weight = weight
+//                    healthModel.health.weight = .init(
+//                        source: .userEntered,
+//                        quantity: .init(value: nil)
+//                    )
+                }
+            default:
+                break
+            }
         }
     }
-
+    
     func removeWeight() {
         switch formType {
         case .healthDetails:
-            healthModel.remove(.weight)
-            showingTextField = false
+            withAnimation {
+                isRemoved = true
+                if healthModel.isCurrent {
+                    healthModel.remove(.weight)
+                } else {
+                    value = nil
+                    isDailyAverage = nil
+                    source = .userEntered
+                }
+            }
         default:
             break
         }
@@ -372,31 +549,12 @@ extension WeightForm.Model {
 //        }
 //    }
     
-    var isUserEntered: Bool {
-        switch formType {
-        case .adaptiveSample:
-            sampleSource == .userEntered
-        default:
-            source == .userEntered
-        }
-    }
     var footerString: String? {
         switch formType {
         case .healthDetails:
             HealthType.weight.reason!
         default:
             nil
-        }
-    }
-    
-    var isRemoved: Bool {
-        switch formType {
-        case .healthDetails:
-            healthModel.health.weight == nil
-        case .adaptiveSample:
-            false
-        case .specificDate:
-            false
         }
     }
     
@@ -407,13 +565,14 @@ extension WeightForm.Model {
     func computedValue(in unit: BodyMassUnit) -> Double? {
         switch formType {
         case .healthDetails:
-            switch source {
-            case .healthKit:
-                guard let value = healthModel.health.weight?.quantity?.value else { return nil }
-                return BodyMassUnit.kg.convert(value, to: unit)
-            default:
-                return nil
-            }
+            return value
+//            switch source {
+//            case .healthKit:
+//                guard let value = healthModel.health.weight?.quantity?.value else { return nil }
+//                return BodyMassUnit.kg.convert(value, to: unit)
+//            default:
+//                return nil
+//            }
             
         case .adaptiveSample:
             switch sampleSource {
@@ -450,7 +609,8 @@ extension WeightForm.Model {
     var shouldShowHealthKitError: Bool {
         formType == .healthDetails
         && source == .healthKit
-        && healthModel.health.weight?.quantity?.value == nil
+//        && healthModel.health.weight?.quantity?.value == nil
+        && value == nil
         && !healthModel.isLocked
     }
     
@@ -498,53 +658,13 @@ extension WeightForm.Model {
     }
 }
 
+
 extension WeightForm.Model {
     
     var sourceBinding: Binding<HealthSource> {
         Binding<HealthSource>(
             get: { self.source ?? .userEntered },
-            set: { newValue in
-                withAnimation {
-                    self.source = newValue
-                }
-                
-                switch self.formType {
-                case .healthDetails:
-                    /// [ ] We might have to stop syncing weight from healthKit whenever biometrics change since we're doing it in the form
-                    self.healthModel.health.weight?.source = newValue
-                    switch newValue {
-                    case .healthKit:
-                        self.setHealthKitQuantity()
-                    case .userEntered:
-                        break
-                    }
-                    
-                case .specificDate:
-                    
-                    /// Update the backend and send a notification so that the form for the sample can update itself
-
-                    let healthQuantity: HealthQuantity
-                    switch newValue {
-                    case .healthKit:
-                        self.setHealthKitQuantity()
-                        healthQuantity = self.healthKitHealthQuantity
-                        
-                    case .userEntered:
-                        healthQuantity = self.userEnteredHealthQuantity
-                    }
-                    
-                    self.updateBackend(with: healthQuantity)
-                    
-                    /// [ ] Receive notification HealthModel and update itself if date pertains to it (is the date itself or the date that its using)
-                    /// [ ] Receive notification in WeightForm, and if date pertains to it (if its an average component or its health details uses it—actually this should be handled by HealthModel itself receiving the notification—then update itself)
-                   
-                    /// [ ] Modify the update backend function or at least add notes to imply that we'll be triggering changes in all the Health structs that the weight pertains to (in Health.Weight or as adaptive sample), and if we have a change there, updating the plan if its dependent on those components too;
-
-                case .adaptiveSample:
-                    /// Not handled here (we use `sampleSourceBinding` instead
-                    break
-                }
-            }
+            set: { self.handleNewSource($0) }
         )
     }
     
@@ -557,36 +677,36 @@ extension WeightForm.Model {
         }
     }
     
-    var healthKitHealthQuantity: HealthQuantity {
-        let isDailyAverage = switch formType {
-        case .healthDetails:    healthModel.health.weight?.isDailyAverage
-        case .specificDate:     isDailyAverage
-        case .adaptiveSample:   sample?.isDailyAverage
-        }
-        return HealthQuantity(
-            source: .healthKit,
-            isDailyAverage: isDailyAverage ?? false,
-//            quantity: self.healthKitLatestQuantity
-            quantity: healthModel.health.weight?.quantity
-        )
-    }
-    
-    var userEnteredHealthQuantity: HealthQuantity {
-        let value = switch formType {
-        case .healthDetails:
-            healthModel.health.weight?.quantity?.value
-        case .adaptiveSample:
-            sample?.value
-        case .specificDate:
-            self.value
-        }
-        
-        return HealthQuantity(
-            source: .userEntered,
-            isDailyAverage: false,
-            quantity: .init(value: value)
-        )
-    }
+//    var healthKitHealthQuantity: HealthQuantity {
+//        let isDailyAverage = switch formType {
+//        case .healthDetails:    healthModel.health.weight?.isDailyAverage
+//        case .specificDate:     isDailyAverage
+//        case .adaptiveSample:   sample?.isDailyAverage
+//        }
+//        return HealthQuantity(
+//            source: .healthKit,
+//            isDailyAverage: isDailyAverage ?? false,
+////            quantity: self.healthKitLatestQuantity
+//            quantity: healthModel.health.weight?.quantity
+//        )
+//    }
+//    
+//    var userEnteredHealthQuantity: HealthQuantity {
+//        let value = switch formType {
+//        case .healthDetails:
+//            healthModel.health.weight?.quantity?.value
+//        case .adaptiveSample:
+//            sample?.value
+//        case .specificDate:
+//            self.value
+//        }
+//        
+//        return HealthQuantity(
+//            source: .userEntered,
+//            isDailyAverage: false,
+//            quantity: .init(value: value)
+//        )
+//    }
     
     var sampleSourceBinding: Binding<WeightSampleSource> {
         Binding<WeightSampleSource>(
@@ -603,13 +723,14 @@ extension WeightForm.Model {
                 switch newValue {
                 case .healthKit:
                     self.setHealthKitQuantity()
-                    self.updateBackend(with: self.healthKitHealthQuantity)
+//                    self.updateBackend(with: self.healthKitHealthQuantity)
 
                 case .movingAverage:
                     self.setMovingAverageValue()
 
                 case .userEntered:
-                    self.updateBackend(with: self.userEnteredHealthQuantity)
+                    break
+//                    self.updateBackend(with: self.userEnteredHealthQuantity)
                 }
                 
                 switch self.formType.isPreviousSample {
@@ -647,7 +768,7 @@ extension WeightForm.Model {
         get {
             switch formType {
             case .healthDetails:
-                healthModel.health.weight?.isDailyAverage ?? false
+                isDailyAverage == true
             case .specificDate:
                 isDailyAverage == true
             case .adaptiveSample:
@@ -658,6 +779,9 @@ extension WeightForm.Model {
             switch formType {
             case .healthDetails:
                 withAnimation {
+                    isDailyAverage = newValue
+                }
+                if healthModel.isCurrent {
                     healthModel.health.weight?.isDailyAverage = newValue
                 }
             case .specificDate:

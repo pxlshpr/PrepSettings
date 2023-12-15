@@ -18,7 +18,7 @@ struct HealthTexts {
     var maintenance: HealthDetails.Maintenance? { health.maintenance }
     var restingEnergy: HealthDetails.RestingEnergy? { health.restingEnergy }
     var activeEnergy: HealthDetails.ActiveEnergy? { health.activeEnergy }
-    var weight: HealthQuantity? { health.weight }
+    var weight: HealthDetails.Weight? { health.weight }
     var leanBodyMass: HealthDetails.LeanBodyMass? { health.leanBodyMass }
     var height: HealthQuantity? { health.height }
     var age: HealthDetails.Age? { health.age }
@@ -170,8 +170,8 @@ struct HealthTexts {
 
     var weightText: some View {
         var valueInDisplayedUnit: Double? {
-            guard let value = health.weightQuantity?.value else { return nil }
-            return BodyMassUnit.kg.convert(value, to: bodyMassUnit)
+            guard let valueInKg = health.weight?.valueInKg else { return nil }
+            return BodyMassUnit.kg.convert(valueInKg, to: bodyMassUnit)
         }
         return Group {
             if let valueInDisplayedUnit {

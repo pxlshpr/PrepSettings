@@ -46,33 +46,33 @@ public extension HealthModel {
 
     func setTypeFromHealthKit(_ type: HealthType) async throws {
         
-        func showProgressBar() async {
-            await MainActor.run { withAnimation { startSettingTypeFromHealthKit(type) } }
-        }
-        
-        func hideProgressBar() async {
-            await MainActor.run { withAnimation { stopSettingTypeFromHealthKit(type) } }
-        }
-
-        await showProgressBar()
-        
-        /// Get the value here
-        let value = try await healthKitValue(for: type)
-        
-        /// If this isn't the current model (ie, a past one), don't clear out the value if its not available so that we preserve the validity of goals in plans as a priority
-        if !isCurrent { guard value != nil else { return } }
-
-        /// Checking for cancellation before setting the new value
-        try Task.checkCancellation()
-
-        /// Set the value with an animation
-        await MainActor.run { [value] in
-            withAnimation {
-                health.setHealthKitValue(value, for: type)
-            }
-        }
-        
-        await hideProgressBar()
+//        func showProgressBar() async {
+//            await MainActor.run { withAnimation { startSettingTypeFromHealthKit(type) } }
+//        }
+//        
+//        func hideProgressBar() async {
+//            await MainActor.run { withAnimation { stopSettingTypeFromHealthKit(type) } }
+//        }
+//
+//        await showProgressBar()
+//        
+//        /// Get the value here
+//        let value = try await healthKitValue(for: type)
+//        
+//        /// If this isn't the current model (ie, a past one), don't clear out the value if its not available so that we preserve the validity of goals in plans as a priority
+//        if !isCurrent { guard value != nil else { return } }
+//
+//        /// Checking for cancellation before setting the new value
+//        try Task.checkCancellation()
+//
+//        /// Set the value with an animation
+//        await MainActor.run { [value] in
+//            withAnimation {
+//                health.setHealthKitValue(value, for: type)
+//            }
+//        }
+//        
+//        await hideProgressBar()
     }
     
     func previewValue(for type: HealthType) async throws -> HealthKitValue? {

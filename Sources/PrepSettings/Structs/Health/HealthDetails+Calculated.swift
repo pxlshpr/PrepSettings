@@ -6,7 +6,7 @@ public extension HealthDetails {
     //MARK: Recalculators
     
     mutating func recalculate() {
-        cleanup()
+//        cleanup()
         
         calculateAge()
         calculateLeanBodyMass()
@@ -60,7 +60,7 @@ public extension HealthDetails {
             break
         case .equation:
             guard let equation = leanBodyMass?.equation,
-                  let weightValue,
+                  let weightInKg = weight?.valueInKg,
                   let heightValue,
                   let sex = sex?.value
             else {
@@ -69,7 +69,7 @@ public extension HealthDetails {
             }
             let valueInKg = equation.calculateInKg(
                 sexIsFemale: sex == .female,
-                weightInKg: weightValue,
+                weightInKg: weightInKg,
                 heightInCm: heightValue
             )
 //            let value = BodyMassUnit.kg.convert(valueInKg, to: bodyMassUnit)
@@ -79,13 +79,13 @@ public extension HealthDetails {
             guard let fatPercentage,
                   fatPercentage > 0,
                   fatPercentage < 100,
-                  let weightQuantity
+                  let weightInKg = weight?.valueInKg
             else {
                 clearQuantity()
                 return
             }
             let leanPercentage = 100.0 - fatPercentage
-            setQuantity(.init(value: (leanPercentage/100.0) * weightQuantity.value))
+            setQuantity(.init(value: (leanPercentage/100.0) * weightInKg))
             
         case .userEntered:
             break
@@ -132,10 +132,10 @@ public extension HealthDetails {
                 nil
             }
         case .henryOxford, .schofield:
-            if let age = age?.value, let weightValue, let sex = sex?.value {
+            if let age = age?.value, let weightInKg = weight?.valueInKg, let sex = sex?.value {
                 restingEnergyEquation.calculate(
                     age: age,
-                    weightInKg: weightValue,
+                    weightInKg: weightInKg,
                     sexIsFemale: sex == .female,
                     energyUnit: .kcal
 //                    energyUnit: energyUnit
@@ -144,10 +144,10 @@ public extension HealthDetails {
                 nil
             }
         default:
-            if let age = age?.value, let weightValue, let heightValue, let sex = sex?.value {
+            if let age = age?.value, let weightInKg = weight?.valueInKg, let heightValue, let sex = sex?.value {
                 restingEnergyEquation.calculate(
                     age: age,
-                    weightInKg: weightValue,
+                    weightInKg: weightInKg,
                     heightInCm: heightValue,
                     sexIsFemale: sex == .female,
                     energyUnit: .kcal

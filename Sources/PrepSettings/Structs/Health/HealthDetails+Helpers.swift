@@ -43,7 +43,7 @@ public extension HealthDetails {
         switch type {
         case .sex:                  sexValue != nil && sexValue != .other
         case .age:                  ageValue != nil
-        case .weight:               weight?.quantity?.value != nil
+        case .weight:               weight?.valueInKg != nil
         case .leanBodyMass:         leanBodyMass?.quantity?.value != nil
         case .height:               height?.quantity?.value != nil
         case .fatPercentage:        fatPercentage != nil
@@ -64,9 +64,9 @@ extension HealthDetails {
             ageSource = .userEnteredDateOfBirth
         case .sex:
             sex = .init(source: .userEntered, value: .female)
-        case .weight:
+//        case .weight:
 //            let initial = BodyMassUnit.kg.convert(DefaultWeightInKg, to: bodyMassUnit)
-            weight = .init(source: .userEntered, quantity: .init(value: DefaultWeightInKg))
+//            weight = .init(source: .userEntered, quantity: .init(value: DefaultWeightInKg))
         case .height:
 //            let initial = HeightUnit.cm.convert(DefaultHeightInCm, to: heightUnit)
             height = .init(source: .userEntered, quantity: .init(value: DefaultHeightInCm))
@@ -127,7 +127,7 @@ extension HealthDetails {
         case .activeEnergy:         activeEnergy?.value != nil
         case .sex:                  sex?.value != nil
         case .age:                  age?.value != nil
-        case .weight:               weight?.quantity?.value != nil
+        case .weight:               weight?.valueInKg != nil
         case .leanBodyMass:         leanBodyMass?.quantity?.value != nil
         case .fatPercentage:        fatPercentage != nil
         case .height:               height?.quantity?.value != nil
@@ -168,7 +168,7 @@ extension HealthDetails {
             return "\(age) years"
             
         case .weight:
-            guard let kg = weight?.quantity?.value else { return nil }
+            guard let kg = weight?.valueInKg else { return nil }
             let unit = SettingsStore.bodyMassUnit
             let value = BodyMassUnit.kg.convert(kg, to: unit)
             return "\(value.clean) \(unit.abbreviation)"
@@ -234,17 +234,17 @@ extension HealthDetails {
 
 extension HealthDetails {
     func bodyMassValue(for type: BodyMassType, in unit: BodyMassUnit? = nil) -> Double? {
-        let value: Double? = switch type {
-        case .weight:   weight?.quantity?.value
+        let valueInKg: Double? = switch type {
+        case .weight:   weight?.valueInKg
         case .leanMass: leanBodyMass?.quantity?.value
         }
         
-        guard let value else { return nil}
+        guard let valueInKg else { return nil}
         
         return if let unit {
-            BodyMassUnit.kg.convert(value, to: unit)
+            BodyMassUnit.kg.convert(valueInKg, to: unit)
         } else {
-            value
+            valueInKg
         }
     }
 }

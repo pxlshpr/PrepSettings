@@ -94,7 +94,7 @@ struct WeightForm: View {
             .onReceive(didRemoveWeight, perform: model.didRemoveWeight)
 
             .onChange(of: scenePhase, scenePhaseChanged)
-            .onChange(of: focusedType, model.focusedTypeChanged)
+//            .onChange(of: focusedType, model.focusedTypeChanged)
 
             .onAppear(perform: appeared)
     }
@@ -104,22 +104,28 @@ extension WeightForm {
     
     var content: some View {
         Form {
+            explanationSection
+            valueSection
             sampleDateSection
             if model.isRemoved {
                 emptyContent
             } else {
                 Group {
                     sourceSection
+                    useDailyAverageSection
                     dateSection
                     movingAverageIntervalSection
                     movingAverageValuesSection
-                    dailyAverageSection
                     dailyAverageValuesSection
-                    valueSection
-                    textFieldSection
                     removeSection
                 }
             }
+        }
+    }
+    
+    var explanationSection: some View {
+        Section {
+            Text("Your weight is used to calculate your maintenance energy.\n\nIt may also be used in certain equations when estimating your resting energy.\n\nIt is also used when calculating your lean body mass using your fat percentage.")
         }
     }
     
@@ -160,28 +166,12 @@ extension WeightForm {
         }
     }
 
-    @ViewBuilder
-    var weightFooter: some View {
-        if let string = model.footerString {
-            Text(string)
-        }
-    }
-
     var emptyContent: some View {
         
         var setButton: some View {
             Button("Set Weight") {
-                withAnimation {
-                    switch model.formType {
-                    case .healthDetails:
-                        healthModel.health.weight = .init(
-                            source: .userEntered,
-                            quantity: .init(value: nil)
-                        )
-                    default:
-                        break
-                    }
-                }
+                model.setWeight()
+                focusTextField(afterDelay: true)
             }
         }
         
@@ -190,7 +180,7 @@ extension WeightForm {
                 .foregroundStyle(.secondary)
         }
         
-        return Section(footer: weightFooter) {
+        return Section {
             if healthModel.isEditing {
                 setButton
             } else {
@@ -209,6 +199,7 @@ extension WeightForm {
             Button("Done") {
                 withAnimation {
                     healthModel.isEditing = false
+                    model.doneEditing()
                 }
             }
             .fontWeight(.semibold)
@@ -218,6 +209,7 @@ extension WeightForm {
             Button("Edit") {
                 withAnimation {
                     healthModel.isEditing = true
+                    model.startEditing()
                 }
             }
         }
@@ -226,6 +218,7 @@ extension WeightForm {
             Button("Cancel") {
                 withAnimation {
                     healthModel.isEditing = false
+                    model.cancelEditing()
                 }
             }
         }
@@ -343,21 +336,31 @@ extension WeightForm {
     }
     
     var dateSection: some View {
-        var footer: some View {
-            let verb = healthModel.isCurrent ? "is" : "was"
-            let string: String? = switch model.formType {
+        
+        var footerString: String? {
+            switch model.formType {
             case .healthDetails:
-                model.useDailyAverage
-                ? "This \(verb) the most recent date with weight data in Apple Health."
-                : "This \(verb) the most recent weight data in Apple Health."
-            default: nil
-            }
-            return Group {
-                if let string {
-                    Text(string)
+                if model.healthKitQuantities?.count == 1 || !model.useDailyAverage
+                {
+                    "This \(healthModel.isEditing ? "is" : "was") the most recently logged weight in Apple Health\(healthModel.isCurrent ? "" : " to this date")."
                 } else {
-                    EmptyView()
+                    if healthModel.isEditing {
+                        "The following weights logged in the Health App on this date are being averaged to establish the overall weight."
+                    } else {
+                        "The following weights logged in the Health App on this date were averaged to establish the overall weight."
+                    }
                 }
+            default:
+                nil
+            }
+        }
+
+        @ViewBuilder
+        var footer: some View {
+            if let footerString {
+                Text(footerString)
+            } else {
+                EmptyView()
             }
         }
         
@@ -413,10 +416,11 @@ extension WeightForm {
                 Spacer()
                 Text("\(BodyMassUnit.kg.convert(quantity.value, to: settingsStore.bodyMassUnit).clean) \(settingsStore.bodyMassUnit.abbreviation)")
             }
+            .foregroundStyle(foregroundColor)
         }
-        
+                
         func section(_ quantities: [Quantity]) -> some View {
-            Section(footer: Text("The average of these values is being used.")) {
+            Section {
                 ForEach(quantities, id: \.self) { quantity in
                     row(quantity)
                 }
@@ -424,12 +428,15 @@ extension WeightForm {
         }
         
         var quantities: [Quantity]? {
-            model.healthKitQuantities
+            if healthModel.isLocked {
+                healthModel.health.weight?.healthKitQuantities
+            } else {
+                model.healthKitQuantities
+            }
         }
         
         return Group {
-            if !healthModel.isLocked,
-               model.shouldShowDailyAverageValuesSection,
+            if model.shouldShowDailyAverageValuesSection,
                let quantities
             {
                 section(quantities)
@@ -508,7 +515,7 @@ extension WeightForm {
         }
     }
     
-    var dailyAverageSection: some View {
+    var useDailyAverageSection: some View {
         var section: some View {
             Section(footer: Text("Use the average when multiple values for the day are available.")) {
                 HStack {
@@ -529,9 +536,9 @@ extension WeightForm {
         }
     }
     
-    func focusTextField() {
+    func focusTextField(afterDelay: Bool = false) {
 //        Haptics.selectionFeedback()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + (afterDelay ? 0.3 : 0)) {
             focusedType = .weight
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 sendSelectAllTextAction()
@@ -546,43 +553,21 @@ extension WeightForm {
     var sourceSection: some View {
         
         var sampleSourcePicker: some View {
-            let binding = Binding<WeightSampleSource>(
-                get: { model.sampleSourceBinding.wrappedValue },
-                set: { newValue in
-                    model.sampleSourceBinding.wrappedValue = newValue
-                }
-            )
-            
-            var options: [WeightSampleSource] {
-                if model.healthKitQuantities?.isEmpty == false {
-                    WeightSampleSource.allCases
-                } else {
-                    [.movingAverage, .userEntered]
-                }
-            }
-
-            var disabledOptions: [WeightSampleSource] {
-                model.healthKitQuantities?.isEmpty == false ? [] : [.healthKit]
-            }
-
-            return PickerSection(binding, disabledOptions: disabledOptions)
+            PickerSection(
+                model.sampleSourceBinding,
+                "Source",
+                disabledOptions: model.disabledSampleSources)
         }
         
         var sourcePicker: some View {
-            
-//            let binding = Binding<HealthSource>(
-//                get: { model.sourceBinding.wrappedValue },
-//                set: { newValue in
-//                    model.sourceBinding.wrappedValue = newValue
-//                }
-//            )
-//            
-//            var disabledOptions: [HealthSource] {
-//                guard model.formType != .healthDetails else { return [] }
-//                return model.healthKitQuantities?.isEmpty == false ? [] : [.healthKit]
-//            }
-
-            PickerSection(model.sourceBinding, disabledOptions: model.disabledSources)
+            let binding = Binding<HealthSource>(
+                get: { model.sourceBinding.wrappedValue },
+                set: {
+                    model.sourceBinding.wrappedValue = $0
+                    focusTextField(afterDelay: true)
+                }
+            )
+            return PickerSection(binding, "Source", disabledOptions: model.disabledSources)
         }
         
         return Group {
@@ -595,8 +580,36 @@ extension WeightForm {
     
     var valueSection: some View {
         
+        var textField: some View {
+            let value = Binding<Double?>(
+                get: { model.value },
+                set: { model.textFieldValueChanged(to: $0) }
+            )
+            
+            let disabled = Binding<Bool>(
+                get: { healthModel.isLocked || model.isHealthKit },
+                set: { _ in }
+            )
+            
+            var field: some View {
+                BodyMassField(
+                    unit: $settingsStore.bodyMassUnit,
+                    valueInKg: value,
+                    focusedType: $focusedType,
+                    healthType: .weight,
+                    disabled: disabled
+                )
+            }
+            
+            return Group {
+                if model.isUserEntered {
+                    field
+                }
+            }
+        }
+        
         @ViewBuilder
-        var nonSampleContent: some View {
+        var nonSampleValue: some View {
             switch model.source {
             case .healthKit:
                 if let value = model.computedValue(in: settingsStore.bodyMassUnit) {
@@ -615,7 +628,7 @@ extension WeightForm {
             }
         }
         
-        var sampleContent: some View {
+        var sampleValue: some View {
             
             var sampleSource: WeightSampleSource {
                 model.sampleSource ?? .default
@@ -652,82 +665,35 @@ extension WeightForm {
                 HealthKitErrorCell(type: .weight)
             }
         }
-        
-        return Group {
-            Section(footer: weightFooter) {
-                errorCell
-                switch model.formType {
-                case .healthDetails, .specificDate: nonSampleContent
-                case .adaptiveSample:               sampleContent
-                }
-            }
-        }
-    }
-    
-    var textFieldSection: some View {
-        
-        let binding = Binding<Double?>(
-            get: {
-                switch model.formType {
-                case .healthDetails:                    healthModel.weightValue
-                case .adaptiveSample:                   model.sample?.value
-                case .specificDate:   model.value
-                }
-            },
-            set: {
-                switch model.formType {
-                case .healthDetails:                    
-                    healthModel.weightValue = $0
 
-                case .adaptiveSample:
-                    model.setSampleValue($0)
-
-                case .specificDate:
-                    model.value = $0
-                }
-            }
-        )
-        
-        var textField: some View {
-            BodyMassField(
-                unit: $settingsStore.bodyMassUnit,
-                valueInKg: binding,
-                focusedType: $focusedType,
-                healthType: .weight,
-                disabled: Binding<Bool>(
-                    get: { healthModel.isLocked },
-                    set: { _ in }
-                )
-            )
-//            .disabled(healthModel.isLocked)
-        }
-        
         var section: some View {
             Section {
+                errorCell
                 ZStack(alignment: .bottomTrailing) {
+                    switch model.formType {
+                    case .healthDetails, .specificDate: nonSampleValue
+                    case .adaptiveSample:               sampleValue
+                    }
                     textField
-//                    HStack {
-//                        Spacer()
-//                    }
                     LargePlaceholderText
                 }
             }
         }
         
         return Group {
-            if model.shouldShowTextFieldSection {
+            if !model.isRemoved {
                 section
             }
         }
     }
 
-    var healthValue: some View {
-        CalculatedBodyMassView(
-            unit: $settingsStore.bodyMassUnit,
-            quantityInKg: $healthModel.health.weightQuantity,
-            source: healthModel.weightSource
-        )
-    }
+//    var healthValue: some View {
+//        CalculatedBodyMassView(
+//            unit: $settingsStore.bodyMassUnit,
+//            quantityInKg: $healthModel.health.weightQuantity,
+//            source: healthModel.weightSource
+//        )
+//    }
 }
 
 //MARK: - Previews

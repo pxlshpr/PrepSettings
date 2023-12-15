@@ -14,24 +14,24 @@ public extension HealthDetails {
     
     mutating func setHealthKitValue(_ value: HealthKitValue?, for type: HealthType) {
         
-        switch type {
-        case .weight:           weightQuantity = value?.quantity
-        case .height:           heightQuantity = value?.quantity
-        case .leanBodyMass:     leanBodyMassQuantity = value?.quantity
-            
-        case .restingEnergy:    restingEnergyValue = value?.double
-        case .activeEnergy:     activeEnergyValue = value?.double
-            
-        case .sex:              sexValue = value?.sex
-        case .age:              ageHealthKitDateComponents = value?.dateComponents
-
-        case .maintenance:
-            if let adaptiveMaintenance = value?.adaptiveMaintenance {
-                maintenance?.adaptive = adaptiveMaintenance
-            }
-
-        default:                break
-        }
+//        switch type {
+//        case .weight:           weightQuantity = value?.quantity
+//        case .height:           heightQuantity = value?.quantity
+//        case .leanBodyMass:     leanBodyMassQuantity = value?.quantity
+//            
+//        case .restingEnergy:    restingEnergyValue = value?.double
+//        case .activeEnergy:     activeEnergyValue = value?.double
+//            
+//        case .sex:              sexValue = value?.sex
+//        case .age:              ageHealthKitDateComponents = value?.dateComponents
+//
+//        case .maintenance:
+//            if let adaptiveMaintenance = value?.adaptiveMaintenance {
+//                maintenance?.adaptive = adaptiveMaintenance
+//            }
+//
+//        default:                break
+//        }
     }
 }
 
@@ -96,7 +96,7 @@ public extension HealthDetails {
         usesHealthKitForRestingEnergy || usesHealthKitForActiveEnergy
     }
     
-    var usesHealthKitForWeight: Bool { weightSource == .healthKit }
+    var usesHealthKitForWeight: Bool { weight?.source == .healthKit }
     var usesHealthKitForHeight: Bool { heightSource == .healthKit }
     var usesHealthKitForSex: Bool { sexSource == .healthKit }
     var usesHealthKitForAge: Bool { ageSource == .healthKit }

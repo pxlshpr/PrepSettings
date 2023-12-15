@@ -94,26 +94,26 @@ extension HealthModel {
     }
     
     @objc func didUpdateWeight(notification: Notification) {
-        guard let date = notification.date,
-              let healthQuantity = notification.weightHealthQuantity,
-              health.date == date
-        else {
-            return
-        }
-        
-        health.weight = healthQuantity
+//        guard let date = notification.date,
+//              let healthQuantity = notification.weightHealthQuantity,
+//              health.date == date
+//        else {
+//            return
+//        }
+//        
+//        health.weight = healthQuantity
         //TODO: Handle re-calculating stuff in Health?
     }
     
     @objc func didRemoveWeight(notification: Notification) {
-        guard let date = notification.date,
-              health.date == date,
-              health.weight?.source == .userEntered
-        else {
-            return
-        }
-        
-        health.weight = nil
+//        guard let date = notification.date,
+//              health.date == date,
+//              health.weight?.source == .userEntered
+//        else {
+//            return
+//        }
+//        
+//        health.weight = nil
         //TODO: Handle re-calculating stuff in Health?
     }
 }

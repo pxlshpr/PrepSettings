@@ -233,6 +233,25 @@ public extension HealthDetails {
         public var value: Sex?
     }
 
+    struct Weight: Hashable, Codable {
+        public var source: HealthSource
+        public var isDailyAverage: Bool
+        public var healthKitQuantities: [Quantity]?
+        public var valueInKg: Double?
+
+        public init(
+            source: HealthSource,
+            isDailyAverage: Bool = false,
+            healthKitQuantities: [Quantity]? = nil,
+            valueInKg: Double? = nil
+        ) {
+            self.source = source
+            self.isDailyAverage = isDailyAverage
+            self.healthKitQuantities = healthKitQuantities
+            self.valueInKg = valueInKg
+        }
+    }
+
     struct LeanBodyMass: Hashable, Codable {
         public var source: LeanBodyMassSource
         public var equation: LeanBodyMassEquation?

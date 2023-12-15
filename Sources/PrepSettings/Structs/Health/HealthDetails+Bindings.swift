@@ -132,17 +132,17 @@ public extension HealthDetails {
         }
     }
     
-    var weightSource: HealthSource {
-        get { weight?.source ?? .default }
-        set {
-            guard weight != nil else {
-                weight = HealthQuantity(source: newValue)
-                return
-            }
-            weight?.source = newValue
-            weight?.quantity?.date = nil
-        }
-    }
+//    var weightSource: HealthSource {
+//        get { weight?.source ?? .default }
+//        set {
+//            guard weight != nil else {
+//                weight = HealthQuantity(source: newValue)
+//                return
+//            }
+//            weight?.source = newValue
+//            weight?.quantity?.date = nil
+//        }
+//    }
     
     var heightSource: HealthSource {
         get { height?.source ?? .default }
@@ -233,35 +233,35 @@ public extension HealthDetails {
 //MARK: Values
 
 extension HealthDetails {
-    mutating func handleFocusLoss(for type: HealthType) {
-        
-        let typesToRemoveIfNil: [HealthType] = []
-        for type in typesToRemoveIfNil {
-            if valueIsNil(for: type) {
-                remove(type)
-            }
-        }
-        
-        let typesToSetToZeroIfNil: [HealthType] = [.activeEnergy, .restingEnergy, .weight, .height, .leanBodyMass, .age]
-        for type in typesToSetToZeroIfNil {
-            if valueIsNil(for: type) {
-                guard let zeroValue = HealthKitValue.zeroValue(for: type) else { continue }
-                setHealthKitValue(zeroValue, for: type)
-            }
-        }
-        
-//        switch type {
-//        case .activeEnergy:     if activeEnergyValue == nil { activeEnergyValue = 0 }
-//        case .restingEnergy:    if restingEnergyValue == nil { restingEnergyValue = 0 }
-//        case .weight:           if weightValue == nil { remove(.weight) }
-//        case .height:           if heightValue == nil { remove(.height) }
-//        case .leanBodyMass:     if leanBodyMassValue == nil { remove(.leanBodyMass) }
-//        case .age:              if ageValue == nil { remove(.age) }
-//        case .fatPercentage:    if fatPercentage == nil { fatPercentage = 0 }
-//        default:
-//            break
+//    mutating func handleFocusLoss(for type: HealthType) {
+//        
+//        let typesToRemoveIfNil: [HealthType] = []
+//        for type in typesToRemoveIfNil {
+//            if valueIsNil(for: type) {
+//                remove(type)
+//            }
 //        }
-    }
+//        
+//        let typesToSetToZeroIfNil: [HealthType] = [.activeEnergy, .restingEnergy, .weight, .height, .leanBodyMass, .age]
+//        for type in typesToSetToZeroIfNil {
+//            if valueIsNil(for: type) {
+//                guard let zeroValue = HealthKitValue.zeroValue(for: type) else { continue }
+//                setHealthKitValue(zeroValue, for: type)
+//            }
+//        }
+//        
+////        switch type {
+////        case .activeEnergy:     if activeEnergyValue == nil { activeEnergyValue = 0 }
+////        case .restingEnergy:    if restingEnergyValue == nil { restingEnergyValue = 0 }
+////        case .weight:           if weightValue == nil { remove(.weight) }
+////        case .height:           if heightValue == nil { remove(.height) }
+////        case .leanBodyMass:     if leanBodyMassValue == nil { remove(.leanBodyMass) }
+////        case .age:              if ageValue == nil { remove(.age) }
+////        case .fatPercentage:    if fatPercentage == nil { fatPercentage = 0 }
+////        default:
+////            break
+////        }
+//    }
 }
 
 public extension HealthDetails {
@@ -393,19 +393,19 @@ public extension HealthDetails {
         }
     }
 
-    var weightQuantity: Quantity? {
-        get { weight?.quantity }
-        set {
-            guard weight != nil else {
-                weight = HealthQuantity(
-                    source: .userEntered,
-                    quantity: newValue
-                )
-                return
-            }
-            weight?.quantity = newValue
-        }
-    }
+//    var weightQuantity: Quantity? {
+//        get { weight?.quantity }
+//        set {
+//            guard weight != nil else {
+//                weight = HealthQuantity(
+//                    source: .userEntered,
+//                    quantity: newValue
+//                )
+//                return
+//            }
+//            weight?.quantity = newValue
+//        }
+//    }
     
     var heightQuantity: Quantity? {
         get { height?.quantity }
