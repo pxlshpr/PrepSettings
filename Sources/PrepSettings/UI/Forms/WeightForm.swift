@@ -702,7 +702,7 @@ extension WeightForm {
 #Preview {
     return NavigationStack {
         WeightForm(
-            healthModel: MockHealthModel,
+            healthModel: MockCurrentHealthModel,
             settingsStore: .shared
         )
     }
@@ -719,7 +719,7 @@ let MockDate = Date(fromDateString: "2021_08_27")!
             ),
             date: MockDate,
             isPrevious: true,
-            healthModel: MockHealthModel,
+            healthModel: MockCurrentHealthModel,
             settingsStore: .shared
         )
     }
@@ -732,7 +732,7 @@ let MockDate = Date(fromDateString: "2021_08_27")!
             value: 93.5,
             source: .userEntered,
             isDailyAverage: false,
-            healthModel: MockHealthModel,
+            healthModel: MockCurrentHealthModel,
             settingsStore: .shared
         )
     }

@@ -11,6 +11,7 @@ public typealias SaveHealthHandler = ((HealthDetails, Bool) async throws -> ())
 @Observable public class HealthModel {
 
     public let isCurrent: Bool
+    public var isEditing: Bool
     public var ignoreChanges: Bool = false
     
     internal let logger = Logger(subsystem: "HealthModel", category: "")
@@ -42,6 +43,7 @@ public typealias SaveHealthHandler = ((HealthDetails, Bool) async throws -> ())
         self.delegate = delegate
         self.health = HealthDetails()
         self.isCurrent = true
+        self.isEditing = true
         loadCurrentHealth(fetchCurrentHealthHandler)
         addObservers()
     }
@@ -57,6 +59,7 @@ public typealias SaveHealthHandler = ((HealthDetails, Bool) async throws -> ())
         self.delegate = delegate
         self.health = health
         self.isCurrent = false
+        self.isEditing = false
         addObservers()
     }
 

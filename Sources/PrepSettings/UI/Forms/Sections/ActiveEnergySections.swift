@@ -232,7 +232,7 @@ struct ActiveEnergySections: View {
             NavigationStack {
                 Form {
                     ActiveEnergySections(
-                        model: MockHealthModel,
+                        model: MockCurrentHealthModel,
                         settingsStore: SettingsStore.shared,
                         focusedType: $focusedType
                     )

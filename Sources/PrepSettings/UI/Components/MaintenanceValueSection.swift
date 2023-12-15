@@ -211,7 +211,7 @@ struct MaintenanceValueSection: View {
 
 #Preview {
     NavigationStack {
-        HealthSummary(model: MockHealthModel)
+        HealthSummary(model: MockCurrentHealthModel)
             .environment(SettingsStore.shared)
     }
 }

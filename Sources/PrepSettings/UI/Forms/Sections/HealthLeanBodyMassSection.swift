@@ -137,7 +137,7 @@ struct HealthLeanBodyMassSection: View {
     Text("")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                HealthSummary(model: MockHealthModel)
+                HealthSummary(model: MockCurrentHealthModel)
                     .environment(SettingsStore.shared)
             }
         }

@@ -321,7 +321,7 @@ struct DietaryEnergySampleForm: View {
                 DietaryEnergySampleForm(
                     sample: .init(type: .logged),
                     date: Date.now,
-                    healthModel: MockHealthModel,
+                    healthModel: MockCurrentHealthModel,
                     settingsStore: SettingsStore.shared,
                     didSave: { value in
                         

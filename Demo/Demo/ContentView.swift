@@ -10,16 +10,43 @@ import PrepSettings
 /// [ ] Add pregnancy status and smoking status to Settings Health form
 struct ContentView: View {
     
-    @State var model: HealthModel = MockHealthModel
+    @State var currentHealthModel: HealthModel = MockCurrentHealthModel
+    @State var pastHealthModel: HealthModel = MockCurrentHealthModel
+
     @State var settingsStore: SettingsStore = SettingsStore.shared
+    
+    @State var showingCurrentHealthDetails = false
+    @State var showingPastHealthDetails = false
     
     var body: some View {
         NavigationStack {
-            HealthSummary(model: model)
-                .environment(settingsStore)
+            Form {
+                Button("Current Health Details") {
+                    showingCurrentHealthDetails = true
+                }
+                Button("Past Health Details") {
+                    showingPastHealthDetails = true
+                }
+            }
         }
+        .sheet(isPresented: $showingCurrentHealthDetails) { currentHealthSummary }
+        .sheet(isPresented: $showingPastHealthDetails) { pastHealthSummary }
         .onAppear {
             SettingsStore.configureAsMock()
+        }
+    }
+    
+    var currentHealthSummary: some View {
+        NavigationStack {
+            HealthSummary(model: currentHealthModel)
+                .environment(settingsStore)
+        }
+    }
+    
+    var pastHealthSummary: some View {
+        NavigationStack {
+            HealthSummary(model: currentHealthModel)
+                .environment(settingsStore)
         }
     }
 }

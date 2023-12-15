@@ -374,7 +374,7 @@ struct AdaptiveMaintenanceForm: View {
 //                    .onAppear {
 //                        SettingsStore.configureAsMock()
 //                    }
-                HealthSummary(model: MockHealthModel)
+                HealthSummary(model: MockCurrentHealthModel)
                     .environment(SettingsStore.shared)
             }
         }

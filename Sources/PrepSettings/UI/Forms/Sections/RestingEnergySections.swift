@@ -185,7 +185,7 @@ struct RestingEnergySections: View {
             NavigationStack {
                 Form {
                     RestingEnergySections(
-                        model: MockHealthModel,
+                        model: MockCurrentHealthModel,
                         settingsStore: SettingsStore.shared,
                         focusedType: $focusedType
                     )

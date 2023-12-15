@@ -105,21 +105,36 @@ struct HealthLink: View {
     let type: HealthType
     
     var body: some View {
-        NavigationLink(value: type) {
-            HStack {
-                Text(type.name)
-                Spacer()
-                if let string = model.health.summaryDetail(for: type) {
-                    Text(string)
-                } else {
-                    Text("Not Set")
-                        .foregroundStyle(.secondary)
-                }
+        Group {
+            if model.isEditing {
+                navigationLink
+                    .navigationDestination(for: HealthType.self) { type in
+                        HealthForm(model, [type])
+                            .environment(settingsStore)
+                    }
+            } else {
+                label
             }
         }
-        .navigationDestination(for: HealthType.self) { type in
-            HealthForm(model, [type])
-                .environment(settingsStore)
+    }
+    
+    var navigationLink: some View {
+        NavigationLink(value: type) {
+            label
+        }
+    }
+    
+    var label: some View {
+        HStack {
+            Text(type.name)
+            Spacer()
+            if let string = model.health.summaryDetail(for: type) {
+                Text(string)
+                    .foregroundStyle(model.isEditing ? .primary : .secondary)
+            } else {
+                Text("Not Set")
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }
@@ -128,7 +143,7 @@ struct HealthLink: View {
     Text("")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                EstimatedMaintenanceForm(MockHealthModel)
+                EstimatedMaintenanceForm(MockCurrentHealthModel)
                     .environment(SettingsStore.shared)
             }
         }

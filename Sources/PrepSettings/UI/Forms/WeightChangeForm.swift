@@ -286,7 +286,7 @@ struct WeightChangeForm: View {
 
 #Preview {
     NavigationStack {
-        WeightChangeForm(MockHealthModel)
+        WeightChangeForm(MockCurrentHealthModel)
 //        HealthSummary(model: MockHealthModel)
             .environment(SettingsStore.shared)
             .onAppear {

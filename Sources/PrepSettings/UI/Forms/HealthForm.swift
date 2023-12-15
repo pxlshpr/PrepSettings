@@ -127,7 +127,7 @@ public struct HealthForm: View {
 
 #Preview {
     NavigationStack {
-        HealthForm(MockHealthModel, [.leanBodyMass])
+        HealthForm(MockCurrentHealthModel, [.leanBodyMass])
             .environment(SettingsStore.shared)
             .onAppear {
                 SettingsStore.configureAsMock()
