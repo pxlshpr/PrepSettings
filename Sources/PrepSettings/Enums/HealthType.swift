@@ -130,8 +130,10 @@ extension HealthType {
             "Used to calculate resting energy. Also used as a criteria when choosing daily values for micronutrients."
         case .leanBodyMass:
             "Used to create goals and calculate resting energy."
-        case .weight, .height:
+        case .height:
             "Used to calculate resting energy or lean body mass."
+        case .weight:
+            "Used in maintenance energy and lean body mass calculations."
         default:
             nil
         }

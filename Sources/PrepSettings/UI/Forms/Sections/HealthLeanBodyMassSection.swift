@@ -48,7 +48,8 @@ struct HealthLeanBodyMassSection: View {
             unit: $settingsStore.bodyMassUnit,
             valueInKg: $model.leanBodyMassValue,
             focusedType: focusedType,
-            healthType: .leanBodyMass
+            healthType: .leanBodyMass,
+            disabled: .constant(false)
         )
     }
     

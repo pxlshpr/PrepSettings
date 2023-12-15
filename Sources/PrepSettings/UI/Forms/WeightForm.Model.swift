@@ -1,6 +1,9 @@
 import SwiftUI
 import PrepShared
 
+/// [ ] We need to have a temporary value in the form itself that is computed so that we can display it while editing until user taps done (unless we're in the current health model in which case it happens immediately)
+/// [ ] Revisit the updateBackend thing with our current thinking, and maybe treat past health details differently
+
 /// [ ] Consider having different units, by first renaming `value` to `valueInKg`, then addressing every place we use it
 /// [ ] Also consider different units for the two other form types
 
@@ -31,7 +34,9 @@ extension WeightForm {
         /// List of moving average weights that are displayed based on the current interval
         var movingAverageDatedWeights: [DatedWeight] = []
         
-        /// Health init
+        var showingTextField: Bool = false
+        
+        /// HealthDetails init
         init(
             healthModel: HealthModel
         ) {
@@ -42,6 +47,8 @@ extension WeightForm {
             let weight = healthModel.health.weight
             self.value = weight?.quantity?.value
             self.source = weight?.source
+            
+            self.showingTextField = weight?.source == .userEntered
         }
         
         /// Weight Sample init
@@ -67,6 +74,8 @@ extension WeightForm {
                     self.movingAverageDatedWeights.append(.init(date: date))
                 }
             }
+            
+            self.showingTextField = sample.source == .userEntered
         }
         
         /// Average Component init
@@ -84,8 +93,28 @@ extension WeightForm {
             self.value = value
             self.source = source ?? .userEntered
             self.isDailyAverage = isDailyAverage
-        }
 
+            self.showingTextField = source == .userEntered
+        }
+    }
+}
+
+
+extension WeightForm.Model {
+    var disabledSources: [HealthSource] {
+        
+        if healthModel.isLocked {
+            return HealthSource.allCases
+        }
+        
+        guard formType != .healthDetails else {
+            return []
+        }
+        return if healthKitQuantities?.isEmpty == false {
+            []
+        } else {
+            [.healthKit]
+        }
     }
 }
 
@@ -194,7 +223,20 @@ extension WeightForm.Model {
     }
     
     func fetchHealthKitData() async throws {
+        //TODO: Next
+        /// [ ] Handle displaying single value in average section (maybe don't say average of these is being used)
+        /// [ ] Calculations are wrong
         guard !isPreview else {
+            await MainActor.run {
+                self.healthKitQuantities = [
+                    .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
+                    .init(value: 94.8, date: date.startOfDay.addingTimeInterval(56520)),
+                ]
+//                self.healthKitQuantities = [
+//                    .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
+//                ]
+//                self.healthKitQuantities = nil
+            }
             return
         }
         
@@ -287,6 +329,7 @@ extension WeightForm.Model {
         switch formType {
         case .healthDetails:
             healthModel.remove(.weight)
+            showingTextField = false
         default:
             break
         }
@@ -404,6 +447,13 @@ extension WeightForm.Model {
 
 extension WeightForm.Model {
     
+    var shouldShowHealthKitError: Bool {
+        formType == .healthDetails
+        && source == .healthKit
+        && healthModel.health.weight?.quantity?.value == nil
+        && !healthModel.isLocked
+    }
+    
     var shouldShowTextFieldSection: Bool {
         switch formType {
         case .healthDetails, .specificDate:
@@ -516,7 +566,8 @@ extension WeightForm.Model {
         return HealthQuantity(
             source: .healthKit,
             isDailyAverage: isDailyAverage ?? false,
-            quantity: self.healthKitLatestQuantity
+//            quantity: self.healthKitLatestQuantity
+            quantity: healthModel.health.weight?.quantity
         )
     }
     

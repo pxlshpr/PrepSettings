@@ -129,7 +129,8 @@ struct WeightAveragedSampleForm: View {
                 unit: $settingsStore.bodyMassUnit,
                 valueInKg: binding,
                 focusedType: $focusedType,
-                healthType: .weight
+                healthType: .weight,
+                disabled: .constant(false)
             )
             
 //            return HealthNumberField(

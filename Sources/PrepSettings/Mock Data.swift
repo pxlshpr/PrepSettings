@@ -9,13 +9,13 @@ public let MockCurrentHealthModel = HealthModel(
     }
 )
 
-public let MockPastHealthModel = HealthModel(
-    delegate: MockPastHealthModelDelegate(),
-    fetchCurrentHealthHandler: {
-        let healthDetails: HealthDetails = fetchFromBackend(.pastHealthDetails)
-        return healthDetails
-    }
-)
+public var MockPastHealthModel: HealthModel {
+    let healthDetails: HealthDetails = fetchFromBackend(.pastHealthDetails)
+    return HealthModel(
+        delegate: MockPastHealthModelDelegate(),
+        health: healthDetails
+    )
+}
 
 struct MockCurrentHealthModelDelegate: HealthModelDelegate {
     func saveHealth(_ healthDetails: HealthDetails, isCurrent: Bool) async throws {

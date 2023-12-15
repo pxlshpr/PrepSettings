@@ -7,7 +7,20 @@ struct LargeHealthValue: View {
     
     let value: Double
     let valueString: String
+    let valueColor: Color
     let unitString: String
+    
+    init(
+        value: Double,
+        valueString: String,
+        valueColor: Color = .primary,
+        unitString: String
+    ) {
+        self.value = value
+        self.valueString = valueString
+        self.valueColor = valueColor
+        self.unitString = unitString
+    }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
@@ -17,6 +30,7 @@ struct LargeHealthValue: View {
                 .contentTransition(.numericText(value: value))
 //                .font(.system(.largeTitle, design: .monospaced, weight: .bold))
                 .font(LargeNumberFont)
+                .foregroundStyle(valueColor)
             Text(unitString)
 //                .font(.system(.body, design: .default, weight: .semibold))
                 .font(LargeUnitFont)

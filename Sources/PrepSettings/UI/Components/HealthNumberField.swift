@@ -11,6 +11,7 @@ struct HealthNumberField<Unit: HealthUnit>: View {
     let secondComponentBinding: Binding<Double?>
     let focusedType: FocusState<HealthType?>.Binding
     let healthType: HealthType
+    let disabled: Binding<Bool>?
     
     init(
         unitBinding: Binding<Unit>,
@@ -18,7 +19,8 @@ struct HealthNumberField<Unit: HealthUnit>: View {
         firstComponentBinding: Binding<Int?> = .constant(0),
         secondComponentBinding: Binding<Double?> = .constant(0),
         focusedType: FocusState<HealthType?>.Binding,
-        healthType: HealthType
+        healthType: HealthType,
+        disabled: Binding<Bool>? = nil
     ) {
         self.unitBinding = unitBinding
         self.valueBinding = valueBinding
@@ -26,6 +28,7 @@ struct HealthNumberField<Unit: HealthUnit>: View {
         self.secondComponentBinding = secondComponentBinding
         self.focusedType = focusedType
         self.healthType = healthType
+        self.disabled = disabled
     }
     
     var body: some View {
@@ -35,7 +38,8 @@ struct HealthNumberField<Unit: HealthUnit>: View {
                 NumberField(
                     placeholder: "Required",
                     binding: firstComponentBinding,
-                    font: LargeNumberFont
+                    font: LargeNumberFont,
+                    disabled: disabled
                 )
                 .focused(focusedType, equals: healthType)
 
@@ -44,7 +48,8 @@ struct HealthNumberField<Unit: HealthUnit>: View {
                 NumberField(
                     placeholder: "",
                     binding: secondComponentBinding,
-                    font: LargeNumberFont
+                    font: LargeNumberFont,
+                    disabled: disabled
                 )
                 
                 /// only pass the isFocusedBinding to first component
@@ -57,7 +62,8 @@ struct HealthNumberField<Unit: HealthUnit>: View {
                 NumberField(
                     placeholder: "Required",
                     binding: valueBinding,
-                    font: LargeNumberFont
+                    font: LargeNumberFont,
+                    disabled: disabled
                 )
                 .focused(focusedType, equals: healthType)
                 unitView

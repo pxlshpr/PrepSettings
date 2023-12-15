@@ -165,7 +165,7 @@ public struct HealthSummary: View {
     Text("")
         .sheet(isPresented: .constant(true)) {
             NavigationStack {
-                HealthSummary(model: MockCurrentHealthModel)
+                HealthSummary(model: MockPastHealthModel)
                     .environment(SettingsStore.shared)
             }
         }

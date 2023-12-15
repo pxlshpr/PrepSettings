@@ -29,4 +29,12 @@ extension HealthModel {
             break
         }
     }
+    
+    var isEditingPast: Bool {
+        !isCurrent && isEditing
+    }
+    
+    var isLocked: Bool {
+        !isCurrent && !isEditing
+    }
 }

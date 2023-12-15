@@ -7,7 +7,8 @@ struct BodyMassField: View {
     @Binding var valueInKg: Double?
     var focusedType: FocusState<HealthType?>.Binding
     var healthType: HealthType
-    
+    @Binding var disabled: Bool
+
     var body: some View {
         HealthNumberField(
             unitBinding: $unit,
@@ -15,7 +16,8 @@ struct BodyMassField: View {
             firstComponentBinding: stonesComponent,
             secondComponentBinding: poundsComponent,
             focusedType: focusedType,
-            healthType: healthType
+            healthType: healthType,
+            disabled: $disabled
         )
     }
     
