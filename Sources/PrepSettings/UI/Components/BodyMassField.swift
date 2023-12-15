@@ -60,22 +60,16 @@ struct BodyMassField: View {
         )
     }
     
-    var valueInStones: Double? {
-        guard let valueInKg else { return nil }
-        return BodyMassUnit.kg.convert(valueInKg, to: .st)
+    var valueInStones: Double {
+        BodyMassUnit.kg.convert(valueInKg ?? 0, to: .st)
     }
     
     var stonesComponent: Binding<Int?> {
         Binding<Int?>(
-            get: {
-                guard let valueInStones else { return nil }
-                return Int(valueInStones.whole)
-            },
+            get: { valueInStones.stonesComponent },
             set: { newValue in
-                guard let newValue, let pounds = poundsComponent.wrappedValue else {
-                    valueInKg = nil
-                    return
-                }
+                let newValue = newValue ?? 0
+                let pounds = poundsComponent.wrappedValue ?? 0
                 let valueInStones = Double(newValue) + (pounds / PoundsPerStone)
                 valueInKg = BodyMassUnit.st.convert(valueInStones, to: .kg)
             }
@@ -84,19 +78,24 @@ struct BodyMassField: View {
     
     var poundsComponent: Binding<Double?> {
         Binding<Double?>(
-            get: {
-                guard let valueInStones else { return nil }
-                return valueInStones.fraction * PoundsPerStone
-            },
+            get: { valueInStones.poundsComponent },
             set: { newValue in
-                guard let newValue, let stones = stonesComponent.wrappedValue else {
-                    valueInKg = nil
-                    return
-                }
+                let newValue = newValue ?? 0
+                let stones = stonesComponent.wrappedValue ?? 0
                 let value = min(newValue, PoundsPerStone-1)
                 let valueInStones = Double(stones) + (value / PoundsPerStone)
                 valueInKg = BodyMassUnit.st.convert(valueInStones, to: .kg)
             }
         )
+    }
+}
+
+extension Double {
+    var stonesComponent: Int {
+        Int(self.whole)
+    }
+
+    var poundsComponent: Double {
+        self.fraction * PoundsPerStone
     }
 }

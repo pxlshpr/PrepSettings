@@ -250,6 +250,11 @@ public extension HealthDetails {
             self.healthKitQuantities = healthKitQuantities
             self.valueInKg = valueInKg
         }
+        
+        public func value(in unit: BodyMassUnit) -> Double? {
+            guard let valueInKg else { return nil }
+            return BodyMassUnit.kg.convert(valueInKg, to: unit)
+        }
     }
 
     struct LeanBodyMass: Hashable, Codable {

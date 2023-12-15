@@ -586,7 +586,7 @@ extension WeightForm {
         
         var textField: some View {
             let value = Binding<Double?>(
-                get: { model.value },
+                get: { model.valueInKg },
                 set: {
                     model.textFieldValueChanged(to: $0)
                 }
@@ -620,13 +620,18 @@ extension WeightForm {
         var nonSampleValue: some View {
             switch model.source {
             case .healthKit:
-                if let value = model.computedValue(in: settingsStore.bodyMassUnit) {
-                    LargeHealthValue(
-                        value: value,
-                        valueString: value.clean,
-                        valueColor: foregroundColor,
-                        unitString: settingsStore.bodyMassUnit.abbreviation
+                if model.valueInKg != nil {
+                    LargeBodyMassValue(
+                        unit: $settingsStore.bodyMassUnit,
+                        valueInKg: $model.valueInKg,
+                        valueColor: foregroundColor
                     )
+//                    LargeHealthValue(
+//                        value: value,
+//                        valueString: value.clean,
+//                        valueColor: foregroundColor,
+//                        unitString: settingsStore.bodyMassUnit.abbreviation
+//                    )
                 } else {
                     Text("No Data")
                         .foregroundStyle(.secondary)
@@ -746,11 +751,15 @@ let MockDate = Date(fromDateString: "2021_08_27")!
 //}
 
 #Preview {
-    Text("")
-        .sheet(isPresented: .constant(true)) {
-            NavigationStack {
-                HealthSummary(model: MockPastHealthModel)
-                    .environment(SettingsStore.shared)
-            }
-        }
+    DemoView()
+//    Text("")
+//        .sheet(isPresented: .constant(true)) {
+//            NavigationStack {
+//                HealthSummary(model: MockPastHealthModel)
+//                    .environment(SettingsStore.shared)
+//                    .onAppear(perform: {
+//                        SettingsStore.configureAsMock()
+//                    })
+//            }
+//        }
 }

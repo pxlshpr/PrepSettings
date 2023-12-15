@@ -14,7 +14,7 @@ extension WeightForm {
         let healthModel: HealthModel
         var date: Date
 
-        var value: Double?
+        var valueInKg: Double?
         var valueString: String?
         var valueSecondComponentString: String?
         
@@ -41,8 +41,17 @@ extension WeightForm {
             self.date = healthModel.health.date
             
             let weight = healthModel.health.weight
-            self.value = weight?.valueInKg
-            self.valueString = weight?.valueInKg?.cleanWithoutRounding
+            
+            let valueInKg = weight?.valueInKg
+            self.valueInKg = valueInKg
+            if SettingsStore.bodyMassUnit == .st, let valueInKg {
+                let valueInSt = BodyMassUnit.kg.convert(valueInKg, to: .st)
+                self.valueString = "\(valueInSt.stonesComponent)"
+                self.valueSecondComponentString = valueInSt.poundsComponent.clean
+            } else {
+                self.valueString = weight?.value(in: SettingsStore.bodyMassUnit)?.cleanWithoutRounding
+            }
+            
             self.source = weight?.source
             self.isDailyAverage = weight?.isDailyAverage
             
@@ -60,7 +69,7 @@ extension WeightForm {
             self.healthModel = healthModel
             self.date = date
             
-            self.value = sample.value
+            self.valueInKg = sample.value
             self.sampleSource = sample.source
             
             self.sample = sample
@@ -87,7 +96,7 @@ extension WeightForm {
             self.healthModel = healthModel
             self.date = date
             
-            self.value = value
+            self.valueInKg = value
             self.source = source ?? .userEntered
             self.isDailyAverage = isDailyAverage
             
@@ -102,7 +111,7 @@ extension WeightForm.Model {
         switch formType {
         case .healthDetails:
             let weight = healthModel.health.weight
-            self.value = weight?.valueInKg
+            self.valueInKg = weight?.valueInKg
             self.source = weight?.source
             self.isDailyAverage = weight?.isDailyAverage
             self.isRemoved = healthModel.health.weight == nil
@@ -114,7 +123,7 @@ extension WeightForm.Model {
     func doneEditing() {
         switch formType {
         case .healthDetails:
-            if value == nil {
+            if valueInKg == nil {
                 removeWeight()
             }
             if isRemoved {
@@ -154,25 +163,25 @@ extension WeightForm.Model {
         )
     }
     
-    var valueInKg: Double? {
-        guard let value else { return nil }
-        return SettingsStore.bodyMassUnit.convert(value, to: .kg)
-    }
+//    var valueInKg: Double? {
+//        guard let value else { return nil }
+//        return SettingsStore.bodyMassUnit.convert(value, to: .kg)
+//    }
     
     
     func textFieldValueChanged(to value: Double?) {
-        self.value = value
+        self.valueInKg = value
         
         if healthModel.isCurrent {
             switch formType {
             case .healthDetails:
-                healthModel.health.weight?.valueInKg = value
+                healthModel.health.weight?.valueInKg = valueInKg
 
             case .adaptiveSample:
                 setSampleValue(value)
 
             case .specificDate:
-                self.value = value
+                self.valueInKg = value
             }
         }
     }
@@ -444,8 +453,9 @@ extension WeightForm.Model {
         }
         
         withAnimation {
-            self.value = if let quantity, isHealthKit {
-                BodyMassUnit.kg.convert(quantity.value, to: SettingsStore.bodyMassUnit)
+            self.valueInKg = if let quantity, isHealthKit {
+                quantity.value
+//                BodyMassUnit.kg.convert(quantity.value, to: SettingsStore.bodyMassUnit)
             } else {
                 quantity?.value
             }
@@ -491,7 +501,7 @@ extension WeightForm.Model {
                 if healthModel.isCurrent {
                     healthModel.health.weight = weight
                 } else {
-                    value = nil
+                    valueInKg = nil
                     source = .userEntered
                     isDailyAverage = nil
                 }
@@ -509,7 +519,7 @@ extension WeightForm.Model {
                 if healthModel.isCurrent {
                     healthModel.remove(.weight)
                 } else {
-                    value = nil
+                    valueInKg = nil
                     isDailyAverage = nil
                     source = .userEntered
                 }
@@ -572,7 +582,7 @@ extension WeightForm.Model {
     func computedValue(in unit: BodyMassUnit) -> Double? {
         switch formType {
         case .healthDetails:
-            return value
+            return valueInKg
 //            switch source {
 //            case .healthKit:
 //                guard let value = healthModel.health.weight?.quantity?.value else { return nil }
@@ -584,9 +594,9 @@ extension WeightForm.Model {
         case .adaptiveSample:
             switch sampleSource {
             case .healthKit:
-                guard let value else { return nil }
+                guard let valueInKg else { return nil }
 //                guard let value = healthKitValueForDate else { return nil }
-                return BodyMassUnit.kg.convert(value, to: unit)
+                return BodyMassUnit.kg.convert(valueInKg, to: unit)
             case .movingAverage:
                 return 69.0
             default:
@@ -596,9 +606,9 @@ extension WeightForm.Model {
         case .specificDate:
             switch source {
             case .healthKit:
-                guard let value else { return nil }
+                guard let valueInKg else { return nil }
 //                guard let value = healthKitValueForDate else { return nil }
-                return BodyMassUnit.kg.convert(value, to: unit)
+                return BodyMassUnit.kg.convert(valueInKg, to: unit)
             default:
                 return nil
             }
@@ -606,8 +616,8 @@ extension WeightForm.Model {
     }
     
     var quantity: Quantity? {
-        guard let value else { return nil }
-        return .init(value: value, date: date)
+        guard let valueInKg else { return nil }
+        return .init(value: valueInKg, date: date)
     }
 }
 
@@ -617,7 +627,7 @@ extension WeightForm.Model {
         formType == .healthDetails
         && source == .healthKit
 //        && healthModel.health.weight?.quantity?.value == nil
-        && value == nil
+        && valueInKg == nil
         && !healthModel.isLocked
     }
     
