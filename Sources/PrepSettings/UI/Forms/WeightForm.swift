@@ -125,7 +125,7 @@ extension WeightForm {
     
     var explanationSection: some View {
         Section {
-            Text("Your weight is used to calculate your maintenance energy.\n\nIt may also be used in certain equations when estimating your resting energy.\n\nIt is also used when calculating your lean body mass using your fat percentage.")
+            Text("Your weight is used when calculating your adaptive maintenance energy. It may also be used in certain equations that estimate your resting energy, or when calculating your lean body mass.")
         }
     }
     
@@ -342,13 +342,9 @@ extension WeightForm {
             case .healthDetails:
                 if model.healthKitQuantities?.count == 1 || !model.useDailyAverage
                 {
-                    "This \(healthModel.isEditing ? "is" : "was") the most recently logged weight in Apple Health\(healthModel.isCurrent ? "" : " to this date")."
+                    "This \(healthModel.isEditing ? "is" : "was") when the most recent weight in the Health App\(healthModel.isCurrent ? "" : " to this date") was logged."
                 } else {
-                    if healthModel.isEditing {
-                        "The following weights logged in the Health App on this date are being averaged to establish the overall weight."
-                    } else {
-                        "The following weights logged in the Health App on this date were averaged to establish the overall weight."
-                    }
+                    "This \(healthModel.isEditing ? "is" : "was") when the most recent weight in the Health App\(healthModel.isCurrent ? "" : " to this date") was logged."
                 }
             default:
                 nil
@@ -418,9 +414,13 @@ extension WeightForm {
             }
             .foregroundStyle(foregroundColor)
         }
+        
+        var footer: some View {
+            Text("These \(healthModel.isEditing ? "are" : "were") the times when your weight was logged on this date. The average of these \(healthModel.isEditing ? "is being" : "was") used.")
+        }
                 
         func section(_ quantities: [Quantity]) -> some View {
-            Section {
+            Section(footer: footer) {
                 ForEach(quantities, id: \.self) { quantity in
                     row(quantity)
                 }
