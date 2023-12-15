@@ -69,12 +69,16 @@ struct LargeBodyMassValue: View {
             switch unit.hasTwoComponents {
             case true:
                 Text("\(stonesComponent.wrappedValue ?? 0)")
+                    .animation(.default, value: valueInKg)
+                    .contentTransition(.numericText(value: valueInKg ?? 0))
                     .font(LargeNumberFont)
                     .foregroundStyle(valueColor)
                     .multilineTextAlignment(.trailing)
                 unitView
 
                 Text("\((poundsComponent.wrappedValue ?? 0).clean)")
+                    .animation(.default, value: valueInKg)
+                    .contentTransition(.numericText(value: valueInKg ?? 0))
                     .font(LargeNumberFont)
                     .foregroundStyle(valueColor)
                     .multilineTextAlignment(.trailing)
@@ -87,6 +91,8 @@ struct LargeBodyMassValue: View {
                 }
             case false:
                 Text("\((valueInDisplayedUnit.wrappedValue ?? 0).clean)")
+                    .animation(.default, value: valueInKg)
+                    .contentTransition(.numericText(value: valueInKg ?? 0))
                     .font(LargeNumberFont)
                     .foregroundStyle(valueColor)
                     .multilineTextAlignment(.trailing)
