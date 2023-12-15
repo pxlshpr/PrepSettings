@@ -604,7 +604,8 @@ extension WeightForm {
                     focusedType: $focusedType,
                     healthType: .weight,
                     disabled: disabled,
-                    valueString: $model.valueString
+                    valueString: $model.valueString,
+                    secondComponentString: $model.valueSecondComponentString
                 )
             }
             

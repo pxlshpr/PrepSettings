@@ -49,7 +49,9 @@ struct HealthLeanBodyMassSection: View {
             valueInKg: $model.leanBodyMassValue,
             focusedType: focusedType,
             healthType: .leanBodyMass,
-            disabled: .constant(false)
+            disabled: .constant(false),
+            valueString: .constant(""),
+            secondComponentString: .constant("")
         )
     }
     
@@ -81,7 +83,8 @@ struct HealthLeanBodyMassSection: View {
                 NumberField(
                     placeholder: "Required",
                     roundUp: true,
-                    binding: $model.fatPercentageValue
+                    binding: $model.fatPercentageValue,
+                    stringBinding: .constant("")
                 )
                 .focused(focusedType, equals: HealthType.fatPercentage)
                 Text("%")

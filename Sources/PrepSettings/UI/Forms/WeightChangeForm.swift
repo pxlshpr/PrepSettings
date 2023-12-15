@@ -10,6 +10,7 @@ struct WeightChangeForm: View {
     @FocusState var focusedType: HealthType?
     
     @State var textFieldValue: Double? = nil
+    @State var textFieldValueString: String? = nil
     @State var isNegative = false
 
     init(_ healthModel: HealthModel) {
@@ -17,6 +18,7 @@ struct WeightChangeForm: View {
         
         if let delta = healthModel.maintenanceWeightChangeDelta {
             _textFieldValue = State(initialValue: abs(delta))
+            _textFieldValueString = State(initialValue: abs(delta).cleanWithoutRounding)
             _isNegative = State(initialValue: delta < 0)
         }
     }
@@ -159,6 +161,7 @@ struct WeightChangeForm: View {
             return HealthNumberField(
                 unitBinding: unitBinding,
                 valueBinding: $textFieldValue,
+                valueString: $textFieldValueString,
                 focusedType: $focusedType,
                 healthType: .maintenance
             )

@@ -16,9 +16,7 @@ extension WeightForm {
 
         var value: Double?
         var valueString: String?
-//        var includeTrailingPeriod: Bool = false
-//        var includeTrailingZero: Bool = false
-//        var numberOfTrailingZeros: Int = 0
+        var valueSecondComponentString: String?
         
         var sample: WeightSample?
         var isDailyAverage: Bool?

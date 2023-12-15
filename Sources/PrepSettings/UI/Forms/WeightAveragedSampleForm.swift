@@ -130,7 +130,9 @@ struct WeightAveragedSampleForm: View {
                 valueInKg: binding,
                 focusedType: $focusedType,
                 healthType: .weight,
-                disabled: .constant(false)
+                disabled: .constant(false),
+                valueString: .constant(""),
+                secondComponentString: .constant("")
             )
             
 //            return HealthNumberField(

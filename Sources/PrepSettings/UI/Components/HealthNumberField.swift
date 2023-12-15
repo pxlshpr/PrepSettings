@@ -12,14 +12,17 @@ struct HealthNumberField<Unit: HealthUnit>: View {
     let focusedType: FocusState<HealthType?>.Binding
     let healthType: HealthType
     let disabled: Binding<Bool>?
-    let valueString: Binding<String?>?
     
+    let valueString: Binding<String?>
+    let secondComponentStringBinding: Binding<String?>
+
     init(
         unitBinding: Binding<Unit>,
         valueBinding: Binding<Double?>,
-        valueString: Binding<String?>? = nil,
+        valueString: Binding<String?>,
         firstComponentBinding: Binding<Int?> = .constant(0),
         secondComponentBinding: Binding<Double?> = .constant(0),
+        secondComponentStringBinding: Binding<String?> = .constant(""),
         focusedType: FocusState<HealthType?>.Binding,
         healthType: HealthType,
         disabled: Binding<Bool>? = nil
@@ -29,6 +32,7 @@ struct HealthNumberField<Unit: HealthUnit>: View {
         self.valueString = valueString
         self.firstComponentBinding = firstComponentBinding
         self.secondComponentBinding = secondComponentBinding
+        self.secondComponentStringBinding = secondComponentStringBinding
         self.focusedType = focusedType
         self.healthType = healthType
         self.disabled = disabled
@@ -51,6 +55,7 @@ struct HealthNumberField<Unit: HealthUnit>: View {
                 NumberField(
                     placeholder: "",
                     binding: secondComponentBinding,
+                    stringBinding: secondComponentStringBinding,
                     font: LargeNumberFont,
                     disabled: disabled
                 )

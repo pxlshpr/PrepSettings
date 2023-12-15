@@ -25,7 +25,7 @@ public struct NumberField: View {
         placeholder: String = "",
         roundUp: Bool = false,
         binding: Binding<Double?>,
-        stringBinding: Binding<String?>? = nil,
+        stringBinding: Binding<String?>,
         font: Font? = nil,
         disabled: Binding<Bool>? = nil
     ) {
@@ -167,7 +167,8 @@ public struct NumberField: View {
 struct NumberFieldTest: View {
     
     @State var value: Double? = 500
-    
+    @State var valueString: String? = "500"
+
     var body: some View {
         NavigationStack {
             Form {
@@ -175,7 +176,8 @@ struct NumberFieldTest: View {
                     Spacer()
                     NumberField(
                         placeholder: "Placeholder",
-                        binding: $value
+                        binding: $value,
+                        stringBinding: $valueString
                     )
                 }
             }

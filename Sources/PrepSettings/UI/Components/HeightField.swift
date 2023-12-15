@@ -7,12 +7,34 @@ struct HeightField: View {
     @Binding var valueInCm: Double?
     var focusedType: FocusState<HealthType?>.Binding
 
+    @Binding var disabled: Bool
+    var valueString: Binding<String?>
+    var secondComponentString: Binding<String?>
+
+    init(
+        unit: Binding<HeightUnit>,
+        valueInCm: Binding<Double?>,
+        focusedType: FocusState<HealthType?>.Binding,
+        disabled: Binding<Bool>,
+        valueString: Binding<String?>,
+        secondComponentString: Binding<String?>
+    ) {
+        _unit = unit
+        _valueInCm = valueInCm
+        self.focusedType = focusedType
+        _disabled = disabled
+        self.valueString = valueString
+        self.secondComponentString = secondComponentString
+    }
+    
     var body: some View {
         HealthNumberField(
             unitBinding: $unit,
             valueBinding: valueInDisplayedUnit,
+            valueString: valueString,
             firstComponentBinding: feetComponent,
             secondComponentBinding: centimetersComponent,
+            secondComponentStringBinding: secondComponentString,
             focusedType: focusedType,
             healthType: .height
         )

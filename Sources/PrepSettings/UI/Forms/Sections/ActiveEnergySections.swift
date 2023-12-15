@@ -136,7 +136,8 @@ struct ActiveEnergySections: View {
                 NumberField(
                     placeholder: "Required",
                     roundUp: true,
-                    binding: $model.health.activeEnergyValue
+                    binding: $model.health.activeEnergyValue,
+                    stringBinding: .constant("")
                 )
                 .focused(focusedType, equals: HealthType.activeEnergy)
                 Text(settingsStore.energyUnit.abbreviation)

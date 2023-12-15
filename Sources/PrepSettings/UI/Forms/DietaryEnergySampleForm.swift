@@ -146,6 +146,7 @@ struct DietaryEnergySampleForm: View {
             return HealthNumberField(
                 unitBinding: unitBinding,
                 valueBinding: binding,
+                valueString: .constant(""),
                 focusedType: $focusedType,
                 healthType: .maintenance /// placeholder that's not really needed for any function
             )

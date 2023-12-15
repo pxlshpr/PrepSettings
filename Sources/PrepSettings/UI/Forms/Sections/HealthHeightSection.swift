@@ -71,7 +71,10 @@ struct HealthHeightSection: View {
         HeightField(
             unit: $settingsStore.heightUnit,
             valueInCm: $model.heightValue,
-            focusedType: focusedType
+            focusedType: focusedType,
+            disabled: .constant(false),
+            valueString: .constant(""),
+            secondComponentString: .constant("")
         )
     }
 }
