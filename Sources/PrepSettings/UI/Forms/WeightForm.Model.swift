@@ -483,10 +483,10 @@ extension WeightForm.Model {
                 isRemoved = false
                 if healthModel.isCurrent {
                     healthModel.health.weight = weight
-//                    healthModel.health.weight = .init(
-//                        source: .userEntered,
-//                        quantity: .init(value: nil)
-//                    )
+                } else {
+                    value = nil
+                    source = .userEntered
+                    isDailyAverage = nil
                 }
             default:
                 break
