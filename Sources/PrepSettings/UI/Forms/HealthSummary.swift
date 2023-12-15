@@ -21,7 +21,7 @@ public struct HealthSummary: View {
                 Color.clear
             }
         }
-        .navigationTitle("Health Details")
+        .navigationTitle("\(!model.isCurrent ? "Past" : "") Health Details")
         .navigationBarTitleDisplayMode(.large)
         .toolbar { toolbarContent }
         .onAppear(perform: appeared)
@@ -47,8 +47,9 @@ public struct HealthSummary: View {
         
         var date: Date { model.health.date }
         
+        @ViewBuilder
         var footer: some View {
-            Text("You are viewing the health details of a past date. Changes will not affect your current health details and will only affect the goals you had set on this day.")
+            Text("You are viewing the health details of a past date. Changes will not affect your current health details and will only affect the goals for the plan you had set on that day.")
         }
         
         return Group {
@@ -65,46 +66,11 @@ public struct HealthSummary: View {
     }
     
     var toolbarContent: some ToolbarContent {
-        var pastContent: some ToolbarContent {
-            Group {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if model.isEditing {
-                        Button("Done") {
-                            
-                        }
-                        .fontWeight(.semibold)
-                    } else {
-                        Button("Edit") {
-                            
-                        }
-                        .fontWeight(.semibold)
-                    }
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button("Done") {
+                dismiss()
             }
-        }
-        
-        var currentContent: some ToolbarContent {
-            Group {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
-        }
-        
-        return Group {
-            if model.isCurrent {
-                currentContent
-            } else {
-                pastContent
-            }
+            .fontWeight(.semibold)
         }
     }
     
@@ -182,7 +148,7 @@ public struct HealthSummary: View {
         }
         
         return Group {
-            if model.health.shouldShowSyncAllTip {
+            if model.health.shouldShowSyncAllSection {
                 section
             }
         }

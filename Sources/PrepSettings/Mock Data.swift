@@ -4,7 +4,7 @@ import PrepShared
 public let MockCurrentHealthModel = HealthModel(
     delegate: MockCurrentHealthModelDelegate(),
     fetchCurrentHealthHandler: {
-        let healthDetails: HealthDetails = try await fetchFromBackend(.currentHealthDetails)
+        let healthDetails: HealthDetails = fetchFromBackend(.currentHealthDetails)
         return healthDetails
     }
 )
@@ -12,7 +12,7 @@ public let MockCurrentHealthModel = HealthModel(
 public let MockPastHealthModel = HealthModel(
     delegate: MockPastHealthModelDelegate(),
     fetchCurrentHealthHandler: {
-        let healthDetails: HealthDetails = try await fetchFromBackend(.pastHealthDetails)
+        let healthDetails: HealthDetails = fetchFromBackend(.pastHealthDetails)
         return healthDetails
     }
 )
@@ -23,8 +23,8 @@ struct MockCurrentHealthModelDelegate: HealthModelDelegate {
     }
     
     func maintenanceBackendValues(for dateRange: ClosedRange<Date>) async throws -> MaintenanceValues {
-        let weights: WeightValues = try await fetchFromBackend(.weight)
-        let dietaryEnergies: DietaryEnergyValues = try await fetchFromBackend(.dietaryEnergy)
+        let weights: WeightValues = fetchFromBackend(.weight)
+        let dietaryEnergies: DietaryEnergyValues = fetchFromBackend(.dietaryEnergy)
         return MaintenanceValues(
             dateRange: dateRange,
             weightValues: weights,
@@ -33,7 +33,7 @@ struct MockCurrentHealthModelDelegate: HealthModelDelegate {
     }
     
     func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthQuantity] {
-        let weightValues: WeightValues = try await fetchFromBackend(.weight)
+        let weightValues: WeightValues = fetchFromBackend(.weight)
         return weightValues.values
     }
     
@@ -43,11 +43,11 @@ struct MockCurrentHealthModelDelegate: HealthModelDelegate {
     ) async throws {
         
         /// [ ] Load weightValues from backend, amend the value, save it
-        var weightValues: WeightValues = try await fetchFromBackend(.weight)
+        var weightValues: WeightValues = fetchFromBackend(.weight)
         weightValues.values[date] = healthQuantity
         try await saveInBackend(.weight, weightValues)
         
-//        var healthDetails: Health = try await fetchFromBackend(.healthDetails)
+//        var healthDetails: Health = fetchFromBackend(.healthDetails)
 //        if healthDetails.date == date {
 //            if let healthQuantity {
 //                healthDetails.weight = healthQuantity
@@ -75,19 +75,22 @@ struct MockCurrentHealthModelDelegate: HealthModelDelegate {
     }
     
     func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
-        let data: DietaryEnergyValues = try await fetchFromBackend(.dietaryEnergy)
+        let data: DietaryEnergyValues = fetchFromBackend(.dietaryEnergy)
         return data.values[date]?.dietaryEnergyInKcal
     }
 }
 
-struct MockPastHealthModelDelegate: HealthModelDelegate {
-    func saveHealth(_ healthDetails: HealthDetails, isCurrent: Bool) async throws {
+public struct MockPastHealthModelDelegate: HealthModelDelegate {
+    
+    public init() { }
+    
+    public func saveHealth(_ healthDetails: HealthDetails, isCurrent: Bool) async throws {
         try await saveInBackend(.pastHealthDetails, healthDetails)
     }
     
-    func maintenanceBackendValues(for dateRange: ClosedRange<Date>) async throws -> MaintenanceValues {
-        let weights: WeightValues = try await fetchFromBackend(.weight)
-        let dietaryEnergies: DietaryEnergyValues = try await fetchFromBackend(.dietaryEnergy)
+    public func maintenanceBackendValues(for dateRange: ClosedRange<Date>) async throws -> MaintenanceValues {
+        let weights: WeightValues = fetchFromBackend(.weight)
+        let dietaryEnergies: DietaryEnergyValues = fetchFromBackend(.dietaryEnergy)
         return MaintenanceValues(
             dateRange: dateRange,
             weightValues: weights,
@@ -95,26 +98,26 @@ struct MockPastHealthModelDelegate: HealthModelDelegate {
         )
     }
     
-    func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthQuantity] {
-        let weightValues: WeightValues = try await fetchFromBackend(.weight)
+    public func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthQuantity] {
+        let weightValues: WeightValues = fetchFromBackend(.weight)
         return weightValues.values
     }
     
-    func updateBackendWithWeight(
+    public func updateBackendWithWeight(
         _ healthQuantity: HealthQuantity?,
         for date: Date
     ) async throws {
-        var weightValues: WeightValues = try await fetchFromBackend(.weight)
+        var weightValues: WeightValues = fetchFromBackend(.weight)
         weightValues.values[date] = healthQuantity
         try await saveInBackend(.weight, weightValues)
     }
     
-    func planIsWeightDependent(on date: Date) async throws -> Bool {
+    public func planIsWeightDependent(on date: Date) async throws -> Bool {
         false
     }
     
-    func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
-        let data: DietaryEnergyValues = try await fetchFromBackend(.dietaryEnergy)
+    public func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
+        let data: DietaryEnergyValues = fetchFromBackend(.dietaryEnergy)
         return data.values[date]?.dietaryEnergyInKcal
     }
 }
@@ -123,7 +126,7 @@ public extension SettingsStore {
     static func configureAsMock() {
         configure(
             fetchHandler: {
-                let settings: Settings = try await fetchFromBackend(.settings)
+                let settings: Settings = fetchFromBackend(.settings)
                 return settings
             },
             saveHandler: { settings in
@@ -145,7 +148,7 @@ func getDocumentsDirectory() -> URL {
     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
 }
 
-func fetchFromBackend<T: Codable>(_ type: MockType) async throws -> T {
+public func fetchFromBackend<T: Codable>(_ type: MockType) -> T {
     let url = getDocumentsDirectory().appendingPathComponent("\(type.rawValue).json")
     do {
         let data = try Data(contentsOf: url)
@@ -163,7 +166,7 @@ func saveInBackend<T>(_ type: MockType, _ toEncode: T) async throws where T:Coda
 }
 
 
-enum MockType: String {
+public enum MockType: String {
     case currentHealthDetails
     case pastHealthDetails
     case settings

@@ -105,22 +105,12 @@ struct HealthLink: View {
     let type: HealthType
     
     var body: some View {
-        Group {
-            if model.isEditing {
-                navigationLink
-                    .navigationDestination(for: HealthType.self) { type in
-                        HealthForm(model, [type])
-                            .environment(settingsStore)
-                    }
-            } else {
-                label
-            }
-        }
-    }
-    
-    var navigationLink: some View {
         NavigationLink(value: type) {
             label
+        }
+        .navigationDestination(for: HealthType.self) { type in
+            HealthForm(model, [type])
+                .environment(settingsStore)
         }
     }
     
@@ -130,7 +120,6 @@ struct HealthLink: View {
             Spacer()
             if let string = model.health.summaryDetail(for: type) {
                 Text(string)
-                    .foregroundStyle(model.isEditing ? .primary : .secondary)
             } else {
                 Text("Not Set")
                     .foregroundStyle(.secondary)

@@ -11,12 +11,21 @@ import PrepSettings
 struct ContentView: View {
     
     @State var currentHealthModel: HealthModel = MockCurrentHealthModel
-    @State var pastHealthModel: HealthModel = MockCurrentHealthModel
+    @State var pastHealthModel: HealthModel
 
     @State var settingsStore: SettingsStore = SettingsStore.shared
     
     @State var showingCurrentHealthDetails = false
     @State var showingPastHealthDetails = false
+    
+    init() {
+        let healthDetails: HealthDetails = fetchFromBackend(.pastHealthDetails)
+        let healthModel = HealthModel(
+            delegate: MockPastHealthModelDelegate(),
+            health: healthDetails
+        )
+        _pastHealthModel = State(initialValue: healthModel)
+    }
     
     var body: some View {
         NavigationStack {
@@ -45,7 +54,7 @@ struct ContentView: View {
     
     var pastHealthSummary: some View {
         NavigationStack {
-            HealthSummary(model: currentHealthModel)
+            HealthSummary(model: pastHealthModel)
                 .environment(settingsStore)
         }
     }

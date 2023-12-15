@@ -111,8 +111,9 @@ public extension HealthDetails {
     }
 }
 public extension HealthDetails {
-    var shouldShowSyncAllTip: Bool {
-        doesNotHaveAnyHealthKitBasedTypesSet
+    var shouldShowSyncAllSection: Bool {
+        date.startOfDay == Date.now.startOfDay
+        && doesNotHaveAnyHealthKitBasedTypesSet
         && skipSyncAll == false
     }
     
