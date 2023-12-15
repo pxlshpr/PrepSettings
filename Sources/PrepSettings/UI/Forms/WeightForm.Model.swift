@@ -15,6 +15,11 @@ extension WeightForm {
         var date: Date
 
         var value: Double?
+        var valueString: String?
+//        var includeTrailingPeriod: Bool = false
+//        var includeTrailingZero: Bool = false
+//        var numberOfTrailingZeros: Int = 0
+        
         var sample: WeightSample?
         var isDailyAverage: Bool?
         var sampleSource: WeightSampleSource?
@@ -39,6 +44,7 @@ extension WeightForm {
             
             let weight = healthModel.health.weight
             self.value = weight?.valueInKg
+            self.valueString = weight?.valueInKg?.cleanWithoutRounding
             self.source = weight?.source
             self.isDailyAverage = weight?.isDailyAverage
             
@@ -110,6 +116,9 @@ extension WeightForm.Model {
     func doneEditing() {
         switch formType {
         case .healthDetails:
+            if value == nil {
+                removeWeight()
+            }
             if isRemoved {
                 healthModel.health.weight = nil
             } else {

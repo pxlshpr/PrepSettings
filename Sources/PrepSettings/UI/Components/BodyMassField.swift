@@ -8,11 +8,29 @@ struct BodyMassField: View {
     var focusedType: FocusState<HealthType?>.Binding
     var healthType: HealthType
     @Binding var disabled: Bool
+    var valueString: Binding<String?>?
+    
+    init(
+        unit: Binding<BodyMassUnit>,
+        valueInKg: Binding<Double?>,
+        focusedType: FocusState<HealthType?>.Binding,
+        healthType: HealthType,
+        disabled: Binding<Bool>,
+        valueString: Binding<String?>? = nil
+    ) {
+        _unit = unit
+        _valueInKg = valueInKg
+        self.focusedType = focusedType
+        self.healthType = healthType
+        _disabled = disabled
+        self.valueString = valueString
+    }
 
     var body: some View {
         HealthNumberField(
             unitBinding: $unit,
             valueBinding: valueInDisplayedUnit,
+            valueString: valueString,
             firstComponentBinding: stonesComponent,
             secondComponentBinding: poundsComponent,
             focusedType: focusedType,

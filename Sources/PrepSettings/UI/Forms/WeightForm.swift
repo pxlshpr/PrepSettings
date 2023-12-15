@@ -210,6 +210,9 @@ extension WeightForm {
                 withAnimation {
                     healthModel.isEditing = true
                     model.startEditing()
+                    if model.isUserEntered {
+                        focusTextField(afterDelay: true)
+                    }
                 }
             }
         }
@@ -538,7 +541,8 @@ extension WeightForm {
     
     func focusTextField(afterDelay: Bool = false) {
 //        Haptics.selectionFeedback()
-        DispatchQueue.main.asyncAfter(deadline: .now() + (afterDelay ? 0.3 : 0)) {
+        let deadline: DispatchTime = .now() + (afterDelay ? 0.1 : 0)
+        DispatchQueue.main.asyncAfter(deadline: deadline) {
             focusedType = .weight
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 sendSelectAllTextAction()
@@ -583,7 +587,9 @@ extension WeightForm {
         var textField: some View {
             let value = Binding<Double?>(
                 get: { model.value },
-                set: { model.textFieldValueChanged(to: $0) }
+                set: {
+                    model.textFieldValueChanged(to: $0)
+                }
             )
             
             let disabled = Binding<Bool>(
@@ -597,7 +603,8 @@ extension WeightForm {
                     valueInKg: value,
                     focusedType: $focusedType,
                     healthType: .weight,
-                    disabled: disabled
+                    disabled: disabled,
+                    valueString: $model.valueString
                 )
             }
             

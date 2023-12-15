@@ -10,7 +10,8 @@ public struct NumberField: View {
     
     let roundUp: Bool
     let doubleBinding: Binding<Double?>?
-    
+    let stringBinding: Binding<String?>?
+
     let intBinding: Binding<Int?>?
     let disabled: Binding<Bool>?
     
@@ -24,12 +25,14 @@ public struct NumberField: View {
         placeholder: String = "",
         roundUp: Bool = false,
         binding: Binding<Double?>,
+        stringBinding: Binding<String?>? = nil,
         font: Font? = nil,
         disabled: Binding<Bool>? = nil
     ) {
         self.placeholder = placeholder
         self.roundUp = roundUp
         self.doubleBinding = binding
+        self.stringBinding = stringBinding
         self.intBinding = nil
         self.font = font
         self.disabled = disabled
@@ -45,6 +48,7 @@ public struct NumberField: View {
         self.roundUp = true
         self.intBinding = binding
         self.doubleBinding = nil
+        self.stringBinding = nil
         self.font = font
         self.disabled = disabled
     }
@@ -71,12 +75,15 @@ public struct NumberField: View {
     var textField: some View {
         let textBinding = Binding<String>(
             get: {
-                if let doubleBinding {
+                if let string = stringBinding?.wrappedValue {
+                    return string
+                } else if let doubleBinding {
                     
                     var string: String
                     
                     if let value = doubleBinding.wrappedValue {
                         
+                        print("Getting string for: \(value)")
                         if includeTrailingZero {
                             string = "0.0"
                         } else {
@@ -86,6 +93,10 @@ public struct NumberField: View {
                                 string = formatter.string(from: number) ?? ""
                             } else {
                                 string = "\(NSNumber(value: value).decimalValue)"
+//                                if string.hasSuffix(".0") {
+//                                    string.removeLast(2)
+//                                }
+//                                string = "\(NSNumber(value: value).doubleValue)"
                             }
                         }
                         
@@ -106,6 +117,7 @@ public struct NumberField: View {
                     
                     /// Cleanup by removing any extra periods and non-numbers
                     let newValue = newValue.sanitizedDouble
+                    stringBinding?.wrappedValue = newValue
                     
                     print("newValue: \(newValue)")
                     /// If we haven't already set the flag for the trailing period, and the string has period as its last character, set it so that its displayed
@@ -126,6 +138,7 @@ public struct NumberField: View {
                     }
                     
                     let double = Double(newValue)
+                    print("setting doubleBinding with: \(String(describing: double))")
                     doubleBinding.wrappedValue = double
                 } else if let intBinding {
                     intBinding.wrappedValue = Int(newValue)
