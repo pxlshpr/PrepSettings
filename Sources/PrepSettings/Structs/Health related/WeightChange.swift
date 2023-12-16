@@ -51,48 +51,48 @@ public extension WeightChange {
 }
 
 extension WeightChange {
-    mutating func setValues(
-        _ values: MaintenanceValues,
-        _ date: Date,
-        _ maintenanceInterval: HealthInterval
-    ) {
-        
-        let previousDate = maintenanceInterval.startDate(with: date)
-
-        func movingAverageWeightSample(on date: Date, interval: HealthInterval) -> WeightSample {
-            var movingAverageValues: [Int: Double] = [:]
-            for i in 0..<interval.numberOfDays {
-                let movedDate = date.moveDayBy(-i)
-                if let value = values.weightInKg(on: movedDate) {
-                    movingAverageValues[i] = value
-                }
-            }
-            let value = Array(movingAverageValues.values).averageValue
-            return WeightSample(
-                movingAverageInterval: interval,
-//                movingAverageValues: movingAverageValues,
-                value: value
-            )
-        }
-        
-        func weightSample(on date: Date) -> WeightSample {
-            WeightSample(
-                movingAverageInterval: nil,
-//                movingAverageValues: nil,
-                value: values.weightInKg(on: date)
-            )
-        }
-        
-        self.current = if let interval = current.movingAverageInterval {
-            movingAverageWeightSample(on: date, interval: interval)
-        } else {
-            weightSample(on: date)
-        }
-        
-        self.previous = if let interval = previous.movingAverageInterval {
-            movingAverageWeightSample(on: previousDate, interval: interval)
-        } else {
-            weightSample(on: previousDate)
-        }
-    }
+//    mutating func setValues(
+//        _ values: MaintenanceValues,
+//        _ date: Date,
+//        _ maintenanceInterval: HealthInterval
+//    ) {
+//        
+//        let previousDate = maintenanceInterval.startDate(with: date)
+//
+//        func movingAverageWeightSample(on date: Date, interval: HealthInterval) -> WeightSample {
+//            var movingAverageValues: [Int: Double] = [:]
+//            for i in 0..<interval.numberOfDays {
+//                let movedDate = date.moveDayBy(-i)
+//                if let value = values.weightInKg(on: movedDate) {
+//                    movingAverageValues[i] = value
+//                }
+//            }
+//            let value = Array(movingAverageValues.values).averageValue
+//            return WeightSample(
+//                movingAverageInterval: interval,
+////                movingAverageValues: movingAverageValues,
+//                value: value
+//            )
+//        }
+//        
+//        func weightSample(on date: Date) -> WeightSample {
+//            WeightSample(
+//                movingAverageInterval: nil,
+////                movingAverageValues: nil,
+//                value: values.weightInKg(on: date)
+//            )
+//        }
+//        
+//        self.current = if let interval = current.movingAverageInterval {
+//            movingAverageWeightSample(on: date, interval: interval)
+//        } else {
+//            weightSample(on: date)
+//        }
+//        
+//        self.previous = if let interval = previous.movingAverageInterval {
+//            movingAverageWeightSample(on: previousDate, interval: interval)
+//        } else {
+//            weightSample(on: previousDate)
+//        }
+//    }
 }

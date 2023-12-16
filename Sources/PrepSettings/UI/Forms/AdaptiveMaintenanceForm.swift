@@ -73,32 +73,32 @@ struct AdaptiveMaintenanceForm: View {
         )
     }
     
-    var intervalSection_: some View {
-        
-        var stepper: some View {
-            Stepper(
-                "",
-                value: healthModel.intervalValueBinding,
-                in: healthModel.intervalPeriod.range
-            )
-            .fixedSize()
-        }
-        
-        var value: some View {
-            Text("\(healthModel.intervalValueBinding.wrappedValue)")
-                .font(NumberFont)
-                .contentTransition(.numericText(value: Double(healthModel.intervalValueBinding.wrappedValue)))
-        }
-        
-        return Section("Calculate Over") {
-            HStack {
-                stepper
-                Spacer()
-                value
-            }
-            PickerSection([.day, .week], healthModel.intervalPeriodBinding)
-        }
-    }
+//    var intervalSection_: some View {
+//        
+//        var stepper: some View {
+//            Stepper(
+//                "",
+//                value: healthModel.intervalValueBinding,
+//                in: healthModel.intervalPeriod.range
+//            )
+//            .fixedSize()
+//        }
+//        
+//        var value: some View {
+//            Text("\(healthModel.intervalValueBinding.wrappedValue)")
+//                .font(NumberFont)
+//                .contentTransition(.numericText(value: Double(healthModel.intervalValueBinding.wrappedValue)))
+//        }
+//        
+//        return Section("Calculate Over") {
+//            HStack {
+//                stepper
+//                Spacer()
+//                value
+//            }
+//            PickerSection([.day, .week], healthModel.intervalPeriodBinding)
+//        }
+//    }
     
     var intervalString: String {
         "\(healthModel.intervalValue) \(healthModel.intervalPeriod.name.lowercased())\(healthModel.intervalValue > 1 ? "s" : "")"

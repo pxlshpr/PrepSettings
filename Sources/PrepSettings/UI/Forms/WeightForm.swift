@@ -308,11 +308,12 @@ extension WeightForm {
         
         let intervalBinding = Binding<HealthInterval>(
             get: {
-                model.sample?.movingAverageInterval ?? .default
+                model.sample?.movingAverage?.interval ?? DefaultWeightMovingAverageInterval
             },
             set: { newValue in
                 withAnimation {
-                    model.sample?.movingAverageInterval = newValue
+                    model.sample?.movingAverage?.interval = newValue
+                    //TODO: MovingAverage – Add/remove MovingAverageWeights in array based on new interval
                     model.setMovingAverageValue()
                 }
             }
@@ -485,23 +486,16 @@ extension WeightForm {
                     healthModel: healthModel,
                     settingsStore: settingsStore
                 )
-//                WeightAveragedSampleForm(
-//                    value: weight.value,
-//                    date: weight.date,
-//                    healthModel: healthModel,
-//                    settingsStore: settingsStore,
-//                    didSaveWeight: { _ in
-//                        
-//                    }
-//                )
             }
         }
 
         return Group {
             if model.shouldShowMovingAverageSections {
                 Section {
-                    ForEach(model.movingAverageDatedWeights, id: \.self) {
-                        cell(weight: $0)
+                    ForEach(model.movingAverageWeights, id: \.self) { _ in
+                        //TODO: MovingAverage - Revisit this
+                        Text("Todo")
+//                        cell(weight: $0)
                     }
 //                    ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) {
 //                        cell(

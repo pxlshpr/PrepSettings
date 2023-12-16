@@ -3,16 +3,20 @@ import PrepShared
 
 public let DefaultMaintenanceEnergyInterval: HealthInterval = .init(1, .week)
 public let DefaultWeightMovingAverageInterval: HealthInterval = .init(1, .week)
+public let DefaultMovingAverageWeights: [HealthDetails.Weight] = Array(
+    repeating: .init(source: .healthKit, isDailyAverage: true),
+    count: DefaultWeightMovingAverageInterval.numberOfDays
+)
 
 extension HealthDetails {
-    var dateRangeForMaintenanceBackendValues: ClosedRange<Date> {
-        let interval = maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval
-        let previousWeightMovingAverageInterval = maintenance?.adaptive.weightChange.previous.movingAverageInterval ?? DefaultWeightMovingAverageInterval
-        
-        let intervalStartDate = interval.startDate(with: date)
-        let movingAverageStartDate = previousWeightMovingAverageInterval.startDate(with: intervalStartDate)
-        return movingAverageStartDate...date
-    }
+//    var dateRangeForMaintenanceBackendValues: ClosedRange<Date> {
+//        let interval = maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval
+//        let previousWeightMovingAverageInterval = maintenance?.adaptive.weightChange.previous.movingAverageInterval ?? DefaultWeightMovingAverageInterval
+//        
+//        let intervalStartDate = interval.startDate(with: date)
+//        let movingAverageStartDate = previousWeightMovingAverageInterval.startDate(with: intervalStartDate)
+//        return movingAverageStartDate...date
+//    }
 
     var dateRangeForMaintenanceCalculation: ClosedRange<Date> {
         let interval = maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval

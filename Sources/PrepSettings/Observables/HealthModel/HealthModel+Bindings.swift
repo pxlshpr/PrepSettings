@@ -54,7 +54,8 @@ public extension HealthModel {
                     break
                 }
                 
-                try await fetchBackendValuesForAdaptiveMaintenance()
+                //TODO: MovingAverage - Revisit this
+//                try await fetchBackendValuesForAdaptiveMaintenance()
             }
         }
     }
@@ -288,40 +289,40 @@ public extension HealthModel {
 }
 
 extension HealthModel {
-    var intervalValueBinding: Binding<Int> {
-        Binding<Int>(
-            get: { self.intervalValue },
-            set: { newValue in
-                withAnimation {
-                    self.health.maintenance?.adaptive.interval = .init(newValue, self.intervalPeriod)
-                }
-                Task {
-                    try await self.fetchBackendValuesForAdaptiveMaintenance()
-                }
-            }
-        )
-    }
+//    var intervalValueBinding: Binding<Int> {
+//        Binding<Int>(
+//            get: { self.intervalValue },
+//            set: { newValue in
+//                withAnimation {
+//                    self.health.maintenance?.adaptive.interval = .init(newValue, self.intervalPeriod)
+//                }
+//                Task {
+//                    try await self.fetchBackendValuesForAdaptiveMaintenance()
+//                }
+//            }
+//        )
+//    }
     
-    var intervalPeriodBinding: Binding<HealthPeriod> {
-        Binding<HealthPeriod>(
-            get: { self.intervalPeriod },
-            set: { newValue in
-                withAnimation {
-                    var value = self.intervalValue
-                    switch newValue {
-                    case .day:
-                        value = max(2, value)
-                    default:
-                        break
-                    }
-                    self.health.maintenance?.adaptive.interval = .init(value, newValue)
-                }
-                Task {
-                    try await self.fetchBackendValuesForAdaptiveMaintenance()
-                }
-            }
-        )
-    }
+//    var intervalPeriodBinding: Binding<HealthPeriod> {
+//        Binding<HealthPeriod>(
+//            get: { self.intervalPeriod },
+//            set: { newValue in
+//                withAnimation {
+//                    var value = self.intervalValue
+//                    switch newValue {
+//                    case .day:
+//                        value = max(2, value)
+//                    default:
+//                        break
+//                    }
+//                    self.health.maintenance?.adaptive.interval = .init(value, newValue)
+//                }
+//                Task {
+//                    try await self.fetchBackendValuesForAdaptiveMaintenance()
+//                }
+//            }
+//        )
+//    }
     
     var maintenance: HealthDetails.Maintenance {
         health.maintenance ?? .init()

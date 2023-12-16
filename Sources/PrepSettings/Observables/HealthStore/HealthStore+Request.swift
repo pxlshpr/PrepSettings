@@ -1,9 +1,6 @@
 import HealthKit
 import PrepShared
 
-let DefaultNumberOfDaysForAdaptiveMaintenance = 7
-let DefaultNumberOfDaysForMovingAverage = 7
-
 extension HealthStore {
 
     static func latestDaysWeights(

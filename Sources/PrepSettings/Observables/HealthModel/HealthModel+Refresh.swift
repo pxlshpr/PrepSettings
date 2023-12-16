@@ -130,10 +130,10 @@ public extension HealthDetails {
             return
         }
 
+        modifyAdaptiveMaintenanceForNewDay()
+
         /// Set the date to the new day (today)
         self.date = Date.now.startOfDay
-        
-        modifyAdaptiveMaintenanceForNewDay()
     }
     
     mutating func modifyAdaptiveMaintenanceForNewDay() {
@@ -145,29 +145,30 @@ public extension HealthDetails {
             
             switch weightChange.type {
             case .userEntered:
-                /// If WeightChange delta is custom, set ot nil—since the delta would now be invalid
+                /// If type is `.custom`, set ot nil—since the delta would now be invalid
                 maintenance?.adaptive.weightChange.delta = nil
 
             case .usingWeights:
-                if weightChange.current.source == .userEntered {
-                    /// Clear the value as it does not apply to the new day
-                    maintenance?.adaptive.weightChange.current.value = nil
-                }
-                
-                if weightChange.previous.source == .userEntered {
-                    /// Clear the value as it does not apply to the new day
-                    maintenance?.adaptive.weightChange.previous.value = nil
-                }
+                maintenance?.adaptive.weightChange.current.modifyForNewDay(from: date)
+                maintenance?.adaptive.weightChange.previous.modifyForNewDay(from: date)
             }
         }
         
         func modifyDietaryEnergy() {
             
-            /// Insert a new empty `DietarySample` at the start with a type of `.log` (so that its value will be fetched in the next refrehs)
-            maintenance?.adaptive.dietaryEnergy.samples.insert(.init(type: .logged, value: nil), at: 0)
+            /// Determine how much to shift the array by getting the number of days since `date` (up to a maximum of the number of days in the interval)
+            guard let intervalDays = maintenance?.adaptive.interval.numberOfDays else { return }
+            let shiftCount = min(intervalDays, Date.now.numberOfDaysFrom(date))
+
+            /// Insert that many new samples at start of array with source set as `.logged`
+            let newSamples = Array(
+                repeating: DietaryEnergySample(type: .logged),
+                count: shiftCount
+            )
+            maintenance?.adaptive.dietaryEnergy.samples.insert(contentsOf: newSamples, at: 0)
             
-            /// Remove the last `DietarySample` to maintain the interval
-            maintenance?.adaptive.dietaryEnergy.samples.removeLast()
+            /// Remove that many samples from the end of the array to maintain the number of days of the interval
+            maintenance?.adaptive.dietaryEnergy.samples.removeLast(shiftCount)
         }
         
         modifyWeightChange()

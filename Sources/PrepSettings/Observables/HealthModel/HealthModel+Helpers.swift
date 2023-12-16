@@ -22,8 +22,8 @@ extension HealthModel {
         switch type {
         case .maintenance:
             Task {
-//                try await sleepTask(1)
-                try await fetchBackendValuesForAdaptiveMaintenance()
+                //TODO: MovingAverage - Revisit this
+//                try await fetchBackendValuesForAdaptiveMaintenance()
             }
         default:
             break

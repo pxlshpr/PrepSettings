@@ -9,51 +9,51 @@ extension HealthModel {
     }
     
     /// Used when turning on adaptive calculation initially. Fetches backend and HealthKit data and calculates using those
-    func fetchBackendValuesForAdaptiveMaintenance() async throws {
-        
-        /// Get the backend values for the date range spanning the st
-        let dateRange = health.dateRangeForMaintenanceBackendValues
-        var values = try await delegate.maintenanceBackendValues(for: dateRange)
-        
-        if !isPreview {
-            //TODO: Do these in parallel
-//            try await values.fillInMissingWeightsFromHealthKit(healthModel: self)
-//            try await values.fillInMissingDietaryEnergyFromHealthKit()
-        } else {
-            /// Don't touch HealthKit if we've in a preview
-        }
-        
-        let adaptive = HealthDetails.Maintenance.Adaptive(
-            interval: health.maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval,
-            weightChange: weightChange(from: values),
-            dietaryEnergy: dietaryEnergy(from: values)
-        )
-
-        await MainActor.run {
-            withAnimation {
-                health.maintenance?.adaptive = adaptive
-            }
-        }
-    }
+//    func fetchBackendValuesForAdaptiveMaintenance() async throws {
+//        
+//        /// Get the backend values for the date range spanning the st
+//        let dateRange = health.dateRangeForMaintenanceBackendValues
+//        var values = try await delegate.maintenanceBackendValues(for: dateRange)
+//        
+//        if !isPreview {
+//            //TODO: Do these in parallel
+////            try await values.fillInMissingWeightsFromHealthKit(healthModel: self)
+////            try await values.fillInMissingDietaryEnergyFromHealthKit()
+//        } else {
+//            /// Don't touch HealthKit if we've in a preview
+//        }
+//        
+//        let adaptive = HealthDetails.Maintenance.Adaptive(
+//            interval: health.maintenance?.adaptive.interval ?? DefaultMaintenanceEnergyInterval,
+//            weightChange: weightChange(from: values),
+//            dietaryEnergy: dietaryEnergy(from: values)
+//        )
+//
+//        await MainActor.run {
+//            withAnimation {
+//                health.maintenance?.adaptive = adaptive
+//            }
+//        }
+//    }
 }
 
 extension HealthModel {
     
-    func weightChange(from values: MaintenanceValues) -> WeightChange {
-        let maintenance = health.maintenance ?? .init()
-        var weightChange = maintenance.adaptive.weightChange
-        weightChange.setValues(values, health.date, maintenance.adaptive.interval)
-        weightChange.calculateDelta()
-        return weightChange
-    }
-    
-    func dietaryEnergy(from values: MaintenanceValues) -> DietaryEnergy {
-        let maintenance = health.maintenance ?? .init()
-        var dietaryEnergy = maintenance.adaptive.dietaryEnergy
-        dietaryEnergy.setValues(values, health.date, maintenance.adaptive.interval)
-        dietaryEnergy.fillEmptyValuesWithAverages()
-        return dietaryEnergy
-    }
+//    func weightChange(from values: MaintenanceValues) -> WeightChange {
+//        let maintenance = health.maintenance ?? .init()
+//        var weightChange = maintenance.adaptive.weightChange
+//        weightChange.setValues(values, health.date, maintenance.adaptive.interval)
+//        weightChange.calculateDelta()
+//        return weightChange
+//    }
+//    
+//    func dietaryEnergy(from values: MaintenanceValues) -> DietaryEnergy {
+//        let maintenance = health.maintenance ?? .init()
+//        var dietaryEnergy = maintenance.adaptive.dietaryEnergy
+//        dietaryEnergy.setValues(values, health.date, maintenance.adaptive.interval)
+//        dietaryEnergy.fillEmptyValuesWithAverages()
+//        return dietaryEnergy
+//    }
 }
 
 extension HealthModel {
