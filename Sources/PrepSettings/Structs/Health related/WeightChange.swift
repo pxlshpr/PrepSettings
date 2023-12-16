@@ -13,6 +13,21 @@ public struct WeightChange: Hashable, Codable {
         self.type = .usingWeights
         self.delta = nil
     }
+    
+    public mutating func modifyForNewDay(
+        from date: Date,
+        maintenanceInterval: HealthInterval
+    ) {
+        switch type {
+        case .userEntered:
+            /// If type is `.custom`, set ot nil—since the delta would now be invalid
+            delta = nil
+
+        case .usingWeights:
+            previous.modifyForNewDay(from: date, laterSample: current, interval: maintenanceInterval)
+            current.modifyForNewDay(from: date)
+        }
+    }
 }
 
 public extension WeightChange {

@@ -138,22 +138,6 @@ public extension HealthDetails {
     
     mutating func modifyAdaptiveMaintenanceForNewDay() {
 
-        guard let adaptive = maintenance?.adaptive else { return }
-
-        func modifyWeightChange() {
-            let weightChange = adaptive.weightChange
-            
-            switch weightChange.type {
-            case .userEntered:
-                /// If type is `.custom`, set ot nil—since the delta would now be invalid
-                maintenance?.adaptive.weightChange.delta = nil
-
-            case .usingWeights:
-                maintenance?.adaptive.weightChange.current.modifyForNewDay(from: date)
-                maintenance?.adaptive.weightChange.previous.modifyForNewDay(from: date)
-            }
-        }
-        
         func modifyDietaryEnergy() {
             
             /// Determine how much to shift the array by getting the number of days since `date` (up to a maximum of the number of days in the interval)
@@ -171,7 +155,12 @@ public extension HealthDetails {
             maintenance?.adaptive.dietaryEnergy.samples.removeLast(shiftCount)
         }
         
-        modifyWeightChange()
+        guard let interval = maintenance?.adaptive.interval else { return }
+        maintenance?.adaptive.weightChange.modifyForNewDay(
+            from: date,
+            maintenanceInterval: interval
+        )
+//        modifyWeightChange()
         modifyDietaryEnergy()
     }
 }
