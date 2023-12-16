@@ -2,8 +2,8 @@ import HealthKit
 import PrepShared
 
 extension HealthStore {
-
-    static func latestDaysWeights(
+    
+    static func latestDayOfWeightQuantities(
         in unit: BodyMassUnit = .kg,
         for date: Date = Date.now
     ) async throws -> [Quantity]? {
@@ -12,15 +12,15 @@ extension HealthStore {
             .removingDuplicateQuantities()
     }
 
-    static func daysWeights(
+    static func weightQuantities(
         in unit: BodyMassUnit = .kg,
-        for date: Date
+        on date: Date
     ) async throws -> [Quantity]? {
         try await HealthKitQuantityRequest(.weight, unit.healthKitUnit)
             .daysQuantities(for: date)
     }
 
-    static func daysWeights(
+    static func weightQuantities(
         in unit: BodyMassUnit = .kg,
         for range: ClosedRange<Date>
     ) async throws -> [Quantity]? {

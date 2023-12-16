@@ -49,7 +49,14 @@ public extension HealthDetails {
                 }
             }
             
-            mutating func recalculate() {
+            mutating func recalculateAdaptiveMaintenance() {
+                
+                /// Re-calculate weight delta if needed
+                weightChange.calculateDelta()
+                
+                /// Fill in empty dietary energy days with average values if needed
+                dietaryEnergy.fillEmptyValuesWithAverages()
+                
                 let result = Self.calculate(
                     weightChange: weightChange,
                     dietaryEnergy: dietaryEnergy,

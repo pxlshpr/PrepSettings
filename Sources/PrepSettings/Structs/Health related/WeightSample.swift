@@ -37,6 +37,45 @@ public struct WeightSample: Hashable, Codable {
         self.healthKitQuantities = healthKitQuantities
         self.movingAverage = movingAverage
     }
+    
+    public mutating func refresh(for date: Date) async throws {
+        switch source {
+        case .userEntered:
+            /// Leave user entered weights intact
+            break
+        case .healthKit:
+            /// Query HealthStore for the HealthKit value
+            let quantities = try await HealthStore.weightQuantities(on: date)
+            let value: Double? = if isDailyAverage {
+                quantities?.averageValue?.rounded(toPlaces: 2)
+            } else {
+                quantities?.last?.value
+            }
+
+            self.value = value
+            self.healthKitQuantities = quantities
+            
+        case .movingAverage:
+            guard let movingAverage else { return }
+            /// For each day in the interval, if it's HealthKit sourced—re-fetch the HealthKit value for it
+            for (index, weight) in movingAverage.weights.enumerated() {
+                guard weight.source == .healthKit else { continue }
+//                let date = movingAverage.interval.startDate(with: date)
+                let date = date.moveDayBy(-index)
+
+                let quantities = try await HealthStore.weightQuantities(on: date)
+                let value: Double? = if weight.isDailyAverage {
+                    quantities?.averageValue?.rounded(toPlaces: 2)
+                } else {
+                    quantities?.last?.value
+                }
+                self.movingAverage?.weights[index].valueInKg = value
+                self.movingAverage?.weights[index].healthKitQuantities = quantities
+            }
+            let values = self.movingAverage?.weights.compactMap({ $0.valueInKg }) ?? []
+            self.value = values.averageValue
+        }
+    }
 
     public mutating func modifyForNewDay(
         from date: Date,

@@ -75,8 +75,16 @@ struct MockCurrentHealthModelDelegate: HealthModelDelegate {
     }
     
     func dietaryEnergyInKcal(on date: Date) async throws -> Double? {
-        let data: DietaryEnergyValues = fetchFromBackend(.dietaryEnergy)
-        return data.values[date]?.dietaryEnergyInKcal
+        
+        switch date.dateString {
+        case "2023_12_16": return 3456.25
+        case "2023_12_13": return 3300.24
+        case "2023_12_12": return 3021.4
+        case "2023_12_11": return 4024
+        default:
+            let data: DietaryEnergyValues = fetchFromBackend(.dietaryEnergy)
+            return data.values[date]?.dietaryEnergyInKcal
+        }
     }
 }
 

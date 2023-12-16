@@ -6,11 +6,26 @@ public struct DietaryEnergy: Hashable, Codable {
     
     public init(
         samples: [DietaryEnergySample] = Array.init(
-            repeating: DietaryEnergySample(type: .healthKit),
+            repeating: DietaryEnergySample(type: .logged),
             count: DefaultNumberOfSamples
         )
     ) {
         self.samples = samples
+    }
+    
+    mutating func modifyForNewDay(from date: Date, maintenanceInterval: HealthInterval) {
+        /// Determine how much to shift the array by getting the number of days since `date` (up to a maximum of the number of days in the interval)
+        let shiftCount = min(maintenanceInterval.numberOfDays, Date.now.numberOfDaysFrom(date))
+
+        /// Insert that many new samples at start of array with source set as `.logged`
+        let newSamples = Array(
+            repeating: DietaryEnergySample(type: .logged),
+            count: shiftCount
+        )
+        samples.insert(contentsOf: newSamples, at: 0)
+        
+        /// Remove that many samples from the end of the array to maintain the number of days of the interval
+        samples.removeLast(shiftCount)
     }
     
     static func dateForSample(at index: Int, for date: Date) -> Date {

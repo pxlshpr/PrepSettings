@@ -363,7 +363,7 @@ extension WeightForm.Model {
             /// [ ] Fetch the latest day's values from HealthKit
             /// [ ] Keep this stored in the model
             /// [ ] If this value exists (ie is stored), only then show the Apple Health option in source
-            let quantities = try await HealthStore.latestDaysWeights(in: .kg, for: date)
+            let quantities = try await HealthStore.latestDayOfWeightQuantities(for: date)
             
             await MainActor.run {
                 self.healthKitQuantities = quantities
@@ -373,7 +373,7 @@ extension WeightForm.Model {
             }
 
         case .adaptiveSample, .specificDate:
-            let quantities = try await HealthStore.daysWeights(in: .kg, for: date)?
+            let quantities = try await HealthStore.weightQuantities(on: date)?
                 .removingDuplicateQuantities()
             
             await MainActor.run {

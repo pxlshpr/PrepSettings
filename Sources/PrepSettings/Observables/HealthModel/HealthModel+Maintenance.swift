@@ -4,7 +4,7 @@ extension HealthModel {
     
     func calculateAdaptiveMaintenance() {
         withAnimation {
-            health.maintenance?.adaptive.recalculate()
+            health.maintenance?.adaptive.recalculateAdaptiveMaintenance()
         }
     }
     

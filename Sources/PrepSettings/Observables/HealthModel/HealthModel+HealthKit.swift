@@ -98,7 +98,7 @@ public extension HealthModel {
         
         switch type {
         case .weight: return .weight(
-            try await HealthStore.latestDaysWeights(in: .kg, for: health.date)
+            try await HealthStore.latestDayOfWeightQuantities(for: health.date)
         )
         case .height: return .height(
             try await HealthStore.height(in: .cm, for: health.date)

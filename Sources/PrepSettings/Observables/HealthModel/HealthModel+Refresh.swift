@@ -42,21 +42,18 @@ public extension HealthModel {
     func refreshAdaptiveMaintenance() async throws {
         
         /// Fetch latest Dietary Energy and Weight Samples in parallel tasks
-        try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-            taskGroup.addTask {
+//        try await withThrowingTaskGroup(of: Void.self) { taskGroup in
+//            taskGroup.addTask {
                 try await self.refreshDietaryEnergyValues()
-            }
-            taskGroup.addTask {
+//            }
+//            taskGroup.addTask {
                 try await self.refreshWeightSamples()
-            }
-            while let _ = try await taskGroup.next() { }
-        }
+//            }
+//            while let _ = try await taskGroup.next() { }
+//        }
 
-        /// [ ] Re-calculate weight delta if needed
-
-        /// [ ] Fill in empty dietary energy days with average values if needed
-
-        /// [ ] Recalculate adaptive maintenance
+        /// Recalculate adaptive maintenance
+        health.maintenance?.adaptive.recalculateAdaptiveMaintenance()
     }
     
     func refreshDietaryEnergyValues() async throws {
@@ -67,19 +64,21 @@ public extension HealthModel {
         
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             /// For each day in interval
-            for sample in samples {
+            for (index, sample) in samples.enumerated() {
                 taskGroup.addTask {
-                    switch sample.type {
+                    let date = self.health.date.moveDayBy(-index)
+                    let value: Double? = switch sample.type {
                     case .userEntered, .average:
                         /// Leave user entered samples and averaged values (which are essentially blank) as they are
-                        break
+                        sample.value
                     case .logged:
-                        /// [ ] Query the delegate for the value
-                        break
+                        /// Query the delegate for the value
+                        try await self.delegate.dietaryEnergyInKcal(on: date)
                     case .healthKit:
-                        /// [ ] Query HealthStore for the HealthKit value
-                        break
+                        /// Query HealthStore for the HealthKit value
+                        try await HealthStore.dietaryEnergyTotalInKcal(for: date)
                     }
+                    self.health.maintenance?.adaptive.dietaryEnergy.samples[index].value = value
                 }
             }
             while let _ = try await taskGroup.next() { }
@@ -88,36 +87,20 @@ public extension HealthModel {
     
     func refreshWeightSamples() async throws {
         guard let weightChange = health.maintenance?.adaptive.weightChange,
-              weightChange.type == .usingWeights
+              weightChange.type == .usingWeights,
+              let adaptiveInterval = health.maintenance?.adaptive.interval
         else {
             return
         }
         
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-            
-            switch weightChange.current.source {
-            case .userEntered:
-                /// Leave user entered weights intact
-                break
-            case .healthKit:
-                /// [ ] Query HealthStore for the HealthKit value
-                break
-            case .movingAverage:
-                /// [ ] For each day in the interval, either query the backend for the value (including hte type), OR use the stored type to either get the HealthKit or backend value if needed
-                break
-            }
 
-            switch weightChange.previous.source {
-            case .userEntered:
-                /// Leave user entered weights intact
-                break
-            case .healthKit:
-                /// [ ] Query HealthStore for the HealthKit value
-                break
-            case .movingAverage:
-                /// [ ] For each day in the interval, either query the backend for the value (including hte type), OR use the stored type to either get the HealthKit or backend value if needed
-                break
-            }
+            try await self.health.maintenance?.adaptive.weightChange.current
+                .refresh(for: self.health.date)
+
+            try await self.health.maintenance?.adaptive.weightChange.previous
+                .refresh(for: adaptiveInterval.startDate(with: self.health.date))
+
             while let _ = try await taskGroup.next() { }
         }
     }
@@ -137,30 +120,17 @@ public extension HealthDetails {
     }
     
     mutating func modifyAdaptiveMaintenanceForNewDay() {
-
-        func modifyDietaryEnergy() {
-            
-            /// Determine how much to shift the array by getting the number of days since `date` (up to a maximum of the number of days in the interval)
-            guard let intervalDays = maintenance?.adaptive.interval.numberOfDays else { return }
-            let shiftCount = min(intervalDays, Date.now.numberOfDaysFrom(date))
-
-            /// Insert that many new samples at start of array with source set as `.logged`
-            let newSamples = Array(
-                repeating: DietaryEnergySample(type: .logged),
-                count: shiftCount
-            )
-            maintenance?.adaptive.dietaryEnergy.samples.insert(contentsOf: newSamples, at: 0)
-            
-            /// Remove that many samples from the end of the array to maintain the number of days of the interval
-            maintenance?.adaptive.dietaryEnergy.samples.removeLast(shiftCount)
-        }
         
         guard let interval = maintenance?.adaptive.interval else { return }
+        
         maintenance?.adaptive.weightChange.modifyForNewDay(
             from: date,
             maintenanceInterval: interval
         )
-//        modifyWeightChange()
-        modifyDietaryEnergy()
+        
+        maintenance?.adaptive.dietaryEnergy.modifyForNewDay(
+            from: date,
+            maintenanceInterval: interval
+        )
     }
 }
