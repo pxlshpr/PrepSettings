@@ -6,14 +6,10 @@ public extension HealthDetails {
     //MARK: Recalculators
     
     mutating func recalculate() {
-//        cleanup()
-        
         calculateAge()
         calculateLeanBodyMass()
         calculateRestingEnergy()
         calculateActiveEnergy()
-
-        updatedAt = Date.now
     }
     
     mutating func calculateAge() {

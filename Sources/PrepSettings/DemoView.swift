@@ -47,7 +47,7 @@ public struct DemoView: View {
         }
         .task {
             Task {
-                try await currentHealthModel.refreshHealthKitData()
+                try await currentHealthModel.refresh()
             }
         }
     }

@@ -64,10 +64,6 @@ public extension HealthModel {
             }
             while let _ = try await taskGroup.next() { }
         }
-        
-        await MainActor.run {
-            health.recalculate()
-        }
     }
 }
 

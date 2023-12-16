@@ -110,6 +110,9 @@ public extension HealthDetails {
     
     mutating func handleFetchedHealthKitValue(_ value: HealthKitValue?, for type: HealthType) {
         
+        if type == .weight {
+            print("Handling value: \(String(describing: value))")
+        }
         switch type {
         case .weight:               weight?.handleFetchedHealthKitValue(value)
 //        case .height:           heightQuantity = value?.quantity

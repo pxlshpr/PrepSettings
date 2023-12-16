@@ -2,7 +2,6 @@ import SwiftUI
 import OSLog
 import HealthKit
 import CoreData
-
 import PrepShared
 
 public typealias FetchCurrentHealthHandler = (() async throws -> HealthDetails)
@@ -115,21 +114,5 @@ extension HealthModel {
 //        
 //        health.weight = nil
         //TODO: Handle re-calculating stuff in Health?
-    }
-}
-
-public extension HealthModel {
-
-    func refreshHealthKitData() async throws {
-        
-        guard isCurrent else { return }
-        
-        /// Set the model to ignore changes so that it doesn't redudantly fetch health twice (in `handleChanges`)
-        ignoreChanges = true
-
-        try await fetchHealthKitData()
-
-        /// Now turn off this flag so that manual user changes are handled appropriately
-        ignoreChanges = false
     }
 }

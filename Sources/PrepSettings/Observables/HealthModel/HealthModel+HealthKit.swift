@@ -35,8 +35,9 @@ public extension HealthModel {
             }
         }
         
-        try await fetchHealthKitData()
-        try await saveHealth()
+        try await refresh()
+//        try await fetchHealthKitDataAndRecalculate()
+//        try await saveHealth()
         ignoreChanges = false
     }
 }
