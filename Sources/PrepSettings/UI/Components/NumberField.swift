@@ -83,7 +83,6 @@ public struct NumberField: View {
                     
                     if let value = doubleBinding.wrappedValue {
                         
-                        print("Getting string for: \(value)")
                         if includeTrailingZero {
                             string = "0.0"
                         } else {
@@ -104,7 +103,6 @@ public struct NumberField: View {
                         string = ""
                     }
                     string = string + "\(includeTrailingPeriod ? "." : "")"
-                    print("Returning \(string)")
                     return string
                 } else if let intBinding, let value = intBinding.wrappedValue {
                     return "\(value)"
@@ -119,15 +117,12 @@ public struct NumberField: View {
                     let newValue = newValue.sanitizedDouble
                     stringBinding?.wrappedValue = newValue
                     
-                    print("newValue: \(newValue)")
                     /// If we haven't already set the flag for the trailing period, and the string has period as its last character, set it so that its displayed
                     if !includeTrailingPeriod, newValue.last == "." {
-                        print("setting includeTrailingPeriod to true")
                         includeTrailingPeriod = true
                     }
                     /// If we have set the flag for the trailing period and the last character isn't it—unset it
                     else if includeTrailingPeriod, newValue.last != "." {
-                        print("setting includeTrailingPeriod to false")
                         includeTrailingPeriod = false
                     }
                     
@@ -138,7 +133,6 @@ public struct NumberField: View {
                     }
                     
                     let double = Double(newValue)
-                    print("setting doubleBinding with: \(String(describing: double))")
                     doubleBinding.wrappedValue = double
                 } else if let intBinding {
                     intBinding.wrappedValue = Int(newValue)

@@ -255,6 +255,22 @@ public extension HealthDetails {
             guard let valueInKg else { return nil }
             return BodyMassUnit.kg.convert(valueInKg, to: unit)
         }
+        
+        public mutating func handleFetchedHealthKitValue(_ healthKitValue: HealthKitValue?) {
+            
+            /// Sanity check that the source is in fact HealthKit
+            guard source == .healthKit else { return }
+
+            let quantities = healthKitValue?.quantities
+            let valueInKg: Double? = if isDailyAverage {
+                quantities?.averageValue?.rounded(toPlaces: 2)
+            } else {
+                quantities?.last?.value
+            }
+            
+            self.valueInKg = valueInKg
+            self.healthKitQuantities = quantities
+        }
     }
 
     struct LeanBodyMass: Hashable, Codable {
@@ -281,4 +297,9 @@ public extension HealthDetails {
             self.quantity = quantity
         }
     }
+}
+
+import SwiftUI
+#Preview {
+    DemoView()
 }

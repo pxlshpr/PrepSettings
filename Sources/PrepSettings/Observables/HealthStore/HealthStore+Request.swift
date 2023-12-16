@@ -11,7 +11,8 @@ extension HealthStore {
         for date: Date = Date.now
     ) async throws -> [Quantity]? {
         try await HealthKitQuantityRequest(.weight, unit.healthKitUnit)
-            .mostRecentDaysQuantities(to: date)
+            .mostRecentDaysQuantities(to: date)?
+            .removingDuplicateQuantities()
     }
 
     static func daysWeights(

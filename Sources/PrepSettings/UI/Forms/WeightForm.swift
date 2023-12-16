@@ -626,12 +626,6 @@ extension WeightForm {
                         valueInKg: $model.valueInKg,
                         valueColor: foregroundColor
                     )
-//                    LargeHealthValue(
-//                        value: value,
-//                        valueString: value.clean,
-//                        valueColor: foregroundColor,
-//                        unitString: settingsStore.bodyMassUnit.abbreviation
-//                    )
                 } else {
                     Text("No Data")
                         .foregroundStyle(.secondary)
@@ -682,7 +676,7 @@ extension WeightForm {
         var section: some View {
             Section {
                 errorCell
-                ZStack(alignment: .bottomTrailing) {
+                ZStack(alignment: .trailing) {
                     switch model.formType {
                     case .healthDetails, .specificDate: nonSampleValue
                     case .adaptiveSample:               sampleValue

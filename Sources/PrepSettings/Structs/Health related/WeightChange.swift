@@ -25,7 +25,6 @@ public extension WeightChange {
             delta = nil
             return
         }
-        print("💡 Calculating delta")
         delta = currentValue - previousValue
     }
     

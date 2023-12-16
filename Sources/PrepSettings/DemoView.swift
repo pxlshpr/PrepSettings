@@ -45,6 +45,11 @@ public struct DemoView: View {
         .onAppear {
             SettingsStore.configureAsMock()
         }
+        .task {
+            Task {
+                try await currentHealthModel.refreshHealthKitData()
+            }
+        }
     }
     
     var unitsView: some View {

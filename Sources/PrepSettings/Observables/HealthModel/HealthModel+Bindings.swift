@@ -68,7 +68,7 @@ public extension HealthModel {
                 await MainActor.run {
                     health.restingEnergyIntervalType = newValue
                 }
-                try await setTypeFromHealthKit(.restingEnergy)
+                try await fetchHealthKitData(for: .restingEnergy)
             }
         }
     }
@@ -80,7 +80,7 @@ public extension HealthModel {
                 await MainActor.run {
                     health.activeEnergyIntervalType = newValue
                 }
-                try await setTypeFromHealthKit(.activeEnergy)
+                try await fetchHealthKitData(for: .activeEnergy)
             }
         }
     }
@@ -94,7 +94,7 @@ public extension HealthModel {
                 await MainActor.run {
                     health.restingEnergyIntervalPeriod = newValue
                 }
-                try await setTypeFromHealthKit(.restingEnergy)
+                try await fetchHealthKitData(for: .restingEnergy)
             }
         }
     }
@@ -106,7 +106,7 @@ public extension HealthModel {
                 await MainActor.run {
                     health.activeEnergyIntervalPeriod = newValue
                 }
-                try await setTypeFromHealthKit(.activeEnergy)
+                try await fetchHealthKitData(for: .activeEnergy)
             }
         }
     }
@@ -122,7 +122,7 @@ public extension HealthModel {
                         health.restingEnergyIntervalValue = newValue
                     }
                 }
-                try await setTypeFromHealthKit(.restingEnergy)
+                try await fetchHealthKitData(for: .restingEnergy)
             }
         }
     }
@@ -136,7 +136,7 @@ public extension HealthModel {
                         health.activeEnergyIntervalValue = newValue
                     }
                 }
-                try await setTypeFromHealthKit(.activeEnergy)
+                try await fetchHealthKitData(for: .activeEnergy)
             }
         }
     }

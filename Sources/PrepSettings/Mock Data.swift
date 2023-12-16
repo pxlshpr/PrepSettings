@@ -237,3 +237,23 @@ let MockDietaryEnergy: [String: Double] = [
     "2021_08_15": 2055,
     "2021_08_07": 1965,
 ]
+
+//MARK: - HealthKit Values
+
+func mockWeightQuantities(for date: Date) -> [Quantity]? {
+//    [
+//        .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
+//        .init(value: 94.8, date: date.startOfDay.addingTimeInterval(56520)),
+//    ]
+    
+    [
+        .init(value: 82.5, date: date.startOfDay.addingTimeInterval(14560)),
+        .init(value: 83.15, date: date.startOfDay.addingTimeInterval(46520)),
+    ]
+//
+//    [
+//        .init(value: 73.69, date: date.startOfDay.addingTimeInterval(34560)),
+//    ]
+//
+//    nil
+}

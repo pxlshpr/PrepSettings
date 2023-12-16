@@ -368,25 +368,9 @@ extension WeightForm.Model {
     }
     
     func fetchHealthKitData() async throws {
-        //TODO: Next
-        /// [ ] Handle displaying single value in average section (maybe don't say average of these is being used)
-        /// [ ] Calculations are wrong
         guard !isPreview else {
             await MainActor.run {
-//                self.healthKitQuantities = [
-//                    .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
-//                    .init(value: 94.8, date: date.startOfDay.addingTimeInterval(56520)),
-//                ]
-                
-                self.healthKitQuantities = [
-                    .init(value: 92.5, date: date.startOfDay.addingTimeInterval(14560)),
-                    .init(value: 93.15, date: date.startOfDay.addingTimeInterval(46520)),
-                ]
-
-//                self.healthKitQuantities = [
-//                    .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
-//                ]
-//                self.healthKitQuantities = nil
+                self.healthKitQuantities = mockWeightQuantities(for: date)
             }
             return
         }
@@ -396,8 +380,7 @@ extension WeightForm.Model {
             /// [ ] Fetch the latest day's values from HealthKit
             /// [ ] Keep this stored in the model
             /// [ ] If this value exists (ie is stored), only then show the Apple Health option in source
-            let quantities = try await HealthStore.latestDaysWeights(in: .kg, for: date)?
-                .removingDuplicateQuantities()
+            let quantities = try await HealthStore.latestDaysWeights(in: .kg, for: date)
             
             await MainActor.run {
                 self.healthKitQuantities = quantities
@@ -443,23 +426,8 @@ extension WeightForm.Model {
             healthKitQuantities?.last?.value
         }
         
-        let date = healthKitLatestQuantity?.date
-        
-        let quantity: Quantity?
-        if let value {
-            quantity = Quantity(value: value, date: date)
-        } else {
-            quantity = nil
-        }
-        
         withAnimation {
-            self.valueInKg = if let quantity, isHealthKit {
-                quantity.value
-//                BodyMassUnit.kg.convert(quantity.value, to: SettingsStore.bodyMassUnit)
-            } else {
-                quantity?.value
-            }
-            sample?.value = value
+            self.valueInKg = value
         }
 
         /// Persist value
@@ -468,7 +436,7 @@ extension WeightForm.Model {
             case .healthDetails:
                 healthModel.health.weight = weight
             case .adaptiveSample:
-                setSampleValue(quantity?.value)
+                setSampleValue(value)
             case .specificDate:
                 break
             }
@@ -495,16 +463,19 @@ extension WeightForm.Model {
     
     func setWeight() {
         withAnimation {
+            isRemoved = false
             switch formType {
             case .healthDetails:
-                isRemoved = false
+                valueInKg = nil
+                source = .userEntered
+                isDailyAverage = nil
                 if healthModel.isCurrent {
                     healthModel.health.weight = weight
-                } else {
-                    valueInKg = nil
-                    source = .userEntered
-                    isDailyAverage = nil
                 }
+            case .adaptiveSample:
+                valueInKg = nil
+                sampleSource = .userEntered
+                isDailyAverage = nil
             default:
                 break
             }

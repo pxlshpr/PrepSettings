@@ -40,7 +40,7 @@ public extension HealthModel {
         
         /// Get the first type that has changed from a non-HealthKit source to HealthKit
         if let type = health.typeToFetchFromHealthKit(from: old) {
-            try await setTypeFromHealthKit(type)
+            try await fetchHealthKitData(for: type)
         }
         
         await MainActor.run {
@@ -52,12 +52,14 @@ public extension HealthModel {
         health.valueIsNil(for: type)
     }
     
-    func setFromHealthKit() async throws {
+    func fetchHealthKitData() async throws {
         
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             for type in HealthType.healthKitTypes {
                 if health.sourceIsHealthKit(for: type) {
-                    taskGroup.addTask { try await self.setTypeFromHealthKit(type) }
+                    taskGroup.addTask {
+                        try await self.fetchHealthKitData(for: type)
+                    }
                 }
             }
             while let _ = try await taskGroup.next() { }

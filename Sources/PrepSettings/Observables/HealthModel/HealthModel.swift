@@ -120,11 +120,14 @@ extension HealthModel {
 
 public extension HealthModel {
 
-    func updateHealthValues() async throws {
+    func refreshHealthKitData() async throws {
+        
+        guard isCurrent else { return }
+        
         /// Set the model to ignore changes so that it doesn't redudantly fetch health twice (in `handleChanges`)
         ignoreChanges = true
 
-        try await setFromHealthKit()
+        try await fetchHealthKitData()
 
         /// Now turn off this flag so that manual user changes are handled appropriately
         ignoreChanges = false

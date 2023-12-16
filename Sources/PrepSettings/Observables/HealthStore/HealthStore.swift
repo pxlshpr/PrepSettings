@@ -120,7 +120,6 @@ private extension HealthStore {
             )
         } catch {
             //TODO: This might be an indiciator of needing permissions
-            print("Error getting quantity")
             return nil
         }
     }
