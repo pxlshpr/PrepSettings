@@ -60,6 +60,7 @@ public struct WeightSample: Hashable, Codable {
                 count: shiftCount
             )
             
+            /// Copy across any overlapping values
             if let laterSample, let adaptiveInterval = interval {
                 
                 switch laterSample.source {
@@ -74,7 +75,6 @@ public struct WeightSample: Hashable, Codable {
                         }
                     }
                 case .healthKit, .userEntered:
-                    //TODO: Test this
                     for newIndex in 0..<shiftCount {
                         let i = adaptiveInterval.numberOfDays - (shiftCount - newIndex)
                         guard i < 1 else { continue }
