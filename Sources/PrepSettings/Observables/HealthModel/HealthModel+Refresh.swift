@@ -87,7 +87,39 @@ public extension HealthModel {
     }
     
     func refreshWeightSamples() async throws {
+        guard let weightChange = health.maintenance?.adaptive.weightChange,
+              weightChange.type == .usingWeights
+        else {
+            return
+        }
         
+        try await withThrowingTaskGroup(of: Void.self) { taskGroup in
+            
+            switch weightChange.current.source {
+            case .userEntered:
+                /// Leave user entered weights intact
+                break
+            case .healthKit:
+                /// [ ] Query HealthStore for the HealthKit value
+                break
+            case .movingAverage:
+                /// [ ] For each day in the interval, either query the backend for the value (including hte type), OR use the stored type to either get the HealthKit or backend value if needed
+                break
+            }
+
+            switch weightChange.previous.source {
+            case .userEntered:
+                /// Leave user entered weights intact
+                break
+            case .healthKit:
+                /// [ ] Query HealthStore for the HealthKit value
+                break
+            case .movingAverage:
+                /// [ ] For each day in the interval, either query the backend for the value (including hte type), OR use the stored type to either get the HealthKit or backend value if needed
+                break
+            }
+            while let _ = try await taskGroup.next() { }
+        }
     }
 }
 
