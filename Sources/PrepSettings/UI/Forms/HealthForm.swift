@@ -41,7 +41,6 @@ public struct HealthForm: View {
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .scrollDismissesKeyboard(.interactively)
-            .onChange(of: focusedType, model.focusedTypeChanged)
             .toolbar { keyboardToolbarContent }
         }
     }

@@ -28,6 +28,15 @@ public struct WeightChange: Hashable, Codable {
             current.modifyForNewDay(from: date)
         }
     }
+    
+    mutating func setIsDailyAverage(_ isDailyAverage: Bool, forPrevious: Bool) {
+        switch forPrevious {
+        case true:
+            previous.isDailyAverage = isDailyAverage
+        case false:
+            current.isDailyAverage = isDailyAverage
+        }
+    }
 }
 
 public extension WeightChange {

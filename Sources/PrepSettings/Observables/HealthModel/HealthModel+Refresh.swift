@@ -41,6 +41,7 @@ public extension HealthModel {
 public extension HealthModel {
     func refreshAdaptiveMaintenance() async throws {
         
+        //TODO: Find out why using parallel tasks causes the adaptive struct to lose some data
         /// Fetch latest Dietary Energy and Weight Samples in parallel tasks
 //        try await withThrowingTaskGroup(of: Void.self) { taskGroup in
 //            taskGroup.addTask {

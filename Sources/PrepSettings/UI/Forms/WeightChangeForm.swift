@@ -245,16 +245,31 @@ struct WeightChangeForm: View {
         
         var date: Date { isPrevious ? previousDate : currentDate }
         
-        return NavigationLink(value: WeightSampleRoute(
-            sample: sample,
-            date: date,
-            isPrevious: isPrevious)
-        ) {
-            WeightSampleCell(sample: sample, date: date)
-                .environment(settingsStore)
+        var dateRow: some View {
+            HStack {
+                Text("Date")
+                Spacer()
+                Text(date.adaptiveMaintenanceDateString)
+            }
         }
-        .navigationDestination(for: WeightSampleRoute.self) { route in
-            sampleForm(for: route)
+        
+        var linkRow: some View {
+            NavigationLink(value: WeightSampleRoute(
+                sample: sample,
+                date: date,
+                isPrevious: isPrevious)
+            ) {
+                WeightSampleCell(sample: sample, date: date)
+                    .environment(settingsStore)
+            }
+            .navigationDestination(for: WeightSampleRoute.self) { route in
+                sampleForm(for: route)
+            }
+        }
+        
+        return Group {
+            dateRow
+            linkRow
         }
     }
     
@@ -311,4 +326,17 @@ extension String {
     var double: Double? {
         Double(self)
     }
+}
+
+#Preview {
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                WeightChangeForm(MockCurrentHealthModel)
+                    .environment(SettingsStore.shared)
+                .onAppear {
+                    SettingsStore.configureAsMock()
+                }
+            }
+        }
 }

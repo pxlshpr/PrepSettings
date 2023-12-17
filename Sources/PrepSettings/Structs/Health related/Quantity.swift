@@ -18,6 +18,12 @@ public struct Quantity: Hashable, Codable {
     }
 }
 
+extension Array where Element == HealthDetails.Weight {
+    var averageValue: Double? {
+        compactMap{ $0.valueInKg }.averageValue
+    }
+}
+
 extension Array where Element == Quantity {
     var valuesGroupedByDate: [Date: [Quantity]] {
         let withDates = self.filter { $0.date != nil }

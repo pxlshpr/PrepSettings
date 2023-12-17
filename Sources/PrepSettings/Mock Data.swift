@@ -1,13 +1,22 @@
 import Foundation
 import PrepShared
 
-public let MockCurrentHealthModel = HealthModel(
-    delegate: MockCurrentHealthModelDelegate(),
-    fetchCurrentHealthHandler: {
-        let healthDetails: HealthDetails = fetchFromBackend(.currentHealthDetails)
-        return healthDetails
-    }
-)
+//public let MockCurrentHealthModel = HealthModel(
+//    delegate: MockCurrentHealthModelDelegate(),
+//    fetchCurrentHealthHandler: {
+//        let healthDetails: HealthDetails = fetchFromBackend(.currentHealthDetails)
+//        return healthDetails
+//    }
+//)
+
+public var MockCurrentHealthModel: HealthModel {
+    let healthDetails: HealthDetails = fetchFromBackend(.currentHealthDetails)
+    return HealthModel(
+        delegate: MockCurrentHealthModelDelegate(),
+        health: healthDetails,
+        isCurrent: true
+    )
+}
 
 public var MockPastHealthModel: HealthModel {
     let healthDetails: HealthDetails = fetchFromBackend(.pastHealthDetails)
@@ -32,9 +41,20 @@ struct MockCurrentHealthModelDelegate: HealthModelDelegate {
         )
     }
     
-    func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthQuantity] {
-        let weightValues: WeightValues = fetchFromBackend(.weight)
-        return weightValues.values
+    func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthDetails.Weight] {
+        mockWeights(for: dateRange)
+//        let weightValues: WeightValues = fetchFromBackend(.weight)
+//        return weightValues.values
+    }
+    
+    func weight(for date: Date) async throws -> HealthDetails.Weight? {
+        let quantities = mockWeightQuantities(for: date)
+        return .init(
+            source: .healthKit,
+            isDailyAverage: true,
+            healthKitQuantities: quantities,
+            valueInKg: quantities?.averageValue
+        )
     }
     
     func updateBackendWithWeight(
@@ -106,11 +126,22 @@ public struct MockPastHealthModelDelegate: HealthModelDelegate {
         )
     }
     
-    public func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthQuantity] {
-        let weightValues: WeightValues = fetchFromBackend(.weight)
-        return weightValues.values
+    public func weights(for dateRange: ClosedRange<Date>) async throws -> [Date : HealthDetails.Weight] {
+        mockWeights(for: dateRange)
+//        let weightValues: WeightValues = fetchFromBackend(.weight)
+//        return weightValues.values
     }
     
+    public func weight(for date: Date) async throws -> HealthDetails.Weight? {
+        let quantities = mockWeightQuantities(for: date)
+        return .init(
+            source: .healthKit,
+            isDailyAverage: true,
+            healthKitQuantities: quantities,
+            valueInKg: quantities?.averageValue
+        )
+    }
+
     public func updateBackendWithWeight(
         _ healthQuantity: HealthQuantity?,
         for date: Date
@@ -248,20 +279,78 @@ let MockDietaryEnergy: [String: Double] = [
 
 //MARK: - HealthKit Values
 
+extension Date {
+    func at(h: Int, m: Int) -> Date {
+        let timeString = String(format: "%02d_%02d", h, m)
+        return Date(fromTimeString: "\(dateString)-\(timeString)")!
+    }
+}
+
+extension ClosedRange<Date> {
+    var startOfDays: [Date] {
+        let dayDurationInSeconds: TimeInterval = 60*60*24
+        var dates: [Date] = []
+        for date in stride(
+            from: lowerBound.startOfDay,
+            to: upperBound.startOfDay,
+            by: dayDurationInSeconds
+        ) {
+            dates.append(date)
+        }
+        return dates
+    }
+}
+
+func mockWeights(for dateRange: ClosedRange<Date>) -> [Date : HealthDetails.Weight] {
+    var weights: [Date : HealthDetails.Weight] = [:]
+
+    for date in dateRange.startOfDays {
+        let quantities = mockWeightQuantities(for: date)
+        weights[date] = .init(
+            source: .healthKit,
+            isDailyAverage: true,
+            healthKitQuantities: quantities,
+            valueInKg: quantities?.averageValue
+        )
+    }
+    return weights
+}
+
 func mockWeightQuantities(for date: Date) -> [Quantity]? {
-//    [
-//        .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
-//        .init(value: 94.8, date: date.startOfDay.addingTimeInterval(56520)),
-//    ]
-    
-    [
-        .init(value: 82.5, date: date.startOfDay.addingTimeInterval(14560)),
-        .init(value: 83.15, date: date.startOfDay.addingTimeInterval(46520)),
-    ]
-//
-//    [
-//        .init(value: 73.69, date: date.startOfDay.addingTimeInterval(34560)),
-//    ]
-//
-//    nil
+    switch date.dateString {
+    case Date.now.dateString:
+            [
+                .init(value: 93.69, date: date.at(h: 9, m: 32)),
+                .init(value: 94.8, date: date.at(h: 12, m: 36)),
+            ]
+    case Date.now.moveDayBy(-1).dateString:
+        [
+            .init(value: 92.5, date: date.at(h: 9, m: 32)),
+            .init(value: 93.1, date: date.at(h: 12, m: 36)),
+        ]
+        
+    case Date.now.moveDayBy(-7).dateString:
+        [
+            .init(value: 96.5, date: date.startOfDay.addingTimeInterval(34560)),
+            .init(value: 97.2, date: date.startOfDay.addingTimeInterval(56520)),
+        ]
+    case "2023_12_16":
+        nil
+    default:
+        //    [
+        //        .init(value: 93.69, date: date.startOfDay.addingTimeInterval(34560)),
+        //        .init(value: 94.8, date: date.startOfDay.addingTimeInterval(56520)),
+        //    ]
+            
+            [
+                .init(value: 82.5, date: date.startOfDay.addingTimeInterval(14560)),
+                .init(value: 83.15, date: date.startOfDay.addingTimeInterval(46520)),
+            ]
+        //
+        //    [
+        //        .init(value: 73.69, date: date.startOfDay.addingTimeInterval(34560)),
+        //    ]
+        //
+        //    nil
+    }
 }

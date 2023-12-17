@@ -11,7 +11,9 @@ public protocol HealthModelDelegate {
      */
     func maintenanceBackendValues(for dateRange: ClosedRange<Date>) async throws -> MaintenanceValues
 
-    func weights(for dateRange: ClosedRange<Date>) async throws -> [Date: HealthQuantity]
+    func weights(for dateRange: ClosedRange<Date>) async throws -> [Date: HealthDetails.Weight]
+
+    func weight(for date: Date) async throws -> HealthDetails.Weight?
 
     /**
      Takes in a weight value, a type (HealthKit or userEntered) and a date and updates it in the backend.
@@ -41,21 +43,12 @@ public protocol HealthModelDelegate {
 }
 
 public extension HealthModelDelegate {
+    
     func handleWeightChange(
         for date: Date,
         with healthQuantity: HealthQuantity?
     ) async throws {
         try await updateBackendWithWeight(healthQuantity, for: date)
-        
-        await MainActor.run {
-            var userInfo: [Notification.PrepSettingsKeys : Any] = [.date: date]
-            if let healthQuantity {
-                userInfo[.weightHealthQuantity] = healthQuantity
-                post(.didUpdateWeight, userInfo)
-            } else {
-                post(.didRemoveWeight, userInfo)
-            }
-        }
     }
 }
 

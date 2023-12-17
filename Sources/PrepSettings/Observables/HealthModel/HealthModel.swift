@@ -47,18 +47,19 @@ public typealias SaveHealthHandler = ((HealthDetails, Bool) async throws -> ())
         addObservers()
     }
     
-    /// Past Health
+    /// Past or Current Health
     public init(
         delegate: HealthModelDelegate,
-        health: HealthDetails
+        health: HealthDetails,
+        isCurrent: Bool = false
 //        saveHandler: @escaping SaveHealthHandler
     ) {
 //        self.fetchCurrentHealthHandler = nil
 //        self.saveHandler = saveHandler
         self.delegate = delegate
         self.health = health
-        self.isCurrent = false
-        self.isEditing = false
+        self.isCurrent = isCurrent
+        self.isEditing = isCurrent
         addObservers()
     }
 
@@ -78,41 +79,5 @@ public typealias SaveHealthHandler = ((HealthDetails, Bool) async throws -> ())
 
 extension HealthModel {
     func addObservers() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(didUpdateWeight),
-            name: .didUpdateWeight,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(didRemoveWeight),
-            name: .didRemoveWeight,
-            object: nil
-        )
-    }
-    
-    @objc func didUpdateWeight(notification: Notification) {
-//        guard let date = notification.date,
-//              let healthQuantity = notification.weightHealthQuantity,
-//              health.date == date
-//        else {
-//            return
-//        }
-//        
-//        health.weight = healthQuantity
-        //TODO: Handle re-calculating stuff in Health?
-    }
-    
-    @objc func didRemoveWeight(notification: Notification) {
-//        guard let date = notification.date,
-//              health.date == date,
-//              health.weight?.source == .userEntered
-//        else {
-//            return
-//        }
-//        
-//        health.weight = nil
-        //TODO: Handle re-calculating stuff in Health?
     }
 }

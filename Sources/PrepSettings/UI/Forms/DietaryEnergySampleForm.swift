@@ -52,7 +52,6 @@ struct DietaryEnergySampleForm: View {
         .navigationBarTitleDisplayMode(.inline)
         .task(model.loadValues)
         .toolbar { toolbarContent }
-        .onChange(of: focusedType, healthModel.focusedTypeChanged)
         .toolbar { keyboardToolbarContent }
     }
     

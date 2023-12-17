@@ -31,7 +31,7 @@ extension HealthSource: Pickable {
         case .healthKit:
 //            "Use the latest weight data from Apple Health"
 //            "Use the most recent weight data from Apple Health"
-            "Use weight data from Apple Health"
+            "Use weight data from the Health app"
         case .userEntered:
             "Use a custom entered value"
         }
@@ -50,7 +50,7 @@ public extension WeightSampleSource {
     var name: String {
         switch self {
         case .movingAverage:    "Moving Average"
-        case .healthKit:        "Apple Health"
+        case .healthKit:        "Health App"
         case .userEntered:      "Custom"
         }
     }

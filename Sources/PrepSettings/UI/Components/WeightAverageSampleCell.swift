@@ -31,7 +31,8 @@ struct WeightCell: View {
     
     @Environment(SettingsStore.self) var settingsStore: SettingsStore
     
-    let weight: DatedWeight
+    let date: Date
+    let weight: HealthDetails.Weight
     
     var body: some View {
         HStack {
@@ -43,7 +44,7 @@ struct WeightCell: View {
     
     @ViewBuilder
     var valueText: some View {
-        if let value = weight.value {
+        if let value = weight.valueInKg {
             HStack(alignment: .firstTextBaseline, spacing: UnitSpacing) {
                 Text("\(value.clean) \(settingsStore.bodyMassUnit.abbreviation)")
             }
@@ -54,6 +55,6 @@ struct WeightCell: View {
     }
     
     var dateText: some View {
-        Text(weight.date.adaptiveMaintenanceDateString)
+        Text(date.adaptiveMaintenanceDateString)
     }
 }

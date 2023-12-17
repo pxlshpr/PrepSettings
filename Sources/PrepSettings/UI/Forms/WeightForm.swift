@@ -33,9 +33,6 @@ struct WeightForm: View {
     
     @FocusState var focusedType: HealthType?
 
-    let didUpdateWeight = NotificationCenter.default.publisher(for: .didUpdateWeight)
-    let didRemoveWeight = NotificationCenter.default.publisher(for: .didRemoveWeight)
-
     init(
         healthModel: HealthModel,
         settingsStore: SettingsStore
@@ -90,11 +87,7 @@ struct WeightForm: View {
             .toolbar { editToolbarContent }
             .toolbar { keyboardToolbarContent }
 
-            .onReceive(didUpdateWeight, perform: model.didUpdateWeight)
-            .onReceive(didRemoveWeight, perform: model.didRemoveWeight)
-
             .onChange(of: scenePhase, scenePhaseChanged)
-//            .onChange(of: focusedType, model.focusedTypeChanged)
 
             .onAppear(perform: appeared)
     }
@@ -106,66 +99,21 @@ extension WeightForm {
         Form {
             explanationSection
             valueSection
-            sampleDateSection
+            //            sampleDateSection
             if model.isRemoved {
                 emptyContent
             } else {
-                Group {
-                    sourceSection
-                    useDailyAverageSection
-                    dateSection
-                    movingAverageIntervalSection
-                    movingAverageValuesSection
-                    dailyAverageValuesSection
-                    removeSection
-                }
+                sourceSection
+                useDailyAverageSection
+                dateSection
+                movingAverageIntervalSection
+                movingAverageValuesSection
+                dailyAverageValuesSection
+                removeSection
             }
         }
     }
     
-    var explanationSection: some View {
-        Section {
-            Text("Your weight is used when calculating your adaptive maintenance energy. It may also be used in certain equations that estimate your resting energy, or when calculating your lean body mass.")
-        }
-    }
-    
-    var title: String {
-        switch model.formType {
-        case .adaptiveSample(let isPrevious):
-            "\(isPrevious ? "Previous" : "Current") Weight"
-        default:
-            "Weight"
-        }
-    }
-    
-    var keyboardToolbarContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .keyboard) {
-            HStack {
-                Spacer()
-                Button("Done") {
-                    focusedType = nil
-                }
-                .fontWeight(.semibold)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    var sampleDateSection: some View {
-        switch model.formType {
-        case .adaptiveSample, .specificDate:
-            Section {
-                HStack {
-                    Text("Date")
-                    Spacer()
-                    Text(model.date.healthDateFormat)
-                }
-            }
-        default:
-            EmptyView()
-        }
-    }
-
     var emptyContent: some View {
         
         var setButton: some View {
@@ -189,10 +137,57 @@ extension WeightForm {
         }
     }
     
-    var hidesBackButton: Bool {
-        healthModel.isEditingPast
+    @ViewBuilder
+    var removeSection: some View {
+        if healthModel.isEditing {
+            Section {
+                Button("Remove Weight") {
+                    model.removeWeight()
+                }
+            }
+        }
     }
+}
+
+//MARK: - Explanation
+
+extension WeightForm {
     
+    var explanationSection: some View {
+        Section {
+            switch model.formType {
+            case .healthDetails:
+                Text("Your weight is used when calculating your adaptive maintenance energy.\n\nIt may also be used in certain equations that estimate your resting energy, or when calculating your lean body mass.")
+            case .adaptiveSample(let isPrevious):
+                Text("This is your \(healthModel.isCurrent ? "\(isPrevious ? "previous" : "current") weight" : "weight on this date"), which is being used to calculate your weight change.\n\nUsing a moving average of multiple days smoothes out short-term fluctuations.")
+            case .specificDate:
+                Text("specific date explanation")
+            }
+            HStack {
+                Text("Date")
+                Spacer()
+                Text(model.date.healthDateFormat)
+            }
+        }
+    }
+}
+
+//MARK: - Toolbars
+
+extension WeightForm {
+    
+    var keyboardToolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            HStack {
+                Spacer()
+                Button("Done") {
+                    focusedType = nil
+                }
+                .fontWeight(.semibold)
+            }
+        }
+    }
+
     var editToolbarContent: some ToolbarContent {
         
         var doneButton: some View {
@@ -243,100 +238,26 @@ extension WeightForm {
             }
         }
     }
-    
+}
+
+//MARK: - Date Sections
+
+extension WeightForm {
+
     @ViewBuilder
-    var removeSection: some View {
-        if healthModel.isEditing {
+    var sampleDateSection: some View {
+        switch model.formType {
+        case .adaptiveSample, .specificDate:
             Section {
-                Button("Remove Weight") {
-                    model.removeWeight()
-                }
-            }
-        }
-    }
-    
-    func appeared() {
-        Task {
-            try await model.fetchHealthKitData()
-            try await model.fetchBackendData()
-        }
-//        if model.isUserEntered {
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                focusTextField()
-//            }
-//        }
-    }
-    
-    func scenePhaseChanged(old: ScenePhase, new: ScenePhase) {
-        switch new {
-        case .active:   
-            Task {
-                try await model.fetchHealthKitData()
-            }
-        default:        
-            break
-        }
-    }
-    
-    var movingAverageIntervalSection: some View {
-        
-        var stepper: some View {
-            Stepper(
-                "",
-                value: $model.movingAverageIntervalValue,
-                in: model.movingAverageIntervalPeriod.range
-            )
-        }
-        
-        var value: some View {
-            Text("\(model.movingAverageIntervalValue)")
-                .font(NumberFont)
-                .contentTransition(.numericText(value: Double(model.movingAverageIntervalValue)))
-        }
-        
-        var section: some View {
-            Section("Moving Average Over") {
                 HStack {
-                    stepper
-                        .fixedSize()
+                    Text("Date")
                     Spacer()
-                    value
-                }
-                PickerSection([.day, .week], $model.movingAverageIntervalPeriod)
-            }
-        }
-        
-        let intervalBinding = Binding<HealthInterval>(
-            get: {
-                model.sample?.movingAverage?.interval ?? DefaultWeightMovingAverageInterval
-            },
-            set: { newValue in
-                withAnimation {
-                    model.sample?.movingAverage?.interval = newValue
-                    //TODO: MovingAverage – Add/remove MovingAverageWeights in array based on new interval
-                    model.setMovingAverageValue()
+                    Text(model.date.healthDateFormat)
                 }
             }
-        )
-        
-        return Group {
-            if model.shouldShowMovingAverageSections {
-                IntervalPicker(
-                    interval: intervalBinding,
-                    periods: [.day, .week],
-                    ranges: [
-                        .day: 2...6,
-                        .week: 1...2
-                    ],
-                    title: "Moving Average Over"
-                )
-//                section
-            }
+        default:
+            EmptyView()
         }
-    }
-    
-    var periodSection: some View {
-        PickerSection([.day, .week], $model.movingAverageIntervalPeriod)
     }
     
     var dateSection: some View {
@@ -354,7 +275,7 @@ extension WeightForm {
                 nil
             }
         }
-
+        
         @ViewBuilder
         var footer: some View {
             if let footerString {
@@ -403,151 +324,11 @@ extension WeightForm {
             }
         }
     }
-    
-    var foregroundColor: Color {
-        healthModel.isLocked ? .secondary : .primary
-    }
+}
 
-    var dailyAverageValuesSection: some View {
-        
-        func row(_ quantity: Quantity) -> some View {
-            HStack {
-                Text(quantity.date?.shortTime ?? "")
-                Spacer()
-                Text("\(BodyMassUnit.kg.convert(quantity.value, to: settingsStore.bodyMassUnit).clean) \(settingsStore.bodyMassUnit.abbreviation)")
-            }
-            .foregroundStyle(foregroundColor)
-        }
-        
-        var footer: some View {
-            Text("These \(healthModel.isEditing ? "are" : "were") the times when your weight was logged on this date. The average of these \(healthModel.isEditing ? "is being" : "was") used.")
-        }
-                
-        func section(_ quantities: [Quantity]) -> some View {
-            Section(footer: footer) {
-                ForEach(quantities, id: \.self) { quantity in
-                    row(quantity)
-                }
-            }
-        }
-        
-        var quantities: [Quantity]? {
-            if healthModel.isLocked {
-                healthModel.health.weight?.healthKitQuantities
-            } else {
-                model.healthKitQuantities
-            }
-        }
-        
-        return Group {
-            if model.shouldShowDailyAverageValuesSection,
-               let quantities
-            {
-                section(quantities)
-            }
-        }
-    }
-    
-//    var movingAverageSection: some View {
-//        var footer: some View {
-//            Text("Use a moving average across multiple days to get a more accurate weight that is less affected by fluctuations due to factors like fluid loss and meal times")
-//        }
-//
-//        var section: some View {
-//            Section(footer: footer) {
-//                HStack {
-//                    Toggle("Use Moving Average", isOn: .constant(false))
-//                }
-//            }
-//        }
-//        
-//        var shouldShow: Bool {
-//            model.formType == .adaptiveSample
-//        }
-//        return Group {
-//            if shouldShow {
-//                section
-//            }
-//        }
-//    }
-    
-    var movingAverageValuesSection: some View {
-        func cell(weight: DatedWeight) -> some View {
-            NavigationLink(value: weight) {
-                WeightCell(weight: weight)
-                    .environment(settingsStore)
-            }
-            .navigationDestination(for: DatedWeight.self) { weight in
-                WeightForm(
-                    date: weight.date,
-                    value: weight.value,
-                    source: weight.source,
-                    isDailyAverage: weight.isDailyAverage,
-                    healthModel: healthModel,
-                    settingsStore: settingsStore
-                )
-            }
-        }
+//MARK: - Source
 
-        return Group {
-            if model.shouldShowMovingAverageSections {
-                Section {
-                    ForEach(model.movingAverageWeights, id: \.self) { _ in
-                        //TODO: MovingAverage - Revisit this
-                        Text("Todo")
-//                        cell(weight: $0)
-                    }
-//                    ForEach(0...model.movingAverageNumberOfDays-1, id: \.self) {
-//                        cell(
-//                            weight: DatedWeight(
-//                                date: model.date.moveDayBy(-$0),
-//                                value: model.backendValue(at: $0),
-//                                source: model.backendSource(at: $0),
-//                                isDailyAverage: model.backendHealthQuantity(at: $0)?.isDailyAverage
-//                            )
-//                        )
-//                    }
-                }
-            }
-        }
-    }
-    
-    var useDailyAverageSection: some View {
-        var section: some View {
-            Section(footer: Text("Use the average when multiple values for the day are available.")) {
-                HStack {
-                    Text("Use Daily Average")
-                        .layoutPriority(1)
-                        .foregroundStyle(healthModel.isLocked ? .secondary : .primary)
-                    Spacer()
-                    Toggle("", isOn: $model.useDailyAverage)
-                }
-                .disabled(healthModel.isLocked)
-            }
-        }
-        
-        return Group {
-            if model.shouldShowDailyAverageSection {
-                section
-            }
-        }
-    }
-    
-    func focusTextField(afterDelay: Bool = false) {
-//        Haptics.selectionFeedback()
-        let deadline: DispatchTime = .now() + (afterDelay ? 0.1 : 0)
-        DispatchQueue.main.asyncAfter(deadline: deadline) {
-            focusedType = .weight
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                sendSelectAllTextAction()
-            }
-        }
-    }
-
-    func unfocusTextField() {
-        focusedType = nil
-    }
-
+extension WeightForm {
     var sourceSection: some View {
         
         var sampleSourcePicker: some View {
@@ -575,6 +356,168 @@ extension WeightForm {
             }
         }
     }
+    
+}
+
+//MARK: - Moving Average
+
+extension WeightForm {
+    
+    var movingAverageIntervalSection: some View {
+        
+        let intervalBinding = Binding<HealthInterval>(
+            get: {
+                model.sampleMovingAverage?.interval ?? DefaultWeightMovingAverageInterval
+            },
+            set: { newValue in
+                withAnimation {
+                    model.sampleMovingAverage?.interval = newValue
+                }
+                model.setMovingAverageValue()
+                model.updateSampleIfNeeded()
+            }
+        )
+        
+        return Group {
+            if model.shouldShowMovingAverageSections {
+                IntervalPicker(
+                    interval: intervalBinding,
+                    periods: [.day, .week],
+                    ranges: [
+                        .day: 2...6,
+                        .week: 1...2
+                    ],
+                    title: "Moving Average Over"
+                )
+                //                section
+            }
+        }
+    }
+    
+    var movingAverageValuesSection: some View {
+        func cell(
+            index: Int,
+            weight: HealthDetails.Weight
+        ) -> some View {
+            
+            let date = model.date.moveDayBy(-index)
+            
+            return NavigationLink(value: weight) {
+                WeightCell(date: date, weight: weight)
+                    .environment(settingsStore)
+            }
+            .navigationDestination(for: HealthDetails.Weight.self) { weight in
+                WeightForm(
+                    date: date,
+                    value: weight.valueInKg,
+                    source: weight.source,
+                    isDailyAverage: weight.isDailyAverage,
+                    healthModel: healthModel,
+                    settingsStore: settingsStore
+                )
+            }
+        }
+        
+        return Group {
+            if model.shouldShowMovingAverageSections {
+                Section {
+                    ForEach(Array(zip(model.movingAverageWeights.indices, model.movingAverageWeights)), id: \.0) { (index, weight) in
+                        cell(index: index, weight: weight)
+                    }
+                }
+            }
+        }
+    }
+}
+
+//MARK: - Daily Average
+extension WeightForm {
+    
+    var useDailyAverageSection: some View {
+        var section: some View {
+            Section(footer: Text("Use the average when multiple values for the day are available.")) {
+                HStack {
+                    Text("Use Daily Average")
+                        .layoutPriority(1)
+                        .foregroundStyle(healthModel.isLocked ? .secondary : .primary)
+                    Spacer()
+                    Toggle("", isOn: $model.useDailyAverage)
+                }
+                .disabled(healthModel.isLocked)
+            }
+        }
+        
+        return Group {
+            if model.shouldShowDailyAverageSection {
+                section
+            }
+        }
+    }
+    
+    var dailyAverageValuesSection: some View {
+        
+        func row(_ quantity: Quantity) -> some View {
+            HStack {
+                Text(quantity.date?.shortTime ?? "")
+                Spacer()
+                Text("\(BodyMassUnit.kg.convert(quantity.value, to: settingsStore.bodyMassUnit).clean) \(settingsStore.bodyMassUnit.abbreviation)")
+            }
+            .foregroundStyle(foregroundColor)
+        }
+        
+        var footer: some View {
+            
+            let presentTense = healthModel.isEditing
+            
+            var multiple: String {
+                let verb = presentTense ? "is being" : "was"
+
+                let used = if model.isDailyAverage == true {
+                    "The average of these \(verb) used."
+                } else {
+                    "The last one \(verb) being used."
+                }
+                
+                return "These \(presentTense ? "are" : "were") the times when your weight was logged on this date. \(used)"
+            }
+            
+            var single: String {
+                let verb = presentTense ? "is" : "was"
+                return "This \(verb) when your weight was logged on this date."
+            }
+            
+            return model.healthKitQuantities?.count == 1 ? Text(single) : Text(multiple)
+        }
+        
+        func section(_ quantities: [Quantity]) -> some View {
+            Section(footer: footer) {
+                ForEach(quantities, id: \.self) { quantity in
+                    row(quantity)
+                }
+            }
+        }
+        
+        var quantities: [Quantity]? {
+            if healthModel.isLocked {
+                healthModel.health.weight?.healthKitQuantities
+            } else {
+                model.healthKitQuantities
+            }
+        }
+        
+        return Group {
+            if model.shouldShowDailyAverageValuesSection,
+               let quantities
+            {
+                section(quantities)
+            }
+        }
+    }
+}
+
+//MARK: - Value
+
+extension WeightForm {
     
     var valueSection: some View {
         
@@ -635,22 +578,16 @@ extension WeightForm {
                 model.sampleSource ?? .default
             }
             
-            var sampleValue: Double? {
-                guard let value = model.sample?.value else { return nil }
-                return BodyMassUnit.kg.convert(value, to: .kg)
-            }
-            
             return Group {
                 switch sampleSource {
                 case .userEntered:
                     EmptyView()
                 default:
-                    if let sampleValue {
-                        LargeHealthValue(
-                            value: sampleValue,
-                            valueString: sampleValue.clean,
-                            valueColor: foregroundColor,
-                            unitString: settingsStore.bodyMassUnit.abbreviation
+                    if model.valueInKg != nil {
+                        LargeBodyMassValue(
+                            unit: $settingsStore.bodyMassUnit,
+                            valueInKg: $model.valueInKg,
+                            valueColor: foregroundColor
                         )
                     } else {
                         Text("Not Set")
@@ -687,14 +624,71 @@ extension WeightForm {
             }
         }
     }
+}
 
-//    var healthValue: some View {
-//        CalculatedBodyMassView(
-//            unit: $settingsStore.bodyMassUnit,
-//            quantityInKg: $healthModel.health.weightQuantity,
-//            source: healthModel.weightSource
-//        )
-//    }
+//MARK: - Convenience
+
+extension WeightForm {
+    
+    var title: String {
+        switch model.formType {
+        case .adaptiveSample(let isPrevious):
+            "\(isPrevious ? "Previous" : "Current") Weight"
+        default:
+            "Weight"
+        }
+    }
+    
+    var foregroundColor: Color {
+        healthModel.isLocked ? .secondary : .primary
+    }
+    
+    var hidesBackButton: Bool {
+        healthModel.isEditingPast
+    }
+}
+
+//MARK: - Actions
+
+extension WeightForm {
+    
+    func appeared() {
+        Task {
+            try await model.fetchHealthKitData()
+            //            try await model.fetchBackendData()
+        }
+        //        if model.isUserEntered {
+        //            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        //                focusTextField()
+        //            }
+        //        }
+    }
+    
+    func scenePhaseChanged(old: ScenePhase, new: ScenePhase) {
+        switch new {
+        case .active:
+            Task {
+                try await model.fetchHealthKitData()
+            }
+        default:
+            break
+        }
+    }
+    
+    func focusTextField(afterDelay: Bool = false) {
+//        Haptics.selectionFeedback()
+        let deadline: DispatchTime = .now() + (afterDelay ? 0.1 : 0)
+        DispatchQueue.main.asyncAfter(deadline: deadline) {
+            focusedType = .weight
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sendSelectAllTextAction()
+            }
+        }
+    }
+
+    func unfocusTextField() {
+        focusedType = nil
+    }
 }
 
 //MARK: - Previews
@@ -740,14 +734,25 @@ let MockDate = Date(fromDateString: "2021_08_27")!
 
 #Preview {
     DemoView()
-//    Text("")
-//        .sheet(isPresented: .constant(true)) {
-//            NavigationStack {
-//                HealthSummary(model: MockPastHealthModel)
-//                    .environment(SettingsStore.shared)
-//                    .onAppear(perform: {
-//                        SettingsStore.configureAsMock()
-//                    })
-//            }
-//        }
+}
+
+#Preview {
+    Text("")
+        .sheet(isPresented: .constant(true)) {
+            NavigationStack {
+                WeightForm(
+                    sample: MockCurrentHealthModel.maintenance.adaptive.weightChange.current,
+                    date: MockCurrentHealthModel.health.date,
+                    isPrevious: false,
+                    healthModel: MockCurrentHealthModel,
+                    settingsStore: SettingsStore.shared
+                )
+                .onAppear {
+                    SettingsStore.configureAsMock()
+                    Task {
+                        try await MockCurrentHealthModel.refresh()
+                    }
+                }
+            }
+        }
 }

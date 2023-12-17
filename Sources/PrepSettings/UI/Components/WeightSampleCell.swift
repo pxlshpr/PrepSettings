@@ -30,8 +30,8 @@ struct WeightSampleCell: View {
     
     var body: some View {
         HStack {
-            Text(date.adaptiveMaintenanceDateString)
-//                .foregroundStyle(.secondary)
+            Text(sample.source.name)
+//            Text(date.adaptiveMaintenanceDateString)
             Spacer()
             value
 //            averageLabel

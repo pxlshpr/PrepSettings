@@ -18,16 +18,17 @@ extension WeightForm {
         var valueString: String?
         var valueSecondComponentString: String?
         
-        var sample: WeightSample?
+//        var sample: WeightSample?
         var isDailyAverage: Bool?
         var sampleSource: WeightSampleSource?
+        var sampleMovingAverage: WeightSample.MovingAverage?
         var source: HealthSource?
         var isRemoved: Bool
 
         var healthKitQuantities: [Quantity]?
         
         /// Reference values kept so that when changing interval we're able to display values quickly without re-querying for them
-        var backendQuantities: [Date: HealthQuantity]?
+//        var backendWeights: [Date: HealthDetails.Weight]?
         
         /// List of moving average weights that are displayed based on the current interval
         var movingAverageWeights: [HealthDetails.Weight] = []
@@ -71,17 +72,14 @@ extension WeightForm {
             
             self.valueInKg = sample.value
             self.sampleSource = sample.source
-            
-            self.sample = sample
+            self.isDailyAverage = sample.isDailyAverage
+            self.sampleMovingAverage = sample.movingAverage
+
+//            self.sample = sample
             self.isRemoved = false
 
             /// Initialize movingAverageDatedWeights with empty placeholders
-//            if let dayCount = sample.movingAverageInterval?.numberOfDays {
-//                for i in 0..<dayCount {
-//                    let date = date.moveDayBy(-i)
-//                    self.movingAverageDatedWeights.append(.init(date: date))
-//                }
-//            }
+            self.movingAverageWeights = sample.movingAverage?.weights ?? []
         }
         
         /// Average Component init
@@ -263,54 +261,6 @@ extension WeightForm.Model {
     }
 }
 
-extension WeightForm.Model {
-    
-    func didRemoveWeight(notification: Notification) {
-        /// We're only interested in external weight changes if we're the adaptive weight form using a moving average
-        guard 
-            formType.isAdaptiveSample,
-            sampleSource == .movingAverage,
-            let date = notification.date
-        else {
-            return
-        }
-        
-        /// If the quantity for this date already exists, replace it with this, otherwise simply set it
-        backendQuantities?[date] = nil
-        setMovingAverageDatedWeights()
-    }
-    
-    func didUpdateWeight(notification: Notification) {
-        
-        /// We're only interested in external weight changes if we're the adaptive weight form using a moving average
-        guard formType.isAdaptiveSample, sampleSource == .movingAverage else {
-            return
-        }
-        
-        /// Make sure we have the date, the actual weight data, and the array of healthKit quantities
-        guard let date = notification.date,
-              let healthQuantity = notification.weightHealthQuantity
-        else { return }
-        
-        /// [ ] Only continue if the date pertains to this form (guard that the date lies within the date range for the moving average interval)
-
-        /// If the array of quantities isn't initialized yet, do so with this quantity
-        guard backendQuantities != nil else {
-            backendQuantities?[date] = healthQuantity
-            return
-        }
-        
-        /// If the quantity for this date already exists, replace it with this, otherwise simply set it
-        backendQuantities?[date] = healthQuantity
-        setMovingAverageDatedWeights()
-    }
-    
-//    func focusedTypeChanged(old: HealthType?, new: HealthType?) {
-//        guard old == .weight, new == nil else { return }
-//        updateBackend(with: userEnteredHealthQuantity)
-//    }
-}
-
 public extension Array where Element == Quantity {
     func removingDuplicateQuantities() -> [Quantity] {
         var addedDict = [Quantity: Bool]()
@@ -332,23 +282,23 @@ extension Quantity {
 }
 extension WeightForm.Model {
     
-    func fetchBackendData() async throws {
-        switch formType {
-        case .adaptiveSample:
-            /// Fetch the backend data for the maximum range for when we use "Moving Average"
-            /// Get the maximum possible date range, that being `2 weeks` from date, backwards
-            let range = date.moveDayBy(-14)...date
-            let quantities = try await healthModel.delegate.weights(for: range)
-            
-            await MainActor.run {
-                self.backendQuantities = quantities
-                self.setMovingAverageDatedWeights()
-            }
-            
-        default:
-            break
-        }
-    }
+//    func fetchBackendData() async throws {
+//        switch formType {
+//        case .adaptiveSample:
+//            /// Fetch the backend data for the maximum range for when we use "Moving Average"
+//            /// Get the maximum possible date range, that being `2 weeks` from date, backwards
+//            let range = date.moveDayBy(-14)...date
+//            let weights = try await healthModel.delegate.weights(for: range)
+//            
+//            await MainActor.run {
+//                self.backendWeights = weights
+////                self.setMovingAverageDatedWeights()
+//            }
+//            
+//        default:
+//            break
+//        }
+//    }
     
     func fetchHealthKitData() async throws {
         guard !isPreview else {
@@ -433,14 +383,18 @@ extension WeightForm.Model {
     }
     
     func setSampleValue(_ value: Double?) {
-        sample?.value = value
-        switch formType.isPreviousSample {
-        case true:
-            healthModel.health.maintenance?.adaptive.weightChange.previous.value = value
-        case false:
-            healthModel.health.maintenance?.adaptive.weightChange.current.value = value
-        default:
-            break
+        
+        self.valueInKg = value
+        
+        if healthModel.isCurrent {
+            switch formType.isPreviousSample {
+            case true:
+                healthModel.health.maintenance?.adaptive.weightChange.previous.value = value
+            case false:
+                healthModel.health.maintenance?.adaptive.weightChange.current.value = value
+            default:
+                break
+            }
         }
     }
     
@@ -613,7 +567,8 @@ extension WeightForm.Model {
         case .healthDetails, .specificDate:
             source == .healthKit && useDailyAverage
         case .adaptiveSample:
-            sampleSource == .healthKit && useDailyAverage
+            sampleSource == .healthKit
+//            sampleSource == .healthKit && useDailyAverage
         }
     }
     
@@ -688,72 +643,35 @@ extension WeightForm.Model {
                 
                 withAnimation {
                     self.sampleSource = newValue
-                    //                    self.sampleSource = newValue
                 }
                 
                 switch newValue {
-                case .healthKit:
-                    self.setHealthKitQuantity()
-                    //                    self.updateBackend(with: self.healthKitHealthQuantity)
-                    
-                case .movingAverage:
-                    self.setMovingAverageValue()
-                    
-                case .userEntered:
-                    break
-                    //                    self.updateBackend(with: self.userEnteredHealthQuantity)
+                case .healthKit:        self.setHealthKitQuantity()
+                case .movingAverage:    self.setMovingAverageValue()
+                case .userEntered:      break
                 }
                 
-                switch self.formType.isPreviousSample {
-                case true:
-                    self.healthModel.health.maintenance?.adaptive.weightChange.previous.source = newValue
-                case false:
-                    self.healthModel.health.maintenance?.adaptive.weightChange.current.source = newValue
-                default:
-                    break
-                }
+                self.updateSampleIfNeeded()
             }
         )
     }
     
     var useDailyAverage: Bool {
-        get {
-            switch formType {
-            case .healthDetails:
-                isDailyAverage == true
-            case .specificDate:
-                isDailyAverage == true
-            case .adaptiveSample:
-                sample?.isDailyAverage == true
-            }
-        }
+        get { isDailyAverage == true }
         set {
-            switch formType {
-            case .healthDetails:
-                withAnimation {
-                    isDailyAverage = newValue
-                }
-                if healthModel.isCurrent {
-                    healthModel.health.weight?.isDailyAverage = newValue
-                }
-            case .specificDate:
-                withAnimation {
-                    isDailyAverage = newValue
-                }
-            case .adaptiveSample(let isPrevious):
-                //TODO: Make accessors for previous and current easier to read
-//                if isPrevious {
-//                    healthModel.health.maintenance?.adaptive.weightChange.previous.isDailyAverage = newValue
-//                    healthModel.health.maintenance?.adaptive.weightChange.previous.movingAverageInterval = newValue ? .default : nil
-//                } else {
-//                    healthModel.health.maintenance?.adaptive.weightChange.current.isDailyAverage = newValue
-//                    healthModel.health.maintenance?.adaptive.weightChange.current.movingAverageInterval = newValue ? .default : nil
-//                }
-                withAnimation {
-                    sample?.isDailyAverage = newValue
+            withAnimation {
+                isDailyAverage = newValue
+            }
+            
+            setHealthKitQuantity()
+
+            if healthModel.isCurrent {
+                switch formType {
+                case .healthDetails:    healthModel.health.weight?.isDailyAverage = newValue
+                case .specificDate:     break
+                case .adaptiveSample:   self.updateSampleIfNeeded()
                 }
             }
-            setHealthKitQuantity()
         }
     }
 }
@@ -761,90 +679,53 @@ extension WeightForm.Model {
 extension WeightForm.Model {
     
     func setMovingAverageValue() {
-        //TODO: MovingAverage – Rewrite this by getting moving average based on each ones type
-//        guard let interval = sample?.movingAverage?.interval else { return }
-//        
-//        var values: [Double] = []
-//        for index in 0..<interval.numberOfDays {
-//            guard let value = backendValue(at: index) else { continue }
-//            values.append(value)
-//        }
-//        setSampleValue(values.averageValue?.rounded(toPlaces: 2))
-    }
-    
-    func setMovingAverageDatedWeights() {
-        //TODO: MovingAverage - Revisit this
-//        guard let dayCount = sample?.movingAverageInterval?.numberOfDays else {
-//            movingAverageDatedWeights = []
-//            return
-//        }
-//        
-//        for i in 0..<dayCount {
-//            let date = date.moveDayBy(-i)
-//            let datedWeight: DatedWeight = if let healthQuantity = backendQuantities?[date] {
-//                .init(date: date, healthQuantity: healthQuantity)
-//            } else {
-//                .init(date: date)
-//            }
-//            movingAverageDatedWeights[i] = datedWeight
-//        }
-    }
-    
-    var movingAverageIntervalPeriod: HealthPeriod {
-        get { sample?.movingAverage?.interval.period ?? DefaultWeightMovingAverageInterval.period }
-        set {
-            //TODO: MovingAverage - Revisit this
-//            guard let sample else { return }
-//            var interval = sample.movingAverageInterval ?? .default
-//            interval.period = newValue
-//            setMovingAverageDatedWeights()
-//            withAnimation {
-//                self.sample?.movingAverageInterval = interval
-//                self.sample?.movingAverageInterval?.correctIfNeeded()
-//            }
+        guard let interval = sampleMovingAverage?.interval else { return }
+        
+        Task {
+            var weights: [HealthDetails.Weight] = []
+            for index in 0..<interval.numberOfDays {
+
+                let date = self.date.moveDayBy(-index)
+                let weight = if index < self.movingAverageWeights.count {
+                    /// If we already have a value for this—use it
+                    movingAverageWeights[index]
+                } else {
+                    /// Otherwise query the backend for it
+                    try await healthModel.delegate.weight(for: date)
+                }
+                if let weight {
+                    weights.append(weight)
+                } else {
+                    /// [ ] Empty values
+                    weights.append(.init(source: .userEntered))
+                }
+            }
+            
+            await MainActor.run { [weights] in
+                withAnimation {
+                    movingAverageWeights = weights
+                    setSampleValue(weights.averageValue?.rounded(toPlaces: 2))
+                }
+            }
         }
     }
     
-    var movingAverageIntervalValue: Int {
-        get { sample?.movingAverage?.interval.value ?? DefaultWeightMovingAverageInterval.value }
-        set {
-            //TODO: MovingAverage - Revisit this
-//            guard let sample else { return }
-//            guard newValue >= movingAverageIntervalPeriod.minValue,
-//                  newValue <= movingAverageIntervalPeriod.maxValue
-//            else { return }
-//            
-//            /// [ ] Once changed – fetch new weights
-//            var interval = sample.movingAverageInterval ?? .default
-//            interval.value = newValue
-//            withAnimation {
-//                self.sample?.movingAverageInterval = interval
-//            }
+    func updateSampleIfNeeded() {
+        guard healthModel.isCurrent else {
+            return
         }
-    }
-    
-    var movingAverageNumberOfDays: Int {
-        sample?.movingAverage?.interval.numberOfDays ?? DefaultWeightMovingAverageInterval.numberOfDays
-    }
-}
-
-extension WeightForm.Model {
-
-    func backendHealthQuantity(at index: Int) -> HealthQuantity? {
-        let date = self.date.moveDayBy(-index)
-        return backendQuantities?[date]
-    }
-    
-    func backendQuantity(at index: Int) -> Quantity? {
-        backendHealthQuantity(at: index)?.quantity
-    }
-    
-    func backendSource(at index: Int) -> HealthSource? {
-        backendHealthQuantity(at: index)?.source
-    }
-    
-    func backendValue(at index: Int) -> Double? {
-        guard let quantity = backendQuantity(at: index) else { return nil }
-        return BodyMassUnit.kg.convert(quantity.value, to: SettingsStore.bodyMassUnit)
+        
+        //TODO: give WeightChange all the current variables pertaining to it with isPrevious
+//        switch self.formType.isPreviousSample {
+//        case true:
+//            self.healthModel.health.maintenance?.adaptive.weightChange.previous.source = sampleSource
+//        case false:
+//            self.healthModel.health.maintenance?.adaptive.weightChange.current.source = sampleSource
+//        default:
+//            break
+//        }
+        
+//        healthModel.health.maintenance?.adaptive.weightChange
+//            .setIsDailyAverage(newValue, forPrevious: isPrevious)
     }
 }

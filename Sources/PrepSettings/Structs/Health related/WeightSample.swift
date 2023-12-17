@@ -45,7 +45,12 @@ public struct WeightSample: Hashable, Codable {
             break
         case .healthKit:
             /// Query HealthStore for the HealthKit value
-            let quantities = try await HealthStore.weightQuantities(on: date)
+            let quantities = if isPreview {
+                mockWeightQuantities(for: date)
+            } else {
+                try await HealthStore.weightQuantities(on: date)
+            }
+
             let value: Double? = if isDailyAverage {
                 quantities?.averageValue?.rounded(toPlaces: 2)
             } else {
@@ -63,7 +68,11 @@ public struct WeightSample: Hashable, Codable {
 //                let date = movingAverage.interval.startDate(with: date)
                 let date = date.moveDayBy(-index)
 
-                let quantities = try await HealthStore.weightQuantities(on: date)
+                let quantities = if isPreview {
+                    mockWeightQuantities(for: date)
+                } else {
+                    try await HealthStore.weightQuantities(on: date)
+                }
                 let value: Double? = if weight.isDailyAverage {
                     quantities?.averageValue?.rounded(toPlaces: 2)
                 } else {
