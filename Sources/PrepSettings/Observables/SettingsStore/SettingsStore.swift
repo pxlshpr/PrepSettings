@@ -125,18 +125,18 @@ public extension SettingsStore {
     }
 }
 
-import HealthKit
-
-public extension SettingsStore {
-    
-    static func unit(for type: QuantityType) -> HKUnit {
-        switch type {
-        case .weight, .leanBodyMass:
-            shared.settings.bodyMassUnit.healthKitUnit
-        case .height:
-            shared.settings.heightUnit.healthKitUnit
-        case .restingEnergy, .activeEnergy:
-            shared.settings.energyUnit.healthKitUnit
-        }
-    }
-}
+//import HealthKit
+//
+//public extension SettingsStore {
+//    
+//    static func unit(for type: QuantityType) -> HKUnit {
+//        switch type {
+//        case .weight, .leanBodyMass:
+//            shared.settings.bodyMassUnit.healthKitUnit
+//        case .height:
+//            shared.settings.heightUnit.healthKitUnit
+//        case .restingEnergy, .activeEnergy:
+//            shared.settings.energyUnit.healthKitUnit
+//        }
+//    }
+//}

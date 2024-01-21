@@ -16,6 +16,12 @@ public struct Settings: Codable, Hashable {
     public var metricType: GoalMetricType
     
     public var displayedMicros: [Micro]
+    
+    public var healthKitSyncedHealthDetails: [HealthDetail]
+    public var dailyValueTypes: [HealthDetail : DailyValueType]
+
+    //TODO: Remove these
+    /// [ ] Because these should be per-day, similar to `Plan` and `HealthDetails`
     public var dailyValues: [Micro: DailyValue]
 }
 
@@ -32,6 +38,8 @@ public extension Settings {
             expandedMicroGroups: [],
             metricType: .consumed,
             displayedMicros: [],
+            healthKitSyncedHealthDetails: [],
+            dailyValueTypes: [:],
             dailyValues: [:]
         )
     }
