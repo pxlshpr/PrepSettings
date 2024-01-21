@@ -1,14 +1,14 @@
 import Foundation
 import HealthKit
 
-struct LeanBodyMassMeasurement: Hashable, Identifiable, Codable {
-    let id: UUID
-    let source: MeasurementSource
-    let healthKitUUID: UUID?
-    let equation: LeanBodyMassAndFatPercentageEquation?
-    let date: Date
-    var leanBodyMassInKg: Double
-    let isConvertedFromFatPercentage: Bool
+public struct LeanBodyMassMeasurement: Hashable, Identifiable, Codable {
+    public let id: UUID
+    public let source: MeasurementSource
+    public let healthKitUUID: UUID?
+    public let equation: LeanBodyMassAndFatPercentageEquation?
+    public let date: Date
+    public var leanBodyMassInKg: Double
+    public let isConvertedFromFatPercentage: Bool
 
     init(
         id: UUID,

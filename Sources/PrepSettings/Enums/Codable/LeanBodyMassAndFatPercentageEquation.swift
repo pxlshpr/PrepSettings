@@ -1,6 +1,6 @@
 import Foundation
 
-enum LeanBodyMassAndFatPercentageEquation: Int, Identifiable, Codable, CaseIterable {
+public enum LeanBodyMassAndFatPercentageEquation: Int, Identifiable, Codable, CaseIterable {
     case boer = 1
     case james
     case hume
@@ -8,7 +8,7 @@ enum LeanBodyMassAndFatPercentageEquation: Int, Identifiable, Codable, CaseItera
     case bmi
     case cunBAE
     
-    var id: Int {
+    public var id: Int {
         rawValue
     }
 }

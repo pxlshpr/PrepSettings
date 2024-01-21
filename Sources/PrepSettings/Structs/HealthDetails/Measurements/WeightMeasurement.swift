@@ -1,11 +1,11 @@
 import Foundation
 import HealthKit
 
-struct WeightMeasurement: Hashable, Identifiable, Codable {
-    let id: UUID
-    let healthKitUUID: UUID?
-    let date: Date
-    let weightInKg: Double
+public struct WeightMeasurement: Hashable, Identifiable, Codable {
+    public let id: UUID
+    public let healthKitUUID: UUID?
+    public let date: Date
+    public let weightInKg: Double
 
     init(
         id: UUID = UUID(),

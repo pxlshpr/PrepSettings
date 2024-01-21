@@ -1,6 +1,6 @@
 import Foundation
 
-enum MeasurementSource: Int, Codable, Hashable {
+public enum MeasurementSource: Int, Codable, Hashable {
     case healthKit = 1
     case equation
     case manual

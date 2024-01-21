@@ -4,12 +4,28 @@ import PrepShared
 extension HealthDetails {
     public struct Maintenance: Hashable, Codable {
         
-        public var type: MaintenanceType = .estimated
+        public var type: MaintenanceType
         public var kcal: Double?
-        public var adaptive = Adaptive()
-        public var estimate = Estimate()
-        public var useEstimateAsFallback: Bool = true
-        public var hasConfigured: Bool = false
+        public var adaptive: Adaptive
+        public var estimate: Estimate
+        public var useEstimateAsFallback: Bool
+        public var hasConfigured: Bool
+        
+        public init(
+            type: MaintenanceType = .estimated,
+            kcal: Double? = nil,
+            adaptive: Adaptive = Adaptive(),
+            estimate: Estimate = Estimate(),
+            useEstimateAsFallback: Bool = true,
+            hasConfigured: Bool = false
+        ) {
+            self.type = type
+            self.kcal = kcal
+            self.adaptive = adaptive
+            self.estimate = estimate
+            self.useEstimateAsFallback = useEstimateAsFallback
+            self.hasConfigured = hasConfigured
+        }
         
         public struct Adaptive: Hashable, Codable {
             public var kcal: Double?
@@ -54,22 +70,58 @@ extension HealthDetails {
         
         public struct Estimate: Hashable, Codable {
             public var kcal: Double?
-            public var restingEnergy = RestingEnergy()
-            public var activeEnergy = ActiveEnergy()
+            public var restingEnergy: RestingEnergy
+            public var activeEnergy: ActiveEnergy
+            
+            public init(
+                kcal: Double? = nil,
+                restingEnergy: RestingEnergy = RestingEnergy(),
+                activeEnergy: ActiveEnergy = ActiveEnergy()
+            ) {
+                self.kcal = kcal
+                self.restingEnergy = restingEnergy
+                self.activeEnergy = activeEnergy
+            }
             
             public struct RestingEnergy: Hashable, Codable {
-                public var kcal: Double? = nil
-                public var source: RestingEnergySource = .equation
-                public var equation: RestingEnergyEquation? = .katchMcardle
-                public var preferLeanBodyMass: Bool = true
+                public var kcal: Double?
+                public var source: RestingEnergySource
+                public var equation: RestingEnergyEquation?
+                public var preferLeanBodyMass: Bool
                 public var healthKitFetchSettings: HealthKitFetchSettings?
+                
+                public init(
+                    kcal: Double? = nil,
+                    source: RestingEnergySource = .equation,
+                    equation: RestingEnergyEquation? = .katchMcardle,
+                    preferLeanBodyMass: Bool = true,
+                    healthKitFetchSettings: HealthKitFetchSettings? = nil
+                ) {
+                    self.kcal = kcal
+                    self.source = source
+                    self.equation = equation
+                    self.preferLeanBodyMass = preferLeanBodyMass
+                    self.healthKitFetchSettings = healthKitFetchSettings
+                }
             }
             
             public struct ActiveEnergy: Hashable, Codable {
-                public var kcal: Double? = nil
-                public var source: ActiveEnergySource = .activityLevel
-                public var activityLevel: ActivityLevel? = .lightlyActive
+                public var kcal: Double?
+                public var source: ActiveEnergySource
+                public var activityLevel: ActivityLevel?
                 public var healthKitFetchSettings: HealthKitFetchSettings?
+                
+                public init(
+                    kcal: Double? = nil,
+                    source: ActiveEnergySource = .activityLevel,
+                    activityLevel: ActivityLevel? = .lightlyActive,
+                    healthKitFetchSettings: HealthKitFetchSettings? = nil
+                ) {
+                    self.kcal = kcal
+                    self.source = source
+                    self.activityLevel = activityLevel
+                    self.healthKitFetchSettings = healthKitFetchSettings
+                }
             }
             
         }

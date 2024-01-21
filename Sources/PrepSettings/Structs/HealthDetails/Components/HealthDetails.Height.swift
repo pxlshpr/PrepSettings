@@ -4,9 +4,19 @@ import PrepShared
 
 extension HealthDetails {
     public struct Height: Hashable, Codable {
-        public var heightInCm: Double? = nil
-        var measurements: [HeightMeasurement] = []
-        var deletedHealthKitMeasurements: [HeightMeasurement] = []
+        public var heightInCm: Double?
+        public var measurements: [HeightMeasurement]
+        public var deletedHealthKitMeasurements: [HeightMeasurement]
+        
+        public init(
+            heightInCm: Double? = nil,
+            measurements: [HeightMeasurement] = [],
+            deletedHealthKitMeasurements: [HeightMeasurement] = []
+        ) {
+            self.heightInCm = heightInCm
+            self.measurements = measurements
+            self.deletedHealthKitMeasurements = deletedHealthKitMeasurements
+        }
     }
 }
 

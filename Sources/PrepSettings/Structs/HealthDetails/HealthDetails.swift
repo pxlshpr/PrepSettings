@@ -5,19 +5,45 @@ public struct HealthDetails: Hashable, Codable {
     
     public let date: Date
     
-    public var maintenance = Maintenance()
+    public var maintenance: Maintenance
     
-    public var weight = Weight()
-    public var height = Height()
-    public var leanBodyMass = LeanBodyMass()
-    public var fatPercentage = FatPercentage()
-    public var pregnancyStatus: PregnancyStatus = .notSet
+    public var weight: Weight
+    public var height: Height
+    public var leanBodyMass: LeanBodyMass
+    public var fatPercentage: FatPercentage
+    public var pregnancyStatus: PregnancyStatus
     
     public var dateOfBirthComponents: DateComponents?
-    public var biologicalSex: BiologicalSex = .notSet
-    public var smokingStatus: SmokingStatus = .notSet
+    public var biologicalSex: BiologicalSex
+    public var smokingStatus: SmokingStatus
     
-    public var replacementsForMissing = ReplacementsForMissing()
+    public var replacementsForMissing: ReplacementsForMissing
+    
+    public init(
+        date: Date,
+        maintenance: Maintenance = Maintenance(),
+        weight: Weight = Weight(),
+        height: Height = Height(),
+        leanBodyMass: LeanBodyMass = LeanBodyMass(),
+        fatPercentage: FatPercentage = FatPercentage(),
+        pregnancyStatus: PregnancyStatus = .notSet,
+        dateOfBirthComponents: DateComponents? = nil,
+        biologicalSex: BiologicalSex = .notSet,
+        smokingStatus: SmokingStatus = .notSet,
+        replacementsForMissing: ReplacementsForMissing = ReplacementsForMissing()
+    ) {
+        self.date = date
+        self.maintenance = maintenance
+        self.weight = weight
+        self.height = height
+        self.leanBodyMass = leanBodyMass
+        self.fatPercentage = fatPercentage
+        self.pregnancyStatus = pregnancyStatus
+        self.dateOfBirthComponents = dateOfBirthComponents
+        self.biologicalSex = biologicalSex
+        self.smokingStatus = smokingStatus
+        self.replacementsForMissing = replacementsForMissing
+    }
 }
 
 extension HealthDetails {
@@ -28,6 +54,22 @@ extension HealthDetails {
         public var datedFatPercentage: DatedFatPercentage?
         public var datedPregnancyStatus: DatedPregnancyStatus?
         public var datedMaintenance: DatedMaintenance?
+        
+        public init(
+            datedWeight: DatedWeight? = nil,
+            datedHeight: DatedHeight? = nil,
+            datedLeanBodyMass: DatedLeanBodyMass? = nil,
+            datedFatPercentage: DatedFatPercentage? = nil,
+            datedPregnancyStatus: DatedPregnancyStatus? = nil,
+            datedMaintenance: DatedMaintenance? = nil
+        ) {
+            self.datedWeight = datedWeight
+            self.datedHeight = datedHeight
+            self.datedLeanBodyMass = datedLeanBodyMass
+            self.datedFatPercentage = datedFatPercentage
+            self.datedPregnancyStatus = datedPregnancyStatus
+            self.datedMaintenance = datedMaintenance
+        }
     }
 }
 

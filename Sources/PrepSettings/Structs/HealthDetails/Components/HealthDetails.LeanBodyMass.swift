@@ -5,8 +5,18 @@ import HealthKit
 extension HealthDetails {
     public struct LeanBodyMass: Hashable, Codable {
         public var leanBodyMassInKg: Double? = nil
-        var measurements: [LeanBodyMassMeasurement] = []
-        var deletedHealthKitMeasurements: [LeanBodyMassMeasurement] = []
+        public var measurements: [LeanBodyMassMeasurement]
+        public var deletedHealthKitMeasurements: [LeanBodyMassMeasurement]
+        
+        public init(
+            leanBodyMassInKg: Double? = nil,
+            measurements: [LeanBodyMassMeasurement] = [],
+            deletedHealthKitMeasurements: [LeanBodyMassMeasurement] = []
+        ) {
+            self.leanBodyMassInKg = leanBodyMassInKg
+            self.measurements = measurements
+            self.deletedHealthKitMeasurements = deletedHealthKitMeasurements
+        }
     }
 }
 
