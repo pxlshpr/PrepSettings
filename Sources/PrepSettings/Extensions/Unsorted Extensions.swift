@@ -34,11 +34,11 @@ public extension Date {
         return formatter.string(from: self)
     }
     
-    var dateString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy_MM_dd"
-        return formatter.string(from: self)
-    }
+//    var dateString: String {
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy_MM_dd"
+//        return formatter.string(from: self)
+//    }
 }
 
 extension Date {
