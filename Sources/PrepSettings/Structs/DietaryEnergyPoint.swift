@@ -16,7 +16,8 @@ extension DietaryEnergyPoint: HealthKitFetchable {
     mutating func fetchFromHealthKitIfNeeded(day: Day, using stats: HKStatisticsCollection) async {
         switch source {
         case .healthKit:
-            kcal = await HealthStore.dietaryEnergyTotalInKcal(for: day.date, using: stats)
+            guard let date = day.date else { break }
+            kcal = await HealthStore.dietaryEnergyTotalInKcal(for: date, using: stats)
         case .log:
             kcal = day.energyInKcal
         default:

@@ -15,7 +15,7 @@ let package = Package(
             targets: ["PrepSettings"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pxlshpr/PrepShared", from: "0.0.230"),
+        .package(url: "https://github.com/pxlshpr/PrepShared", from: "0.0.233"),
         .package(url: "https://github.com/siteline/swiftUI-introspect", from: "1.1.1"),
     ],
     targets: [

@@ -1,17 +1,17 @@
 import Foundation
 import PrepShared
 
-struct Day: Codable, Hashable {
-    let date: Date
-    var healthDetails: HealthDetails
-    var dietaryEnergyPoint: DietaryEnergyPoint?
-    var energyInKcal: Double?
-    
-    init(date: Date) {
-        self.date = date
-        self.healthDetails = HealthDetails(date: date)
-    }
-}
+//struct Day: Codable, Hashable {
+//    let date: Date
+//    var healthDetails: HealthDetails
+//    var dietaryEnergyPoint: DietaryEnergyPoint?
+//    var energyInKcal: Double?
+//    
+//    init(date: Date) {
+//        self.date = date
+//        self.healthDetails = HealthDetails(date: date)
+//    }
+//}
 
 import HealthKit
 
@@ -104,23 +104,23 @@ extension Day {
         switch type {
 
         case .restingEnergy:
-            await healthDetails.maintenance.estimate.restingEnergy
+            await healthDetails?.maintenance.estimate.restingEnergy
                 .fetchFromHealthKitIfNeeded(day: day, using: stats)
 
         case .activeEnergy:
-            await healthDetails.maintenance.estimate.activeEnergy
+            await healthDetails?.maintenance.estimate.activeEnergy
                 .fetchFromHealthKitIfNeeded(day: day, using: stats)
 
         case .dietaryEnergy:
             /// If we don't yet a have dietaryEnergyPoint for this date, create one
-            if dietaryEnergyPoint == nil {
+            if dietaryEnergyPoint == nil, let date = day.date {
                 /// First try grab the log value, then the healthKit value, otherwise not counting the day
                 dietaryEnergyPoint = if let kcal = day.energyInKcal {
-                    .init(date: day.date, kcal: kcal, source: .log)
-                } else if let kcal = await HealthStore.dietaryEnergyTotalInKcal(for: day.date, using: stats) {
-                    .init(date: day.date, kcal: kcal, source: .healthKit)
+                    .init(date: date, kcal: kcal, source: .log)
+                } else if let kcal = await HealthStore.dietaryEnergyTotalInKcal(for: date, using: stats) {
+                    .init(date: date, kcal: kcal, source: .healthKit)
                 } else {
-                    .init(date: day.date, source: .notCounted)
+                    .init(date: date, source: .notCounted)
                 }
             } else {
                 /// Otherwise update the kcals based on the source that the user has chosen

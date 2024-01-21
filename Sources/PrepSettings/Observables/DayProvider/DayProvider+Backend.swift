@@ -1,4 +1,5 @@
 import Foundation
+import PrepShared
 
 let DaysStartDateKey = "DaysStartDate"
 
@@ -50,7 +51,7 @@ extension DayProvider {
     }
     
     static func fetchOrCreateDayFromBackend(_ date: Date) async -> Day {
-        .init(date: date)
+        Day(dateString: date.dateString)
     }
     
     func fetchOrCreateDayFromBackend(_ date: Date) async -> Day {

@@ -53,9 +53,13 @@ extension DayProvider {
             
             var day = value
 
+            guard let healthDetails = day.healthDetails else {
+                fatalError() /// Remove in production
+            }
+            
             /// Create a HealthProvider for it (which in turn fetches the latest health details)
             let healthProvider = HealthProvider(
-                healthDetails: day.healthDetails,
+                healthDetails: healthDetails,
                 settingsProvider: settingsProvider
             )
             
@@ -65,7 +69,7 @@ extension DayProvider {
                 days: days
             )
 
-            latestHealthDetails.extractLatestHealthDetails(from: day.healthDetails)
+            latestHealthDetails.extractLatestHealthDetails(from: healthDetails)
             
             day.healthDetails = healthProvider.healthDetails
 

@@ -108,7 +108,7 @@ extension HealthProvider {
                 for index in 0..<interval.numberOfDays {
                     let date = point.date.startOfDay.moveDayBy(-index)
 //                    let weight = await HealthProvider.fetchOrCreateBackendWeight(for: date)
-                    let weight = days[date]?.healthDetails.weight ?? .init()
+                    let weight = days[date]?.healthDetails?.weight ?? .init()
                     weights[date] = weight
                 }
                 
@@ -120,7 +120,7 @@ extension HealthProvider {
             point.kg = if let interval = point.movingAverageInterval {
                 movingAverageWeight(over: interval)
             } else {
-                (days[point.date]?.healthDetails.weight ?? .init())
+                (days[point.date]?.healthDetails?.weight ?? .init())
                     .weightInKg
             }
         }

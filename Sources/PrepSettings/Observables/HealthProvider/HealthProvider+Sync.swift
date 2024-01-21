@@ -1,6 +1,7 @@
 import SwiftUI
 import HealthKit
 import SwiftSugar
+import PrepShared
 
 extension HealthProvider {
     
@@ -187,19 +188,19 @@ extension HealthProvider {
             guard let day = days[date] else { continue }
             let initialDay = day
             /// If the point doesn't exist, create it
-            if day.dietaryEnergyPoint == nil {
+            if day.dietaryEnergyPoint == nil, let date = day.date {
                 if let kcal = await HealthStore.dietaryEnergyTotalInKcal(
-                    for: day.date,
+                    for: date,
                     using: stats
                 ) {
                     days[date]?.dietaryEnergyPoint = .init(
-                        date: day.date,
+                        date: date,
                         kcal: kcal,
                         source: .healthKit
                     )
                 } else {
                     days[date]?.dietaryEnergyPoint = .init(
-                        date: day.date,
+                        date: date,
                         source: .notCounted
                     )
                 }
@@ -230,7 +231,7 @@ extension HealthProvider {
             
             for type in HealthKitType.syncedTypes {
                 guard let samples = samples[type] else { continue }
-                days[date]?.healthDetails.syncWithHealthKit(
+                days[date]?.healthDetails?.syncWithHealthKit(
                     type: type,
                     samples: samples,
                     toDelete: &toDelete,

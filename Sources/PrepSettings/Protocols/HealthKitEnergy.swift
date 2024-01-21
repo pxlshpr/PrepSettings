@@ -28,19 +28,24 @@ extension HealthKitEnergy {
         day: Day,
         using stats: HKStatisticsCollection
     ) async {
-        guard isHealthKitSourced, let healthKitFetchSettings else { return }
+        guard 
+            let date = day.date,
+            let healthKitFetchSettings,
+            isHealthKitSourced
+        else { return }
+
         let kcal = switch healthKitFetchSettings.intervalType {
         case .average:
             await HealthStore.energy(
                 energyType,
                 for: healthKitFetchSettings.interval,
-                on: day.date,
+                on: date,
                 using: stats
             )
         case .sameDay:
-            await HealthStore.energy(energyType, on: day.date)
+            await HealthStore.energy(energyType, on: date)
         case .previousDay:
-            await HealthStore.energy(energyType, on: day.date.moveDayBy(-1))
+            await HealthStore.energy(energyType, on: date.moveDayBy(-1))
         }
         self.kcal = kcal
     }
