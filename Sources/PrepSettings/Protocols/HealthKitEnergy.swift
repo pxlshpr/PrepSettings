@@ -1,5 +1,6 @@
 import Foundation
 import HealthKit
+import PrepShared
 
 protocol HealthKitEnergy: HealthKitFetchable {
     var healthKitFetchSettings: HealthKitFetchSettings? { get }

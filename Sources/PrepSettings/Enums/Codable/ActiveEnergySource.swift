@@ -1,11 +1,13 @@
 import Foundation
 import PrepShared
 
-public enum ActiveEnergySource: Int, Codable, CaseIterable {
-    case activityLevel = 1
-    case healthKit
-    case manual
-    
+//public enum ActiveEnergySource: Int, Codable, CaseIterable {
+//    case activityLevel = 1
+//    case healthKit
+//    case manual
+//}
+
+public extension ActiveEnergySource {
     var name: String {
         switch self {
         case .healthKit:        "Apple Health"

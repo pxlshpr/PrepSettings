@@ -1,15 +1,15 @@
 import Foundation
 import PrepShared
 
-public enum RestingEnergyEquation: Int16, Hashable, Codable, CaseIterable {
-    case katchMcardle = 1
-    case henryOxford
-    case mifflinStJeor
-    case schofield
-    case cunningham
-    case rozaShizgal
-    case harrisBenedict
-}
+//public enum RestingEnergyEquation: Int16, Hashable, Codable, CaseIterable {
+//    case katchMcardle = 1
+//    case henryOxford
+//    case mifflinStJeor
+//    case schofield
+//    case cunningham
+//    case rozaShizgal
+//    case harrisBenedict
+//}
 
 extension RestingEnergyEquation: Pickable {
     public var pickedTitle: String { name }

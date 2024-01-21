@@ -1,11 +1,12 @@
 import Foundation
+import PrepShared
 
-public enum CorrectionType: Int, Codable, CaseIterable {
-    case add = 1
-    case subtract
-    case multiply
-    case divide
-}
+//public enum CorrectionType: Int, Codable, CaseIterable {
+//    case add = 1
+//    case subtract
+//    case multiply
+//    case divide
+//}
 
 extension CorrectionType {
     var name: String {

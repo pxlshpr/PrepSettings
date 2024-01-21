@@ -4,7 +4,7 @@ import PrepShared
 
 let MaxAdaptiveWeeks: Int = 2
 
-let MinimumAdaptiveEnergyInKcal: Double = 1000
+//let MinimumAdaptiveEnergyInKcal: Double = 1000
 
 struct AdaptiveMaintenanceForm: View {
     

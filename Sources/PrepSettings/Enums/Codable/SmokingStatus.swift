@@ -1,11 +1,11 @@
 import Foundation
 import PrepShared
 
-public enum SmokingStatus: Int16, Codable, CaseIterable {
-    case nonSmoker = 1
-    case smoker
-    case notSet
-}
+//public enum SmokingStatus: Int16, Codable, CaseIterable {
+//    case nonSmoker = 1
+//    case smoker
+//    case notSet
+//}
 
 public extension SmokingStatus {
     

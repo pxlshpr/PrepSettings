@@ -1,5 +1,6 @@
 import Foundation
 import HealthKit
+import PrepShared
 
 protocol Measurable: Identifiable {
     var id: UUID { get }

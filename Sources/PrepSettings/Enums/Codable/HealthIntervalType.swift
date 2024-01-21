@@ -1,10 +1,13 @@
 import Foundation
 import PrepShared
 
-public enum HealthIntervalType: Int16, Codable, CaseIterable {
-    case average = 1
-    case sameDay
-    case previousDay
+//public enum HealthIntervalType: Int16, Codable, CaseIterable {
+//    case average = 1
+//    case sameDay
+//    case previousDay
+//}
+
+extension HealthIntervalType {
     
     var name: String {
         switch self {

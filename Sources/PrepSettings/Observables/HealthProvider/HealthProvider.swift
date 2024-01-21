@@ -1,5 +1,6 @@
 import SwiftUI
 import HealthKit
+import PrepShared
 
 @Observable public class HealthProvider {
     
