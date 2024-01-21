@@ -1,18 +1,16 @@
 import SwiftUI
 import HealthKit
 
-@Observable class HealthProvider {
+@Observable public class HealthProvider {
     
-    var settingsProvider: SettingsProvider
-    
-    let isCurrent: Bool
-    
+    public var settingsProvider: SettingsProvider
+    public let isCurrent: Bool
+    public var healthDetails: HealthDetails
+
     var unsavedHealthDetails: HealthDetails
-    var healthDetails: HealthDetails
-    
     var saveTask: Task<Void, Error>? = nil
     
-    init(
+    public init(
         healthDetails: HealthDetails,
         settingsProvider: SettingsProvider
     ) {

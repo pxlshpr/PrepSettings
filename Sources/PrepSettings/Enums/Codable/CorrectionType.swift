@@ -1,11 +1,13 @@
 import Foundation
 
-enum CorrectionType: Int, Codable, CaseIterable {
+public enum CorrectionType: Int, Codable, CaseIterable {
     case add = 1
     case subtract
     case multiply
     case divide
-    
+}
+
+extension CorrectionType {
     var name: String {
         switch self {
         case .add:      "Add"

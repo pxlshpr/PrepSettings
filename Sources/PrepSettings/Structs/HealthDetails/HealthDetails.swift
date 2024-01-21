@@ -1,33 +1,33 @@
 import Foundation
 import PrepShared
 
-struct HealthDetails: Hashable, Codable {
+public struct HealthDetails: Hashable, Codable {
     
-    let date: Date
+    public let date: Date
     
-    var maintenance = Maintenance()
+    public var maintenance = Maintenance()
     
-    var weight = Weight()
-    var height = Height()
-    var leanBodyMass = LeanBodyMass()
-    var fatPercentage = FatPercentage()
-    var pregnancyStatus: PregnancyStatus = .notSet
+    public var weight = Weight()
+    public var height = Height()
+    public var leanBodyMass = LeanBodyMass()
+    public var fatPercentage = FatPercentage()
+    public var pregnancyStatus: PregnancyStatus = .notSet
     
-    var dateOfBirthComponents: DateComponents?
-    var biologicalSex: BiologicalSex = .notSet
-    var smokingStatus: SmokingStatus = .notSet
+    public var dateOfBirthComponents: DateComponents?
+    public var biologicalSex: BiologicalSex = .notSet
+    public var smokingStatus: SmokingStatus = .notSet
     
-    var replacementsForMissing = ReplacementsForMissing()
+    public var replacementsForMissing = ReplacementsForMissing()
 }
 
 extension HealthDetails {
-    struct ReplacementsForMissing: Hashable, Codable {
-        var datedWeight: DatedWeight?
-        var datedHeight: DatedHeight?
-        var datedLeanBodyMass: DatedLeanBodyMass?
-        var datedFatPercentage: DatedFatPercentage?
-        var datedPregnancyStatus: DatedPregnancyStatus?
-        var datedMaintenance: DatedMaintenance?
+    public struct ReplacementsForMissing: Hashable, Codable {
+        public var datedWeight: DatedWeight?
+        public var datedHeight: DatedHeight?
+        public var datedLeanBodyMass: DatedLeanBodyMass?
+        public var datedFatPercentage: DatedFatPercentage?
+        public var datedPregnancyStatus: DatedPregnancyStatus?
+        public var datedMaintenance: DatedMaintenance?
     }
 }
 
@@ -59,32 +59,32 @@ extension HealthDetails {
     }
 }
 
-struct DatedWeight: Hashable, Codable {
+public struct DatedWeight: Hashable, Codable {
     let date: Date
     var weight: HealthDetails.Weight
 }
 
-struct DatedMaintenance: Hashable, Codable {
+public struct DatedMaintenance: Hashable, Codable {
     let date: Date
     var maintenance: HealthDetails.Maintenance
 }
 
-struct DatedHeight: Hashable, Codable {
+public struct DatedHeight: Hashable, Codable {
     let date: Date
     var height: HealthDetails.Height
 }
 
-struct DatedLeanBodyMass: Hashable, Codable {
+public struct DatedLeanBodyMass: Hashable, Codable {
     let date: Date
     var leanBodyMass: HealthDetails.LeanBodyMass
 }
 
-struct DatedFatPercentage: Hashable, Codable {
+public struct DatedFatPercentage: Hashable, Codable {
     let date: Date
     var fatPercentage: HealthDetails.FatPercentage
 }
 
-struct DatedPregnancyStatus: Hashable, Codable {
+public struct DatedPregnancyStatus: Hashable, Codable {
     let date: Date
     var pregnancyStatus: PregnancyStatus
 }

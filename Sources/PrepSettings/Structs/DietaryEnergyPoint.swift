@@ -1,10 +1,10 @@
 import Foundation
 import HealthKit
 
-struct DietaryEnergyPoint: Hashable, Codable {
-    var date: Date
-    var kcal: Double?
-    var source: DietaryEnergyPointSource
+public struct DietaryEnergyPoint: Hashable, Codable {
+    public var date: Date
+    public var kcal: Double?
+    public var source: DietaryEnergyPointSource
 }
 
 protocol HealthKitFetchable {

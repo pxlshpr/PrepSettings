@@ -3,8 +3,8 @@ import HealthKit
 import PrepShared
 
 extension HealthDetails {
-    struct Height: Hashable, Codable {
-        var heightInCm: Double? = nil
+    public struct Height: Hashable, Codable {
+        public var heightInCm: Double? = nil
         var measurements: [HeightMeasurement] = []
         var deletedHealthKitMeasurements: [HeightMeasurement] = []
     }

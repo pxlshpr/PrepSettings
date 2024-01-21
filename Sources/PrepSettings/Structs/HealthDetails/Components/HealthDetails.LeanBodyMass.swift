@@ -3,8 +3,8 @@ import PrepShared
 import HealthKit
 
 extension HealthDetails {
-    struct LeanBodyMass: Hashable, Codable {
-        var leanBodyMassInKg: Double? = nil
+    public struct LeanBodyMass: Hashable, Codable {
+        public var leanBodyMassInKg: Double? = nil
         var measurements: [LeanBodyMassMeasurement] = []
         var deletedHealthKitMeasurements: [LeanBodyMassMeasurement] = []
     }

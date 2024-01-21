@@ -2,23 +2,22 @@ import Foundation
 import PrepShared
 
 extension HealthDetails {
-    struct Maintenance: Hashable, Codable {
+    public struct Maintenance: Hashable, Codable {
         
-        var type: MaintenanceType = .estimated
-        var kcal: Double?
-        var adaptive = Adaptive()
-        var estimate = Estimate()
-        var useEstimateAsFallback: Bool = true
-        var hasConfigured: Bool = false
+        public var type: MaintenanceType = .estimated
+        public var kcal: Double?
+        public var adaptive = Adaptive()
+        public var estimate = Estimate()
+        public var useEstimateAsFallback: Bool = true
+        public var hasConfigured: Bool = false
         
-        struct Adaptive: Hashable, Codable {
-            var kcal: Double?
-            var interval: HealthInterval
+        public struct Adaptive: Hashable, Codable {
+            public var kcal: Double?
+            public var interval: HealthInterval
+            public var dietaryEnergy = DietaryEnergy()
+            public var weightChange = WeightChange()
             
-            var dietaryEnergy = DietaryEnergy()
-            var weightChange = WeightChange()
-            
-            init(
+            public init(
                 kcal: Double? = nil,
                 interval: HealthInterval = .init(1, .week),
                 dietaryEnergyPoints points: [DietaryEnergyPoint] = [],
@@ -32,8 +31,8 @@ extension HealthDetails {
                 self.kcal = self.calculateIfValid()
             }
 
-            struct DietaryEnergy: Hashable, Codable {
-                var kcalPerDay: Double?
+            public struct DietaryEnergy: Hashable, Codable {
+                public var kcalPerDay: Double?
 
                 init(kcalPerDay: Double? = nil) {
                     self.kcalPerDay = kcalPerDay
@@ -53,24 +52,24 @@ extension HealthDetails {
             }
         }
         
-        struct Estimate: Hashable, Codable {
-            var kcal: Double?
-            var restingEnergy = RestingEnergy()
-            var activeEnergy = ActiveEnergy()
+        public struct Estimate: Hashable, Codable {
+            public var kcal: Double?
+            public var restingEnergy = RestingEnergy()
+            public var activeEnergy = ActiveEnergy()
             
-            struct RestingEnergy: Hashable, Codable {
-                var kcal: Double? = nil
-                var source: RestingEnergySource = .equation
-                var equation: RestingEnergyEquation? = .katchMcardle
-                var preferLeanBodyMass: Bool = true
-                var healthKitFetchSettings: HealthKitFetchSettings?
+            public struct RestingEnergy: Hashable, Codable {
+                public var kcal: Double? = nil
+                public var source: RestingEnergySource = .equation
+                public var equation: RestingEnergyEquation? = .katchMcardle
+                public var preferLeanBodyMass: Bool = true
+                public var healthKitFetchSettings: HealthKitFetchSettings?
             }
             
-            struct ActiveEnergy: Hashable, Codable {
-                var kcal: Double? = nil
-                var source: ActiveEnergySource = .activityLevel
-                var activityLevel: ActivityLevel? = .lightlyActive
-                var healthKitFetchSettings: HealthKitFetchSettings?
+            public struct ActiveEnergy: Hashable, Codable {
+                public var kcal: Double? = nil
+                public var source: ActiveEnergySource = .activityLevel
+                public var activityLevel: ActivityLevel? = .lightlyActive
+                public var healthKitFetchSettings: HealthKitFetchSettings?
             }
             
         }

@@ -1,14 +1,13 @@
 import Foundation
 import PrepShared
 
-enum BiologicalSex: Int, Codable, CaseIterable {
+public enum BiologicalSex: Int, Codable, CaseIterable {
     case female = 1
     case male
     case notSet
 }
 
-extension BiologicalSex {
-    
+public extension BiologicalSex {
     var name: String {
         switch self {
         case .female:   "Female"
@@ -19,7 +18,7 @@ extension BiologicalSex {
 }
 
 extension BiologicalSex: Pickable {
-    var pickedTitle: String { self.name }
-    var menuTitle: String { self.name }
-    static var `default`: BiologicalSex { .notSet }
+    public var pickedTitle: String { self.name }
+    public var menuTitle: String { self.name }
+    public static var `default`: BiologicalSex { .notSet }
 }

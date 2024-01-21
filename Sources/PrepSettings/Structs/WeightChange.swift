@@ -1,15 +1,25 @@
 import Foundation
 import PrepShared
 
-struct WeightChange: Hashable, Codable {
+public struct WeightChange: Hashable, Codable {
 
-    var kg: Double?
-    var type: WeightChangeType = .weights
-    var points: Points? = nil
+    public var kg: Double?
+    public var type: WeightChangeType
+    public var points: Points? = nil
     
-    struct Points: Hashable, Codable {
-        var start: WeightChangePoint
-        var end: WeightChangePoint
+    public init(
+        kg: Double? = nil,
+        type: WeightChangeType = .weights,
+        points: Points? = nil
+    ) {
+        self.kg = kg
+        self.type = type
+        self.points = points
+    }
+    
+    public struct Points: Hashable, Codable {
+        public var start: WeightChangePoint
+        public var end: WeightChangePoint
         
         init(date: Date, interval: HealthInterval) {
             self.end = .init(date: date)
