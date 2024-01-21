@@ -1,4 +1,5 @@
 import Foundation
+import PrepShared
 
 enum Variables {
     case required([HealthDetail], String)

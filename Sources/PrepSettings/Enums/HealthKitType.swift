@@ -1,4 +1,5 @@
 import HealthKit
+import PrepShared
 
 enum HealthKitType {
     case weight

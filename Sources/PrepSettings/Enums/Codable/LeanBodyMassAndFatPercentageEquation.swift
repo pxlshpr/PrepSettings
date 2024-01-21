@@ -1,4 +1,5 @@
 import Foundation
+import PrepShared
 
 public enum LeanBodyMassAndFatPercentageEquation: Int, Identifiable, Codable, CaseIterable {
     case boer = 1

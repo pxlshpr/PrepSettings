@@ -1,5 +1,6 @@
 import Foundation
 import HealthKit
+import PrepShared
 
 protocol HealthKitSyncable {
     associatedtype MeasurementType: Measurable

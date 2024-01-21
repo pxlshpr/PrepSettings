@@ -1,4 +1,5 @@
 import Foundation
+import PrepShared
 
 public enum DailyMeasurementType: Int, CaseIterable, Hashable, Codable {
     case average = 1

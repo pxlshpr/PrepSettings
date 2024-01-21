@@ -1,4 +1,5 @@
 import Foundation
+import PrepShared
 
 extension HealthDetails {
     mutating func setLatestHealthDetails(_ latest: [HealthDetail : DatedHealthData]) {

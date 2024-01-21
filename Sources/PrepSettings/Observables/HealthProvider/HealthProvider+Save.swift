@@ -1,5 +1,6 @@
 import Foundation
 import HealthKit
+import PrepShared
 
 //TODO: For each of these:
 /// [ ] Recalculate any HealthDetails like calculated LBM, Resting Energy

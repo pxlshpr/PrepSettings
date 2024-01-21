@@ -1,4 +1,5 @@
 import Foundation
+import PrepShared
 
 extension HealthDetails {
     mutating func recalculateDailyMeasurements(using settings: Settings) {

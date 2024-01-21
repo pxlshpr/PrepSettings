@@ -1,4 +1,5 @@
 import Foundation
+import PrepShared
 
 extension HealthDetails {
     
@@ -13,7 +14,6 @@ extension HealthDetails {
         case .preganancyStatus: pregnancyStatus
         case .smokingStatus:    smokingStatus
         case .fatPercentage:    fatPercentage
-        default:                nil
         }
     }
     
