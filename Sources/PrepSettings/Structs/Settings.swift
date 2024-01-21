@@ -18,7 +18,7 @@ public struct Settings: Codable, Hashable {
     public var displayedMicros: [Micro]
     
     public var healthKitSyncedHealthDetails: [HealthDetail]
-    public var dailyValueTypes: [HealthDetail : DailyValueType]
+    public var dailyMeasurementTypes: [HealthDetail : DailyMeasurementType] = [:]
 
     //TODO: Remove these
     /// [ ] Because these should be per-day, similar to `Plan` and `HealthDetails`
@@ -39,12 +39,42 @@ public extension Settings {
             metricType: .consumed,
             displayedMicros: [],
             healthKitSyncedHealthDetails: [],
-            dailyValueTypes: [:],
+            dailyMeasurementTypes: [:],
             dailyValues: [:]
         )
     }
     
     var asData: Data {
         try! JSONEncoder().encode(self)
+    }
+}
+
+extension Settings {
+
+    mutating func setDailyMeasurementType(_ type: DailyMeasurementType, for healthDetail: HealthDetail) {
+        dailyMeasurementTypes[healthDetail] = type
+    }
+
+    func dailyMeasurementType(for healthDetail: HealthDetail) -> DailyMeasurementType {
+        dailyMeasurementTypes[healthDetail] ?? .last
+    }
+
+    func dailyMeasurementType(forHealthKitType type: HealthKitType) -> DailyMeasurementType? {
+        guard let healthDetail = type.healthDetail else { return nil }
+        return dailyMeasurementType(for: healthDetail)
+    }
+
+    func isHealthKitSyncing(_ healthDetail: HealthDetail) -> Bool {
+        healthKitSyncedHealthDetails.contains(healthDetail)
+    }
+    
+    mutating func setHealthKitSyncing(for healthDetail: HealthDetail, to isOn: Bool) {
+        switch isOn {
+        case true:
+            guard !isHealthKitSyncing(healthDetail) else { return }
+            healthKitSyncedHealthDetails.append(healthDetail)
+        case false:
+            healthKitSyncedHealthDetails.removeAll(where: { $0 == healthDetail })
+        }
     }
 }
