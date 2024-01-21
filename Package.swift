@@ -15,7 +15,8 @@ let package = Package(
             targets: ["PrepSettings"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pxlshpr/PrepShared", from: "0.0.207"),
+        .package(url: "https://github.com/pxlshpr/PrepShared", from: "0.0.211"),
+        .package(url: "https://github.com/siteline/swiftUI-introspect", from: "1.1.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -24,6 +25,7 @@ let package = Package(
             name: "PrepSettings",
             dependencies: [
                 .product(name: "PrepShared", package: "PrepShared"),
+                .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
             ],
             resources: [
                 .process("Resources")

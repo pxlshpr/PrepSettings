@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pxlshpr/PrepShared",
       "state" : {
-        "revision" : "a06dcd2b49122b8ca079cae276f2a9121d2243ac",
-        "version" : "0.0.207"
+        "revision" : "fc57297b6a96e08949f6edfcd1e9ece81361a0ef",
+        "version" : "0.0.211"
       }
     },
     {
@@ -43,6 +43,15 @@
       "state" : {
         "revision" : "1a03a2ca2ea9c0f459e0870c25e8470556bbc842",
         "version" : "0.0.97"
+      }
+    },
+    {
+      "identity" : "swiftui-introspect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/siteline/SwiftUI-Introspect",
+      "state" : {
+        "revision" : "18e965f867e37a558ad13c12d330dbe047099180",
+        "version" : "1.1.2"
       }
     },
     {
