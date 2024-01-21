@@ -161,7 +161,7 @@
 //    }
 //}
 //
-//public extension SettingsStore {
+//public extension SettingsProvider {
 //    /// Saves and fetches from a `.json` file encoded/decoded in the documents directory
 //    static func configureAsMock() {
 //        configure(

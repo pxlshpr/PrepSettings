@@ -13,7 +13,7 @@ import PrepSettings
 //    @State var currentHealthModel: HealthModel = MockCurrentHealthModel
 //    @State var pastHealthModel: HealthModel
 //
-//    @State var settingsStore: SettingsStore = SettingsStore.shared
+//    @State var settingsStore: SettingsProvider = SettingsProvider.shared
 //    
 //    @State var showingCurrentHealthDetails = false
 //    @State var showingPastHealthDetails = false
@@ -42,7 +42,7 @@ import PrepSettings
 //        .sheet(isPresented: $showingCurrentHealthDetails) { currentHealthSummary }
 //        .sheet(isPresented: $showingPastHealthDetails) { pastHealthSummary }
 //        .onAppear {
-//            SettingsStore.configureAsMock()
+//            SettingsProvider.configureAsMock()
 //        }
 //    }
 //    

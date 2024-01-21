@@ -14,7 +14,7 @@ public struct DemoView: View {
 //    @State var currentHealthModel: HealthModel = MockCurrentHealthModel
 //    @State var pastHealthModel: HealthModel
 //
-//    @State var settingsStore: SettingsStore = SettingsStore.shared
+//    @State var settingsStore: SettingsProvider = SettingsProvider.shared
 //    
 //    @State var showingCurrentHealthDetails = false
 //    @State var showingPastHealthDetails = false
@@ -52,7 +52,7 @@ public struct DemoView: View {
 //        .sheet(isPresented: $showingPastHealthDetails) { pastHealthSummary }
 //        .sheet(isPresented: $showingUnits) { unitsView }
 //        .onAppear {
-//            SettingsStore.configureAsMock()
+//            SettingsProvider.configureAsMock()
 //        }
 //        .task {
 //            Task {
