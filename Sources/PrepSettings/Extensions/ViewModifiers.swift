@@ -9,7 +9,7 @@ struct FormTitle: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
     func formTitleStyle() -> some View {
         modifier(FormTitle())
     }
