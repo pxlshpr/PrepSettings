@@ -74,8 +74,9 @@ extension SettingsProvider {
         Task {
             let settings = try await fetchHandler()
             await MainActor.run {
+                let shouldPostNotification = settings != self.settings
                 self.settings = settings
-                if settings != self.settings {
+                if shouldPostNotification {
                     post(.didUpdateSettings)
                 }
             }
