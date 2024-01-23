@@ -74,10 +74,10 @@ extension SettingsProvider {
         Task {
             let settings = try await fetchHandler()
             await MainActor.run {
+                self.settings = settings
                 if settings != self.settings {
                     post(.didUpdateSettings)
                 }
-                self.settings = settings
             }
         }
     }
