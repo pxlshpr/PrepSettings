@@ -19,8 +19,10 @@ public struct Settings: Codable, Hashable {
     
     public var healthKitSyncedHealthDetails: [HealthDetail]
     public var dailyMeasurementTypes: [HealthDetail : DailyMeasurementType] = [:]
+    
+    public var compactNutrients: [Nutrient]
 
-    //TODO: Remove these
+    //TODO: Remove this
     /// [ ] Because these should be per-day, similar to `Plan` and `HealthDetails`
     public var dailyValues: [Micro: DailyValue]
 }
@@ -40,6 +42,7 @@ public extension Settings {
             displayedMicros: [],
             healthKitSyncedHealthDetails: [],
             dailyMeasurementTypes: [:],
+            compactNutrients: [.energy, .macro(.protein), .macro(.carb), .macro(.fat)],
             dailyValues: [:]
         )
     }
