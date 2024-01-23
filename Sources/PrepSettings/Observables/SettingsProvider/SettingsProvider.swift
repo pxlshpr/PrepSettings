@@ -76,6 +76,8 @@ extension SettingsProvider {
             await MainActor.run {
                 let shouldPostNotification = settings != self.settings
                 self.settings = settings
+                
+                /// Crucial to do this after setting `settings`
                 if shouldPostNotification {
                     post(.didUpdateSettings)
                 }
