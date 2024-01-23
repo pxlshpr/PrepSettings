@@ -24,7 +24,12 @@ public typealias SettingsSaveHandler = ((Settings) async throws -> ())
     var fetchHandler: SettingsFetchHandler? = nil
     var saveHandler: SettingsSaveHandler? = nil
 
-    public init() { }
+    public init() { 
+        if let data = UserDefaults.standard.object(forKey: "Settings") as? Data,
+           let settings = try? JSONDecoder().decode(Settings.self, from: data) {
+            self.settings = settings
+        }
+    }
 
 //    func settingsDidChange(from old: Settings) {
 //        if old != settings {
@@ -65,7 +70,18 @@ extension SettingsProvider {
     func save() {
         guard let saveHandler else { return }
         Task.detached(priority: .background) {
+            
+            /// Save in the backend
             try await saveHandler(self.settings)
+            
+            /// Also save in UserDefaults for quick access on init
+            self.saveSettingsToUserDefaults()
+        }
+    }
+    
+    func saveSettingsToUserDefaults() {
+        if let encoded = try? JSONEncoder().encode(self.settings) {
+            UserDefaults.standard.set(encoded, forKey: "Settings")
         }
     }
     
