@@ -91,6 +91,14 @@ public extension SettingsProvider {
             save()
         }
     }
+    
+    var compactNutrients: [Nutrient] {
+        get { settings.compactNutrients }
+        set {
+            settings.compactNutrients = newValue
+            save()
+        }
+    }
 
     var expandedMicroGroups: [MicroGroup] {
         get { settings.expandedMicroGroups }
