@@ -90,11 +90,12 @@ extension SettingsProvider {
         Task {
             let settings = try await fetchHandler()
             await MainActor.run {
-                let shouldPostNotification = settings != self.settings
+                let hasChanged = settings != self.settings
                 self.settings = settings
                 
                 /// Crucial to do this after setting `settings`
-                if shouldPostNotification {
+                if hasChanged {
+                    saveSettingsToUserDefaults()
                     post(.didUpdateSettings)
                 }
             }
