@@ -95,7 +95,9 @@ public extension SettingsProvider {
     var compactNutrients: [Nutrient] {
         get { settings.compactNutrients }
         set {
-            settings.compactNutrients = newValue
+            withAnimation {
+                settings.compactNutrients = newValue
+            }
             save()
         }
     }
