@@ -1,14 +1,14 @@
 import SwiftUI
 import PrepShared
 
-struct HealthDetailsForm: View {
+public struct HealthDetailsForm: View {
     
     @Bindable var healthProvider: HealthProvider
     
     @Binding var isPresented: Bool
     @State var dismissDisabled: Bool = false
     
-    init(
+    public init(
         healthProvider: HealthProvider,
         isPresented: Binding<Bool>
     ) {
@@ -16,7 +16,7 @@ struct HealthDetailsForm: View {
         _isPresented = isPresented
     }
     
-    var body: some View {
+    public var body: some View {
         NavigationView {
             form
                 .navigationTitle("Health Details")
@@ -177,6 +177,6 @@ struct HealthDetailsForm: View {
 //    MockPastHealthDetailsForm()
 //}
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }

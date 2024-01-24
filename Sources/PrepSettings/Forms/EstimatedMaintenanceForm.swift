@@ -204,5 +204,5 @@ struct EstimatedMaintenanceForm: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

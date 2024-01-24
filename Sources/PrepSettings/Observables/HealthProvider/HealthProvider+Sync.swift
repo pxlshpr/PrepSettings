@@ -252,5 +252,5 @@ extension HealthProvider {
 }
 
 #Preview {
-    DemoView()
+    SettingsDemoView()
 }

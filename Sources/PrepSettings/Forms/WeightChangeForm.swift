@@ -407,6 +407,6 @@ struct WeightChangeForm: View {
     }
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }

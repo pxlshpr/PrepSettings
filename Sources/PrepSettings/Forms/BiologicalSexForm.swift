@@ -125,6 +125,6 @@ struct BiologicalSexForm: View {
     }
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }

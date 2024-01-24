@@ -1,12 +1,12 @@
 import SwiftUI
 import PrepShared
 
-struct SettingsForm: View {
+public struct SettingsForm: View {
     
     @Bindable var settingsProvider: SettingsProvider
     @Binding var isPresented: Bool
     
-    init(
+    public init(
 //        _ settingsProvider: SettingsProvider = SettingsProvider(settings: .init()),
         _ settingsProvider: SettingsProvider = SettingsProvider.shared,
         isPresented: Binding<Bool> = .constant(false)
@@ -15,7 +15,7 @@ struct SettingsForm: View {
         _isPresented = isPresented
     }
     
-    var body: some View {
+    public var body: some View {
         NavigationView {
             Form {
                 energyUnitPicker

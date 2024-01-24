@@ -136,6 +136,6 @@ struct DietaryEnergyForm: View {
     }
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }

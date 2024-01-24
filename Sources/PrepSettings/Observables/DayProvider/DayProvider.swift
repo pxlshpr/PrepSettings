@@ -1,5 +1,6 @@
 import SwiftUI
 
-@Observable class DayProvider {
-    
+@Observable public class DayProvider {
+
+    public init() { }
 }

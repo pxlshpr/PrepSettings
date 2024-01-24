@@ -244,5 +244,5 @@ struct WeightForm: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

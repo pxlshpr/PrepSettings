@@ -301,5 +301,5 @@ struct LeanBodyMassFormPreview: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

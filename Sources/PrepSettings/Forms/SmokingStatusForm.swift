@@ -120,6 +120,6 @@ struct SmokingStatusForm: View {
 
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }

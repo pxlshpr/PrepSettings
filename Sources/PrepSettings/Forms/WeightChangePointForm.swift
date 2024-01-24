@@ -446,5 +446,5 @@ struct WeightChangePointForm: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

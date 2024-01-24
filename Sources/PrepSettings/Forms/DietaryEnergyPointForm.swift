@@ -367,7 +367,7 @@ struct DietaryEnergyPointForm: View {
             }
         }
         
-        return DoubleTextField(
+        return DoubleTextFieldSection(
             title: healthProvider.settingsProvider.unitString(for: .energy),
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustomField,
@@ -394,5 +394,5 @@ struct DietaryEnergyPointForm: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

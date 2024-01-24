@@ -441,6 +441,6 @@ struct AdaptiveMaintenanceForm: View {
     }
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }

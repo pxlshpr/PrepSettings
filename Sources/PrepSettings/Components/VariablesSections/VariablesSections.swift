@@ -772,6 +772,6 @@ struct DailyValueVariablesSectionsPreview: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }
 

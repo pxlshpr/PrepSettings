@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftSugar
+import PrepShared
 
 struct AgeForm: View {
     
@@ -101,7 +102,7 @@ struct AgeForm: View {
         withAnimation {
             let age = dateOfBirth.ageInYears
             self.ageInYears = age
-            manualInput.setNewValue(age)
+            manualInput.setInt(age)
         }
     }
     
@@ -258,6 +259,6 @@ struct AgeForm: View {
     }
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }

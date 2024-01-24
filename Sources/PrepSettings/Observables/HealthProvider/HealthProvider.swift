@@ -23,5 +23,5 @@ import PrepShared
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

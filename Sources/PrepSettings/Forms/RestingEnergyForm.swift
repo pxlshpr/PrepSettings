@@ -474,7 +474,7 @@ struct RestingEnergyForm: View {
             }
         }
         
-        return DoubleTextField(
+        return DoubleTextFieldSection(
             title: energyUnit.abbreviation,
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustomField,
@@ -530,5 +530,5 @@ struct RestingEnergyForm: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

@@ -105,7 +105,7 @@ struct LeanBodyMassMeasurementForm: View {
                 BodyMassUnit.kg.intComponent(leanBodyMassInKg, in: bodyMassUnit)
             } else { nil }
             doubleInput.setDouble(double)
-            intInput.setNewValue(int)
+            intInput.setInt(int)
         }
     }
 
@@ -423,7 +423,7 @@ struct LeanBodyMassMeasurementFormPreview: View {
     LeanBodyMassMeasurementFormPreview()
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }
 

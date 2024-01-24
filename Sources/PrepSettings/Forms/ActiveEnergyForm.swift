@@ -482,7 +482,7 @@ struct ActiveEnergyForm: View {
             }
         }
         
-        return DoubleTextField(
+        return DoubleTextFieldSection(
             title: energyUnit.abbreviation,
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustomField,
@@ -499,5 +499,5 @@ struct ActiveEnergyForm: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

@@ -278,5 +278,5 @@ struct FatPercentageFormPreview: View {
 }
 
 #Preview("Demo") {
-    DemoView()
+    SettingsDemoView()
 }

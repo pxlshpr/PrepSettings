@@ -228,7 +228,7 @@ extension EnergyAppleHealthSections {
                 }
             }
             
-            return DoubleTextField(
+            return DoubleTextFieldSection(
                 title: title,
                 doubleInput: $correctionInput,
                 hasFocused: $hasFocusedCorrectionField,

@@ -248,5 +248,5 @@ struct HeightForm: View {
 }
 
 #Preview {
-    DemoView()
+    SettingsDemoView()
 }

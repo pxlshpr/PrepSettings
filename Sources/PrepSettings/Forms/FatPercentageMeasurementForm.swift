@@ -171,7 +171,7 @@ struct FatPercentageMeasurementForm: View {
             }
         }
 
-        return DoubleTextField(
+        return DoubleTextFieldSection(
             title: "%",
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustom,
@@ -369,7 +369,7 @@ struct FatPercentageMeasurementFormPreview: View {
     FatPercentageMeasurementFormPreview()
 }
 
-#Preview("DemoView") {
-    DemoView()
+#Preview("SettingsDemoView") {
+    SettingsDemoView()
 }
 

@@ -6,7 +6,7 @@ import PrepSettings
 struct DemoApp: App {
     var body: some Scene {
         WindowGroup {
-            DemoView()
+            SettingsDemoView()
 //            ContentView()
                 .onAppear(perform: appeared)
         }
