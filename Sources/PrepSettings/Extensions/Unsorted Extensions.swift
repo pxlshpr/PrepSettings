@@ -24,15 +24,15 @@ public extension Double {
 }
 
 public extension Date {
-    var shortDateString: String {
-        let formatter = DateFormatter()
-        if self.year == Date().year {
-            formatter.dateFormat = "d MMM"
-        } else {
-            formatter.dateFormat = "d MMM yyyy"
-        }
-        return formatter.string(from: self)
-    }
+//    var shortDateString: String {
+//        let formatter = DateFormatter()
+//        if self.year == Date().year {
+//            formatter.dateFormat = "d MMM"
+//        } else {
+//            formatter.dateFormat = "d MMM yyyy"
+//        }
+//        return formatter.string(from: self)
+//    }
     
 //    var dateString: String {
 //        let formatter = DateFormatter()
