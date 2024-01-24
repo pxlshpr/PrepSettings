@@ -10,7 +10,6 @@ struct MeasurementInputSection: View {
     @Binding var doubleInput: DoubleInput
     @Binding var intInput: IntInput
     @Binding var hasFocused: Bool
-    @Binding var focusDelay: Double
     let delayFocus: Bool
     let footerString: String?
     let handleChanges: () -> ()
@@ -22,14 +21,12 @@ struct MeasurementInputSection: View {
         intInput: Binding<IntInput>,
         hasFocused: Binding<Bool>,
         delayFocus: Bool = false,
-        focusDelay: Binding<Double> = .constant(0.05),
         footer: String? = nil,
         handleChanges: @escaping () -> Void
     ) {
         self.type = type
         self.unitString = settingsProvider.unitString(for: type)
         self.secondUnitString = settingsProvider.secondUnitString(for: type)
-        _focusDelay = focusDelay
         _doubleInput = doubleInput
         _intInput = intInput
         _hasFocused = hasFocused
@@ -62,7 +59,6 @@ struct MeasurementInputSection: View {
             doubleInput: $doubleInput,
             hasFocused: $hasFocused,
             delayFocus: delayFocus,
-            focusDelay: $focusDelay,
             footer: footerString,
             handleChanges: handleChanges
         )
@@ -128,7 +124,7 @@ struct MeasurementInputSection: View {
         /// Set this immediately
         hasFocused = true
 
-        let deadline: DispatchTime = .now() + (delayFocus ? focusDelay : 0)
+        let deadline: DispatchTime = .now() + (delayFocus ? DefaultFocusDelay : 0)
         DispatchQueue.main.asyncAfter(deadline: deadline) {
             textField.becomeFirstResponder()
             textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
