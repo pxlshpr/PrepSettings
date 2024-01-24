@@ -57,7 +57,7 @@ struct MeasurementInputSection: View {
     }
     
     var singleUnit: some View {
-        SingleUnitMeasurementTextField(
+        DoubleTextField(
             title: unitString,
             doubleInput: $doubleInput,
             hasFocused: $hasFocused,

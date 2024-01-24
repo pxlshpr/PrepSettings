@@ -1,30 +1,32 @@
 import SwiftUI
 
 /// Provides a binding for inputting a double
-@Observable class DoubleInput {
+@Observable public class DoubleInput {
     
-    var double: Double?
-    var stringAsDouble: Double?
-    var string: String
-
-    var includeTrailingPeriod: Bool = false
-    var includeTrailingZero: Bool = false
-    var numberOfTrailingZeros: Int = 0
-
-    let automaticallySubmitsValues: Bool
+    public var double: Double?
     
-    init(double: Double? = nil, automaticallySubmitsValues: Bool = false) {
+    private var stringAsDouble: Double?
+    private var string: String
+    private var includeTrailingPeriod: Bool = false
+    private var includeTrailingZero: Bool = false
+    private var numberOfTrailingZeros: Int = 0
+    private let automaticallySubmitsValues: Bool
+    
+    public init(double: Double? = nil, automaticallySubmitsValues: Bool = false) {
         self.double = double
         self.stringAsDouble = double
         self.string = double?.clean ?? ""
         self.automaticallySubmitsValues = automaticallySubmitsValues
     }
     
-    func setDouble(_ double: Double?) {
+    public func setDouble(_ double: Double?) {
         self.double = double
         self.stringAsDouble = double
         self.string = double?.clean ?? ""
     }
+}
+
+extension DoubleInput {
     
     var binding: Binding<String> {
         Binding<String>(

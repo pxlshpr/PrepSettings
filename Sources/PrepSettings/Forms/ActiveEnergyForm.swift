@@ -482,7 +482,7 @@ struct ActiveEnergyForm: View {
             }
         }
         
-        return SingleUnitMeasurementTextField(
+        return DoubleTextField(
             title: energyUnit.abbreviation,
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustomField,

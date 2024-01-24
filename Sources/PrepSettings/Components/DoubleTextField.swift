@@ -1,11 +1,11 @@
 import SwiftUI
 import PrepShared
 
-struct SingleUnitMeasurementTextField: View {
+public struct DoubleTextField: View {
     
     let title: String
     let footerString: String?
-
+    
     @Binding var doubleInput: DoubleInput
     @Binding var hasFocused: Bool
     @Binding var focusDelay: Double
@@ -15,7 +15,7 @@ struct SingleUnitMeasurementTextField: View {
     
     @FocusState var focused: Bool
     
-    init(
+    public init(
         title: String,
         doubleInput: Binding<DoubleInput>,
         hasFocused: Binding<Bool>,
@@ -35,7 +35,7 @@ struct SingleUnitMeasurementTextField: View {
         self.handleLostFocus = handleLostFocus
     }
     
-    var body: some View {
+    public var body: some View {
         Section(footer: footer) {
             HStack {
                 Text(title)
@@ -55,6 +55,9 @@ struct SingleUnitMeasurementTextField: View {
             }
         }
     }
+}
+
+extension DoubleTextField {
     
     @ViewBuilder
     var footer: some View {

@@ -367,7 +367,7 @@ struct DietaryEnergyPointForm: View {
             }
         }
         
-        return SingleUnitMeasurementTextField(
+        return DoubleTextField(
             title: healthProvider.settingsProvider.unitString(for: .energy),
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustomField,

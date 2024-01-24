@@ -171,7 +171,7 @@ struct FatPercentageMeasurementForm: View {
             }
         }
 
-        return SingleUnitMeasurementTextField(
+        return DoubleTextField(
             title: "%",
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustom,

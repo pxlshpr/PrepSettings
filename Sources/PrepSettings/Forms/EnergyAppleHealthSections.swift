@@ -228,7 +228,7 @@ extension EnergyAppleHealthSections {
                 }
             }
             
-            return SingleUnitMeasurementTextField(
+            return DoubleTextField(
                 title: title,
                 doubleInput: $correctionInput,
                 hasFocused: $hasFocusedCorrectionField,
