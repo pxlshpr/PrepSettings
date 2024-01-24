@@ -30,7 +30,7 @@ struct AgeForm: View {
         
         let ageInYears = dateOfBirth?.ageInYears
         _ageInYears = State(initialValue: ageInYears)
-        _manualInput = State(initialValue: IntInput(int: ageInYears))
+        _manualInput = State(initialValue: IntInput(int: ageInYears, automaticallySubmitsValues: false))
         
         _dateOfBirth = State(initialValue: dateOfBirth ?? DefaultDateOfBirth)
         

@@ -57,14 +57,14 @@ struct WeightChangeForm: View {
         } else {
            nil
         }
-        _doubleInput = State(initialValue: DoubleInput(double: double, automaticallySubmitsValues: true))
+        _doubleInput = State(initialValue: DoubleInput(double: double))
 
         let int: Int? = if let kg {
             BodyMassUnit.kg.intComponent(kg, in: unit)
         } else {
            nil
         }
-        _intInput = State(initialValue: IntInput(int: int, automaticallySubmitsValues: true))
+        _intInput = State(initialValue: IntInput(int: int))
 
         _isPresented = isPresented
         
@@ -342,12 +342,12 @@ struct WeightChangeForm: View {
         let double: Double? = if let kg {
             BodyMassUnit.kg.doubleComponent(kg, in: bodyMassUnit)
         } else { nil }
-        doubleInput = DoubleInput(double: double, automaticallySubmitsValues: true)
+        doubleInput = DoubleInput(double: double)
 
         let int: Int? = if let kg {
             BodyMassUnit.kg.intComponent(kg, in: bodyMassUnit)
         } else { nil }
-        intInput = IntInput(int: int, automaticallySubmitsValues: true)
+        intInput = IntInput(int: int)
     }
 
     func handleChanges(_ shouldResync: Bool = false) {

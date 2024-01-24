@@ -18,7 +18,7 @@ struct RestingEnergyForm: View {
     @State var interval: HealthInterval
     @State var applyCorrection: Bool
     @State var correctionType: CorrectionType = .divide
-    @State var correctionInput = DoubleInput(automaticallySubmitsValues: true)
+    @State var correctionInput = DoubleInput()
     @State var manualInput: DoubleInput
 
     @State var equationValuesInKcal: [RestingEnergyEquation: Double] = [:]
@@ -52,8 +52,7 @@ struct RestingEnergyForm: View {
             double: restingEnergy.kcal.convertEnergy(
                 from: .kcal,
                 to: healthProvider.settingsProvider.energyUnit
-            ),
-            automaticallySubmitsValues: true
+            )
         ))
 
         _source = State(initialValue: restingEnergy.source)
@@ -78,8 +77,7 @@ struct RestingEnergyForm: View {
                 correction.value
             }
             _correctionInput = State(initialValue: DoubleInput(
-                double: correctionDouble,
-                automaticallySubmitsValues: true
+                double: correctionDouble
             ))
         } else {
             _applyCorrection = State(initialValue: false)

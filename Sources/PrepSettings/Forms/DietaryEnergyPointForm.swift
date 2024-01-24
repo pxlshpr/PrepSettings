@@ -53,8 +53,7 @@ struct DietaryEnergyPointForm: View {
             double: kcal.convertEnergy(
                 from: .kcal,
                 to: healthProvider.settingsProvider.energyUnit
-            ),
-            automaticallySubmitsValues: true
+            )
         ))
     }
 

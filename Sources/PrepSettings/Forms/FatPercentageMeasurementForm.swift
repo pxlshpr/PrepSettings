@@ -13,7 +13,7 @@ struct FatPercentageMeasurementForm: View {
     @State var equation: LeanBodyMassAndFatPercentageEquation = .cunBAE
     
     @State var percent: Double?
-    @State var manualInput = DoubleInput(automaticallySubmitsValues: true)
+    @State var manualInput = DoubleInput()
     
     @State var isDirty: Bool = false
     @State var dismissDisabled: Bool = false

@@ -12,8 +12,8 @@ struct MeasurementForm: View {
     let date: Date
     @State var time = Date.now
     
-    @State var doubleInput = DoubleInput(automaticallySubmitsValues: true)
-    @State var intInput = IntInput(automaticallySubmitsValues: true)
+    @State var doubleInput = DoubleInput()
+    @State var intInput = IntInput()
     
     @State var isDirty: Bool = false
     @State var dismissDisabled: Bool = false

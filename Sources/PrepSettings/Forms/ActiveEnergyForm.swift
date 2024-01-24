@@ -18,8 +18,8 @@ struct ActiveEnergyForm: View {
     @State var interval: HealthInterval = .init(3, .day)
     @State var applyCorrection: Bool = false
     @State var correctionType: CorrectionType = .divide
-    @State var correctionInput = DoubleInput(automaticallySubmitsValues: true)
-    @State var manualInput = DoubleInput(automaticallySubmitsValues: true)
+    @State var correctionInput = DoubleInput()
+    @State var manualInput = DoubleInput()
 
     @State var activityLevelValuesInKcal: [ActivityLevel: Double] = [:]
     @State var hasFetchedHealthKitValues: Bool = false
@@ -53,8 +53,7 @@ struct ActiveEnergyForm: View {
         let energyUnit = healthProvider.settingsProvider.energyUnit
         _activeEnergyInKcal = State(initialValue: activeEnergy.kcal)
         _manualInput = State(initialValue: DoubleInput(
-            double: activeEnergy.kcal.convertEnergy(from: .kcal, to: energyUnit),
-            automaticallySubmitsValues: true
+            double: activeEnergy.kcal.convertEnergy(from: .kcal, to: energyUnit)
         ))
 
         _source = State(initialValue: activeEnergy.source)
@@ -74,8 +73,7 @@ struct ActiveEnergyForm: View {
                 correction.value
             }
             _correctionInput = State(initialValue: DoubleInput(
-                double: correctionDouble,
-                automaticallySubmitsValues: true
+                double: correctionDouble
             ))
         } else {
             _applyCorrection = State(initialValue: false)
