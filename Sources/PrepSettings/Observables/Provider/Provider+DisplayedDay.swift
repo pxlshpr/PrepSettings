@@ -1,6 +1,6 @@
 import Foundation
 
-extension Provider {
+public extension Provider {
     var displayedDate: Date {
         displayedDay.date
     }

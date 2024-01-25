@@ -1,7 +1,7 @@
 import Foundation
 import PrepShared
 
-extension Provider {
+public extension Provider {
     
     var healthDetails: HealthDetails {
         get {
@@ -12,16 +12,18 @@ extension Provider {
         }
     }
     
-    var unsavedHealthDetails: HealthDetails {
-        get { previousToday.healthDetails }
-        set { previousToday.healthDetails = newValue }
-    }
-    
     var biologicalSex: BiologicalSex {
         healthDetails.biologicalSex
     }
     
     var ageInYears: Int? {
         healthDetails.ageInYears
+    }
+}
+
+extension Provider {
+    var unsavedHealthDetails: HealthDetails {
+        get { previousToday.healthDetails }
+        set { previousToday.healthDetails = newValue }
     }
 }
