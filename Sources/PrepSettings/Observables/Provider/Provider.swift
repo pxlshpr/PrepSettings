@@ -19,7 +19,7 @@ public typealias DaySaveHandler = ((Day) async throws -> ())
     var previousToday: Day
     
     var daySaveTask: Task<Void, Error>? = nil
-    var displayedDayChangeTask: Task<Void, Error>? = nil
+    public var displayedDayChangeTask: Task<Void, Error>? = nil
 
     var handlers: ProviderHandlers? = nil
 
