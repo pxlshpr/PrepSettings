@@ -8,11 +8,11 @@ public typealias DayFetchOrCreateHandler = ((Date) async throws -> Day)
 public typealias DaySaveHandler = ((Day) async throws -> ())
 
 @Observable public class Provider {
-
+    
     public static let shared = Provider()
-
+    
     public var settings: Settings = .default
-
+    
     public var _displayedDate: Date
     public var displayedDay: Day
     public var today: Day
@@ -20,9 +20,9 @@ public typealias DaySaveHandler = ((Day) async throws -> ())
     
     var daySaveTask: Task<Void, Error>? = nil
     public var displayedDayChangeTask: Task<Void, Error>? = nil
-
+    
     public var handlers: ProviderHandlers? = nil
-
+    
     public init() {
         //TODO: Store these in UserDefaults too for quick access
         let day = Day(dateString: Date.now.dateString)
@@ -34,6 +34,26 @@ public typealias DaySaveHandler = ((Day) async throws -> ())
         if let settings = UserDefaults.settings {
             self.settings = settings
         }
+        
+        addObservers()
+    }
+}
+
+extension Provider {
+    func addObservers() {
+        observe(.cloudKitImportCompleted, #selector(cloudKitImportCompleted))
+    }
+    
+    @objc func cloudKitImportCompleted(notification: Notification) {
+        /// Re-fetch everything in case changes were made
+        fetch()
+    }
+    
+    func observe(_ name: Notification.Name, _ selector: Selector) {
+        NotificationCenter.default.addObserver(
+            self, selector: selector,
+            name: name, object: nil
+        )
     }
 }
 
@@ -91,13 +111,43 @@ public extension Provider {
     }
 }
 
+public let DefaultDisplayedDateChangeDelay: Double = 0.1
+public var DisplayedDateChangeDelay: Double = DefaultDisplayedDateChangeDelay
+import SwiftSugar
+
 extension Provider {
     
     func configure(handlers: ProviderHandlers) {
         self.handlers = handlers
+        fetch()
+    }
+    
+    func fetch() {
         fetchSettings()
+        fetchDisplayedDay()
+        //TODO: fetchToday()
     }
 
+    func fetchDisplayedDay() {
+        displayedDayChangeTask?.cancel()
+        displayedDayChangeTask = Task {
+            
+            try await sleepTask(DisplayedDateChangeDelay)
+            try Task.checkCancellation()
+
+            guard let fetchOrCreate = handlers?.day.fetchOrCreate else {
+                fatalError()
+            }
+            let day = try await fetchOrCreate(_displayedDate)
+            try Task.checkCancellation()
+            await MainActor.run {
+                withAnimation(.snappy) {
+                    self.displayedDay = day
+                }
+            }
+        }
+    }
+    
     func saveSettings() {
         guard let save = handlers?.settings.save else { return }
         Task.detached(priority: .background) {
