@@ -231,6 +231,7 @@ import Foundation
 import PrepShared
 
 extension Provider {
+    
     static func recalculateAllDays() async throws {
         let daysStartDate = await fetchBackendDaysStartDate()
         let logStartDate = await fetchBackendLogStartDate()
