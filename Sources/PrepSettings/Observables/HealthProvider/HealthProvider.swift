@@ -6,8 +6,8 @@ import PrepShared
     
     public var settingsProvider: SettingsProvider
     public let isCurrent: Bool
+    
     public var healthDetails: HealthDetails
-
     var unsavedHealthDetails: HealthDetails
     var saveTask: Task<Void, Error>? = nil
     

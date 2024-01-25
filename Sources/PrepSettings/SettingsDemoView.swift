@@ -337,9 +337,7 @@ func fetchDayFromDocuments(_ date: Date) async -> Day? {
 }
 
 func saveDayInDocuments(_ day: Day) async {
-    guard let date = day.date else {
-        fatalError()
-    }
+    let date = day.date
     do {
         let filename = "\(date.dateString).json"
         let url = getDocumentsDirectory().appendingPathComponent(filename)
@@ -351,13 +349,14 @@ func saveDayInDocuments(_ day: Day) async {
 }
 
 func fetchOrCreateHealthDetailsFromDocuments(_ date: Date) async -> HealthDetails {
-    var day = await fetchOrCreateDayFromDocuments(date)
-    guard let healthDetails = day.healthDetails else {
-        let healthDetails = HealthDetails(date: date)
-        day.healthDetails = healthDetails
-        await saveDayInDocuments(day)
-        return healthDetails
-    }
+    let day = await fetchOrCreateDayFromDocuments(date)
+    let healthDetails = day.healthDetails
+//    guard let healthDetails = day.healthDetails else {
+//        let healthDetails = HealthDetails(date: date)
+//        day.healthDetails = healthDetails
+//        await saveDayInDocuments(day)
+//        return healthDetails
+//    }
     return healthDetails
 }
 

@@ -104,23 +104,23 @@ extension Day {
         switch type {
 
         case .restingEnergy:
-            await healthDetails?.maintenance.estimate.restingEnergy
+            await healthDetails.maintenance.estimate.restingEnergy
                 .fetchFromHealthKitIfNeeded(day: day, using: stats)
 
         case .activeEnergy:
-            await healthDetails?.maintenance.estimate.activeEnergy
+            await healthDetails.maintenance.estimate.activeEnergy
                 .fetchFromHealthKitIfNeeded(day: day, using: stats)
 
         case .dietaryEnergy:
             /// If we don't yet a have dietaryEnergyPoint for this date, create one
-            if dietaryEnergyPoint == nil, let date = day.date {
+            if dietaryEnergyPoint == nil {
                 /// First try grab the log value, then the healthKit value, otherwise not counting the day
                 dietaryEnergyPoint = if let kcal = day.energyInKcal {
-                    .init(date: date, kcal: kcal, source: .log)
-                } else if let kcal = await HealthStore.dietaryEnergyTotalInKcal(for: date, using: stats) {
-                    .init(date: date, kcal: kcal, source: .healthKit)
+                    .init(date: day.date, kcal: kcal, source: .log)
+                } else if let kcal = await HealthStore.dietaryEnergyTotalInKcal(for: day.date, using: stats) {
+                    .init(date: day.date, kcal: kcal, source: .healthKit)
                 } else {
-                    .init(date: date, source: .notCounted)
+                    .init(date: day.date, source: .notCounted)
                 }
             } else {
                 /// Otherwise update the kcals based on the source that the user has chosen

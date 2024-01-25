@@ -188,7 +188,8 @@ extension HealthProvider {
             guard let day = days[date] else { continue }
             let initialDay = day
             /// If the point doesn't exist, create it
-            if day.dietaryEnergyPoint == nil, let date = day.date {
+            let date = day.date
+            if day.dietaryEnergyPoint == nil {
                 if let kcal = await HealthStore.dietaryEnergyTotalInKcal(
                     for: date,
                     using: stats
@@ -231,7 +232,7 @@ extension HealthProvider {
             
             for type in HealthKitType.syncedTypes {
                 guard let samples = samples[type] else { continue }
-                days[date]?.healthDetails?.syncWithHealthKit(
+                days[date]?.healthDetails.syncWithHealthKit(
                     type: type,
                     samples: samples,
                     toDelete: &toDelete,
