@@ -8,7 +8,7 @@ extension Provider {
     static func syncWithHealthKitAndRecalculateAllDays() async throws {
 
         guard !isPreview else {
-            try await DayProvider.recalculateAllDays()
+            try await Provider.recalculateAllDays()
             return
         }
         
@@ -19,18 +19,18 @@ extension Provider {
         let settings = Provider.shared.settings
 
         /// Fetch all HealthKit weight samples from start of log (since we're not interested in any before that)
-        let logStartDate = await DayProvider.fetchBackendLogStartDate()
+        let logStartDate = await Provider.fetchBackendLogStartDate()
         var daysStartDate = logStartDate
         
         var samples = try await samples(from: logStartDate, settings: settings)
-        let prelogDeletedHealthKitUUIDs = await DayProvider.fetchPrelogDeletedHealthKitUUIDs()
+        let prelogDeletedHealthKitUUIDs = await Provider.fetchPrelogDeletedHealthKitUUIDs()
 
         try await fetchMostRecentSamplesForEmptyQuantityTypes(
             samples: &samples,
             daysStartDate: &daysStartDate,
             prelogDeletedHealthKitUUIDs: prelogDeletedHealthKitUUIDs
         )
-        await DayProvider.updateDaysStartDate(daysStartDate)
+        await Provider.updateDaysStartDate(daysStartDate)
         
         let earliestDateForDietaryEnergyPoints = logStartDate.earliestDateForDietaryEnergyPoints
 
@@ -43,7 +43,7 @@ extension Provider {
             )
         }
         
-        var days = await DayProvider.fetchAllDaysFromBackend(
+        var days = await Provider.fetchAllDaysFromBackend(
             from: daysStartDate,
             createIfNotExisting: false
         )
@@ -72,7 +72,7 @@ extension Provider {
             await HealthStore.saveMeasurements(toExport)
         }
 
-        try await DayProvider.recalculateAllDays(
+        try await Provider.recalculateAllDays(
             days,
             initialDays: initialDays,
             syncStart: start,
@@ -133,7 +133,7 @@ extension Provider {
                 daysStartDate = latestSample.startDate
             }
             
-            let logStartDate = await DayProvider.fetchBackendLogStartDate()
+            let logStartDate = await Provider.fetchBackendLogStartDate()
             
             /// Now grab all the pre-log recent samples for all days from daysStartDate till the log start date (so that we fetch the deleted ones too to be passed into `processHealthKitSamples`, otherwise resulting in the removal of them from being considered deleted from HealthKit—and subsequent addition back into Prep in the next sync by being more recent).
             let preLogSamples = await HealthStore.samples(
@@ -176,7 +176,7 @@ extension Provider {
         print("Getting all DietaryEnergy took: \(CFAbsoluteTimeGetCurrent()-start)s")
         print("Fetching or Creating all days for dietary starting from: \(startDate.shortDateString)")
         start = CFAbsoluteTimeGetCurrent()
-        var days = await DayProvider.fetchAllDaysFromBackend(
+        var days = await Provider.fetchAllDaysFromBackend(
             from: startDate,
             to: logStartDate.moveDayBy(-1),
             createIfNotExisting: true
@@ -214,7 +214,7 @@ extension Provider {
             }
             
             if let updatedDay = days[date], updatedDay != initialDay {
-                await DayProvider.saveDayInBackend(updatedDay)
+                await Provider.saveDayInBackend(updatedDay)
             }
         }
         print("Took: \(CFAbsoluteTimeGetCurrent()-start)s")

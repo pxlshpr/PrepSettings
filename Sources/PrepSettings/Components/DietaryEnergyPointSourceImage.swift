@@ -8,7 +8,7 @@ struct DietaryEnergyPointSourceImage: View {
     var body: some View {
         switch source {
         case .healthKit:
-            Image("AppleHealthIcon")
+            Image(packageResource: "AppleHealthIcon", ofType: "png")
                 .resizable()
                 .frame(width: 24, height: 24)
                 .overlay(

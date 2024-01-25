@@ -61,7 +61,7 @@ struct MeasurementCell<U : HealthUnit>: View {
     var image: some View {
         switch measurement.imageType {
         case .healthKit:
-            Image("AppleHealthIcon")
+            Image(packageResource: "AppleHealthIcon", ofType: "png")
                 .resizable()
                 .frame(width: 24, height: 24)
                 .overlay(

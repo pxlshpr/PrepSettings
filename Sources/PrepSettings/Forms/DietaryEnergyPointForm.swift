@@ -171,7 +171,7 @@ struct DietaryEnergyPointForm: View {
     }
 
     func fetchLogValue() async throws {
-        let kcal = await DayProvider.fetchBackendEnergyInKcal(for: pointDate)
+        let kcal = await Provider.fetchBackendEnergyInKcal(for: pointDate)
         await MainActor.run { [kcal] in
             withAnimation {
                 logValueInKcal = kcal?

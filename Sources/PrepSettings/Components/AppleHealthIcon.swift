@@ -8,7 +8,7 @@ struct AppleHealthIcon: View {
     let lineWidth: CGFloat = 0.5
 
     var body: some View {
-        Image("AppleHealthIcon")
+        Image(packageResource: "AppleHealthIcon", ofType: "png")
             .resizable()
             .frame(width: imageScale * scale, height: imageScale * scale)
             .overlay(

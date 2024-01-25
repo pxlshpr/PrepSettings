@@ -24,7 +24,7 @@ extension Provider {
             try Task.checkCancellation()
 
             /// Do this first to ensure that recalculations happen instantly (since in most cases, the sync is simply to provide the Health App with new measurements)
-            try await DayProvider.recalculateAllDays()
+            try await Provider.recalculateAllDays()
 
             /// Refetch HealthDetails as recalculations may have modified it further
             await refetchHealthDetails()

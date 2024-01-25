@@ -206,7 +206,7 @@ struct AdaptiveMaintenanceForm: View {
                 points.append(point)
             }
             /// Otherwise check if we have a value in the log for it and create a point for it if needed
-            else if let energyInKcal = await DayProvider.fetchBackendEnergyInKcal(for: date)
+            else if let energyInKcal = await Provider.fetchBackendEnergyInKcal(for: date)
             {
                 print("No existing point for: \(date.shortDateString) – created one with log value")
                 /// Create a `.log` sourced `DietaryEnergyPoint` for this date

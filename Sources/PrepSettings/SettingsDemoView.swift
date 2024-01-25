@@ -48,7 +48,7 @@ public struct SettingsDemoView: View {
 //                resetData()
 //            }
 //
-//            if let daysStartDate = await DayProvider.fetchBackendDaysStartDate() {
+//            if let daysStartDate = await Provider.fetchBackendDaysStartDate() {
 //                let numberOfDays = LogStartDate.numberOfDaysFrom(daysStartDate)
 //                guard numberOfDays > 0 else { return }
 //                var preLogDates: [Date] = []
@@ -249,10 +249,10 @@ func fetchOrCreateDayFromDocuments(_ date: Date) async -> Day {
 }
 
 func fetchAllPreLogDaysFromDocuments() async -> [Date : Day] {
-    guard let daysStartDate = await DayProvider.fetchBackendDaysStartDate() else {
+    guard let daysStartDate = await Provider.fetchBackendDaysStartDate() else {
         return [:]
     }
-    let logStartDate = await DayProvider.fetchBackendLogStartDate()
+    let logStartDate = await Provider.fetchBackendLogStartDate()
     return await fetchAllDaysFromDocuments(
         from: daysStartDate,
         to: logStartDate,

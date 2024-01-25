@@ -9,7 +9,7 @@
 //        let settings = await fetchSettingsFromDocuments()
 //
 //        /// Fetch all HealthKit weight samples from start of log (since we're not interested in any before that)
-//        let logStartDate = await DayProvider.fetchBackendLogStartDate()
+//        let logStartDate = await Provider.fetchBackendLogStartDate()
 //        var daysStartDate = logStartDate
 //
 //        /// First, fetch whatever isSynced is turned on for (weight, height, LBM)—fetch everything from the first Day's date onwards
@@ -206,7 +206,7 @@
 //            await HealthStore.saveMeasurements(toExport)
 //        }
 //
-//        try await DayProvider.recalculateAllDays(
+//        try await Provider.recalculateAllDays(
 //            days,
 //            initialDays: initialDays,
 //            start: start,

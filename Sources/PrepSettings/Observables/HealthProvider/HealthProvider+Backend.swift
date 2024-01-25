@@ -17,22 +17,22 @@
 //    func saveDietaryEnergyPoint(_ point: DietaryEnergyPoint) {
 //        //TODO: Get any other HealthDetails (other than the one in this HealthProvider) that uses this point and get them to update within an instantiated HealthProvider as well
 //        Task {
-//            var day = await DayProvider.fetchOrCreateDayFromBackend(point.date)
+//            var day = await Provider.fetchOrCreateDayFromBackend(point.date)
 //            day.dietaryEnergyPoint = point
-//            await DayProvider.saveDayInBackend(day)
+//            await Provider.saveDayInBackend(day)
 //        }
 //    }
 //    
 //    static func setBackendDietaryEnergyPoint(_ point: DietaryEnergyPoint, for date: Date) {
 //        Task {
-//            var day = await DayProvider.fetchOrCreateDayFromBackend(date)
+//            var day = await Provider.fetchOrCreateDayFromBackend(date)
 //            day.dietaryEnergyPoint = point
-//            await DayProvider.saveDayInBackend(day)
+//            await Provider.saveDayInBackend(day)
 //        }
 //    }
 //
 //    static func fetchBackendDietaryEnergyPoint(for date: Date) async -> DietaryEnergyPoint? {
-//        let day = await DayProvider.fetchOrCreateDayFromBackend(date)
+//        let day = await Provider.fetchOrCreateDayFromBackend(date)
 //        return day.dietaryEnergyPoint
 //    }
 //}
