@@ -3,7 +3,7 @@ import PrepShared
 
 struct VariablesSections: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     
     @Binding var variables: Variables
     let date: Date
@@ -19,12 +19,12 @@ struct VariablesSections: View {
         type: VariablesType,
         variables: Binding<Variables>,
         preferLeanBodyMass: Binding<Bool>? = nil,
-        healthProvider: HealthProvider,
+        provider: Provider,
         date: Date,
         isPresented: Binding<Bool>,
         showHeader: Bool = true
     ) {
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.type = type
         self.preferLeanBodyMass = preferLeanBodyMass
         self.date = date
@@ -45,7 +45,7 @@ struct VariablesSections: View {
         var shouldShow: Bool {
             variables.isLeanBodyMass
             && preferLeanBodyMass != nil
-            && healthProvider.healthDetails.hasIncompatibleLeanBodyMassAndFatPercentageWithWeight
+            && provider.healthDetails.hasIncompatibleLeanBodyMassAndFatPercentageWithWeight
         }
         
         let binding = Binding<Bool>(
@@ -84,7 +84,7 @@ struct VariablesSections: View {
         func link(for healthDetail: HealthDetail) -> some View {
             NonTemporalVariableLink(
                 healthDetail: healthDetail,
-                healthProvider: healthProvider,
+                provider: provider,
                 date: date,
                 isPresented: $isPresented
             )
@@ -106,7 +106,7 @@ struct VariablesSections: View {
         func section(for healthDetail: HealthDetail, index: Int) -> some View {
             TemporalVariableSection(
                 healthDetail: healthDetail,
-                healthProvider: healthProvider,
+                provider: provider,
                 type: type,
                 date: date,
                 isPresented: $isPresented,
@@ -148,7 +148,7 @@ import SwiftUI
 struct TemporalVariableSection: View {
     
     let healthDetail: HealthDetail
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
 
     let type: VariablesType
     let date: Date
@@ -162,7 +162,7 @@ struct TemporalVariableSection: View {
 
     init(
         healthDetail: HealthDetail,
-        healthProvider: HealthProvider,
+        provider: Provider,
         type: VariablesType,
         date: Date,
         isPresented: Binding<Bool>,
@@ -170,13 +170,13 @@ struct TemporalVariableSection: View {
         showHeader: Bool
     ) {
         self.healthDetail = healthDetail
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.type = type
         self.date = date
         _isPresented = isPresented
         _shouldShowMainHeader = shouldShowMainHeader
         self.showHeader = showHeader
-        _replacements = State(initialValue: healthProvider.healthDetails.replacementsForMissing)
+        _replacements = State(initialValue: provider.healthDetails.replacementsForMissing)
     }
 
     var body: some View {
@@ -184,7 +184,7 @@ struct TemporalVariableSection: View {
             pastLink
             currentLink
         }
-        .onChange(of: healthProvider.healthDetails.replacementsForMissing, replacementsChanged)
+        .onChange(of: provider.healthDetails.replacementsForMissing, replacementsChanged)
     }
     
     func replacementsChanged(old: HealthDetails.ReplacementsForMissing, new: HealthDetails.ReplacementsForMissing) {
@@ -212,7 +212,7 @@ struct TemporalVariableSection: View {
     
     @ViewBuilder
     var pastLink: some View {
-        if !healthProvider.healthDetails.hasSet(healthDetail) {
+        if !provider.healthDetails.hasSet(healthDetail) {
             switch healthDetail {
             case .weight:           pastWeight
             case .leanBodyMass:     pastLeanBodyMass
@@ -240,32 +240,32 @@ struct TemporalVariableSection: View {
                 switch healthDetail {
                 case .height:
                     HeightForm(
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented
                     )
                 case .weight:
                     WeightForm(
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented
                     )
                 case .leanBodyMass:
                     LeanBodyMassForm(
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented
                     )
                 case .preganancyStatus:
                     PregnancyStatusForm(
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented
                     )
                 case .fatPercentage:
                     FatPercentageForm(
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented
                     )
                 case .maintenance:
                     MaintenanceForm(
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented
                     )
                 default:
@@ -278,8 +278,8 @@ struct TemporalVariableSection: View {
             HStack {
                 Text(dateString)
                 Spacer()
-                if healthProvider.healthDetails.hasSet(healthDetail)  {
-                    Text(healthProvider.healthDetails.valueString(for: healthDetail, healthProvider.settingsProvider))
+                if provider.healthDetails.hasSet(healthDetail)  {
+                    Text(provider.healthDetails.valueString(for: healthDetail, provider))
                 } else {
                     Text(NotSetString)
                         .foregroundStyle(.secondary)
@@ -295,10 +295,10 @@ struct TemporalVariableSection: View {
                 WeightForm(
                     date: dated.date,
                     weight: dated.weight,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     save: { newWeight in
-                        healthProvider.updateLatestWeight(newWeight)
+                        provider.updateLatestWeight(newWeight)
                     }
                 )
                 .onAppear(perform: formAppeared)
@@ -307,7 +307,7 @@ struct TemporalVariableSection: View {
                 HStack {
                     Text(dated.date.shortDateString)
                     Spacer()
-                    Text(dated.weight.valueString(in: healthProvider.settingsProvider.bodyMassUnit))
+                    Text(dated.weight.valueString(in: provider.bodyMassUnit))
                 }
             }
         }
@@ -320,10 +320,10 @@ struct TemporalVariableSection: View {
                 LeanBodyMassForm(
                     date: dated.date,
                     leanBodyMass: dated.leanBodyMass,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     save: { leanBodyMass in
-                        healthProvider.updateLatestLeanBodyMass(leanBodyMass)
+                        provider.updateLatestLeanBodyMass(leanBodyMass)
                     }
                 )
                 .onAppear(perform: formAppeared)
@@ -332,7 +332,7 @@ struct TemporalVariableSection: View {
                 HStack {
                     Text(dated.date.shortDateString)
                     Spacer()
-                    Text(dated.leanBodyMass.valueString(in: healthProvider.settingsProvider.bodyMassUnit))
+                    Text(dated.leanBodyMass.valueString(in: provider.bodyMassUnit))
                 }
             }
         }
@@ -345,10 +345,10 @@ struct TemporalVariableSection: View {
                 FatPercentageForm(
                     date: dated.date,
                     fatPercentage: dated.fatPercentage,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     save: { fatPercentage in
-                        healthProvider.updateLatestFatPercentage(fatPercentage)
+                        provider.updateLatestFatPercentage(fatPercentage)
                     }
                 )
                 .onAppear(perform: formAppeared)
@@ -370,10 +370,10 @@ struct TemporalVariableSection: View {
                 MaintenanceForm(
                     date: dated.date,
                     maintenance: dated.maintenance,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     saveHandler: { maintenance, shouldResync in
-                        healthProvider.updateLatestMaintenance(maintenance)
+                        provider.updateLatestMaintenance(maintenance)
                     }
                 )
                 .onAppear(perform: formAppeared)
@@ -382,7 +382,7 @@ struct TemporalVariableSection: View {
                 HStack {
                     Text(dated.date.shortDateString)
                     Spacer()
-                    Text(dated.maintenance.valueString(in: healthProvider.settingsProvider.energyUnit))
+                    Text(dated.maintenance.valueString(in: provider.energyUnit))
                 }
             }
         }
@@ -397,7 +397,7 @@ struct TemporalVariableSection: View {
                     pregnancyStatus: dated.pregnancyStatus,
                     isPresented: $isPresented,
                     save: { pregnancyStatus in
-                        healthProvider.updateLatestPregnancyStatus(pregnancyStatus)
+                        provider.updateLatestPregnancyStatus(pregnancyStatus)
                     }
                 )
                 .onAppear(perform: formAppeared)
@@ -419,10 +419,10 @@ struct TemporalVariableSection: View {
                 HeightForm(
                     date: dated.date,
                     height: dated.height,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     save: { newHeight in
-                        healthProvider.updateLatestHeight(newHeight)
+                        provider.updateLatestHeight(newHeight)
                     }
                 )
                 .onAppear(perform: formAppeared)
@@ -431,7 +431,7 @@ struct TemporalVariableSection: View {
                 HStack {
                     Text(dated.date.shortDateString)
                     Spacer()
-                    Text(dated.height.valueString(in: healthProvider.settingsProvider.heightUnit))
+                    Text(dated.height.valueString(in: provider.heightUnit))
                 }
             }
         }
@@ -446,7 +446,7 @@ struct TemporalVariableSection: View {
     
     var footer: some View {
         var string: String? {
-            guard !healthProvider.healthDetails.hasSet(healthDetail) else {
+            guard !provider.healthDetails.hasSet(healthDetail) else {
                 return nil
             }
             if hasLatestDetail {
@@ -473,7 +473,7 @@ struct TemporalVariableSection: View {
     }
 
     var hasLatestDetail: Bool {
-        healthProvider.healthDetails.replacementsForMissing.has(healthDetail)
+        provider.healthDetails.replacementsForMissing.has(healthDetail)
     }
 }
 
@@ -482,7 +482,7 @@ import SwiftUI
 struct NonTemporalVariableLink: View {
     
     let healthDetail: HealthDetail
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     let date: Date
     @Binding var isPresented: Bool
 
@@ -499,17 +499,17 @@ struct NonTemporalVariableLink: View {
         switch healthDetail {
         case .age:
             AgeForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .biologicalSex:
             BiologicalSexForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .smokingStatus:
             SmokingStatusForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         default:
@@ -521,11 +521,11 @@ struct NonTemporalVariableLink: View {
         HStack {
             Text(healthDetail.name)
             Spacer()
-            Text(healthProvider.healthDetails.valueString(
+            Text(provider.healthDetails.valueString(
                 for: healthDetail,
-                healthProvider.settingsProvider
+                provider
             ))
-            .foregroundStyle(healthProvider.healthDetails.hasSet(healthDetail)
+            .foregroundStyle(provider.healthDetails.hasSet(healthDetail)
                              ? .primary : .secondary
             )
         }
@@ -534,7 +534,7 @@ struct NonTemporalVariableLink: View {
 
 struct RestingEnergyEquationVariablesSectionsPreview: View {
     
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     @State var equation: RestingEnergyEquation = .katchMcardle
 //    @State var variables: Variables = RestingEnergyEquation.cunningham.variables
     
@@ -542,7 +542,7 @@ struct RestingEnergyEquationVariablesSectionsPreview: View {
     
     @ViewBuilder
     var body: some View {
-        if let healthProvider {
+        if let provider {
             NavigationView {
                 Form {
                     Section(header: Text("Equation")) {
@@ -565,8 +565,8 @@ struct RestingEnergyEquationVariablesSectionsPreview: View {
                                 self.preferLeanBodyMass = newValue
                             }
                         ),
-                        healthProvider: healthProvider,
-                        date: healthProvider.healthDetails.date,
+                        provider: provider,
+                        date: provider.healthDetails.date,
                         isPresented: .constant(true),
                         showHeader: true
                     )
@@ -589,12 +589,10 @@ struct RestingEnergyEquationVariablesSectionsPreview: View {
                         fatPercentage: 20,
                         measurements: [.init(date: Date.now, percent: 20, source: .manual, healthKitUUID: nil)]
                     )
-                    let healthProvider = HealthProvider(
-                        healthDetails: healthDetails,
-                        settingsProvider: SettingsProvider.shared
-                    )
+                    let provider = Provider()
+                    provider.healthDetails = healthDetails
                     await MainActor.run {
-                        self.healthProvider = healthProvider
+                        self.provider = provider
                     }
                 }
         }
@@ -606,13 +604,13 @@ struct RestingEnergyEquationVariablesSectionsPreview: View {
 
 struct LeanBodyMassEquationVariablesSectionsPreview: View {
     
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     @State var equation: LeanBodyMassAndFatPercentageEquation = .boer
 //    @State var variables: Variables = RestingEnergyEquation.cunningham.variables
     
     @ViewBuilder
     var body: some View {
-        if let healthProvider {
+        if let provider {
             NavigationView {
                 Form {
                     Section(header: Text("Equation")) {
@@ -629,8 +627,8 @@ struct LeanBodyMassEquationVariablesSectionsPreview: View {
                             get: { equation.variables },
                             set: { _ in }
                         ),
-                        healthProvider: healthProvider,
-                        date: healthProvider.healthDetails.date,
+                        provider: provider,
+                        date: provider.healthDetails.date,
                         isPresented: .constant(true),
                         showHeader: true
                     )
@@ -639,17 +637,15 @@ struct LeanBodyMassEquationVariablesSectionsPreview: View {
         } else {
             Color.clear
                 .task {
-                    var healthDetails = await HealthProvider.fetchOrCreateHealthDetailsFromBackend(Date.now)
+                    var healthDetails = await Provider.fetchOrCreateHealthDetailsFromBackend(Date.now)
                     healthDetails.weight = .init(
                         weightInKg: 95,
                         measurements: [.init(date: Date.now, weightInKg: 95)]
                     )
-                    let healthProvider = HealthProvider(
-                        healthDetails: healthDetails,
-                        settingsProvider: SettingsProvider.shared
-                    )
+                    let provider = Provider()
+                    provider.healthDetails = healthDetails
                     await MainActor.run {
-                        self.healthProvider = healthProvider
+                        self.provider = provider
                     }
                 }
         }
@@ -661,11 +657,11 @@ struct LeanBodyMassEquationVariablesSectionsPreview: View {
 
 struct GoalVariablesSectionsPreview: View {
     
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     
     @ViewBuilder
     var body: some View {
-        if let healthProvider {
+        if let provider {
             NavigationView {
                 Form {
                     VariablesSections(
@@ -674,8 +670,8 @@ struct GoalVariablesSectionsPreview: View {
                             get: { .required([.maintenance], "Your Maintenance Energy is required for this goal.") },
                             set: { _ in }
                         ),
-                        healthProvider: healthProvider,
-                        date: healthProvider.healthDetails.date,
+                        provider: provider,
+                        date: provider.healthDetails.date,
                         isPresented: .constant(true),
                         showHeader: true
                     )
@@ -684,7 +680,7 @@ struct GoalVariablesSectionsPreview: View {
         } else {
             Color.clear
                 .task {
-                    var healthDetails = await HealthProvider.fetchOrCreateHealthDetailsFromBackend(Date.now)
+                    var healthDetails = await Provider.fetchOrCreateHealthDetailsFromBackend(Date.now)
                     healthDetails.weight = .init(
                         weightInKg: 95,
                         measurements: [.init(date: Date.now, weightInKg: 95)]
@@ -711,12 +707,10 @@ struct GoalVariablesSectionsPreview: View {
                             )
                         )
                     )
-                    let healthProvider = HealthProvider(
-                        healthDetails: healthDetails,
-                        settingsProvider: SettingsProvider.shared
-                    )
+                    let provider = Provider()
+                    provider.healthDetails = healthDetails
                     await MainActor.run {
-                        self.healthProvider = healthProvider
+                        self.provider = provider
                     }
                 }
         }
@@ -728,11 +722,11 @@ struct GoalVariablesSectionsPreview: View {
 
 struct DailyValueVariablesSectionsPreview: View {
     
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     
     @ViewBuilder
     var body: some View {
-        if let healthProvider {
+        if let provider {
             NavigationView {
                 Form {
                     VariablesSections(
@@ -741,8 +735,8 @@ struct DailyValueVariablesSectionsPreview: View {
                             get: { .required([.smokingStatus], "Your Smoking Status is required to pick a recommended daily value for Magnesium.") },
                             set: { _ in }
                         ),
-                        healthProvider: healthProvider,
-                        date: healthProvider.healthDetails.date,
+                        provider: provider,
+                        date: provider.healthDetails.date,
                         isPresented: .constant(true),
                         showHeader: true
                     )
@@ -751,17 +745,15 @@ struct DailyValueVariablesSectionsPreview: View {
         } else {
             Color.clear
                 .task {
-                    var healthDetails = await HealthProvider.fetchOrCreateHealthDetailsFromBackend(Date.now)
+                    var healthDetails = await Provider.fetchOrCreateHealthDetailsFromBackend(Date.now)
                     healthDetails.weight = .init(
                         weightInKg: 95,
                         measurements: [.init(date: Date.now, weightInKg: 95)]
                     )
-                    let healthProvider = HealthProvider(
-                        healthDetails: healthDetails,
-                        settingsProvider: SettingsProvider.shared
-                    )
+                    let provider = Provider()
+                    provider.healthDetails = healthDetails
                     await MainActor.run {
-                        self.healthProvider = healthProvider
+                        self.provider = provider
                     }
                 }
         }

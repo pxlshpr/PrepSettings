@@ -15,7 +15,7 @@ extension Provider {
 
     //TODO: These two are duplicates, so consolidate them
     func saveDietaryEnergyPoint(_ point: DietaryEnergyPoint) {
-        //TODO: Get any other HealthDetails (other than the one in this HealthProvider) that uses this point and get them to update within an instantiated HealthProvider as well
+        //TODO: Get any other HealthDetails (other than the one in this Provider) that uses this point and get them to update within an instantiated Provider as well
         Task {
             var day = await DayProvider.fetchOrCreateDayFromBackend(point.date)
             day.dietaryEnergyPoint = point

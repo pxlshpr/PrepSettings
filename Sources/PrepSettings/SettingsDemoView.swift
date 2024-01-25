@@ -9,7 +9,7 @@ let LogStartDate = Date(fromDateString: "2024_01_01")!
 
 public struct SettingsDemoView: View {
     
-    @State var settingsProvider: SettingsProvider = SettingsProvider.shared
+    @State var provider: Provider = Provider.shared
     
     @State var pastDateBeingShown: Date? = nil
     @State var showingSettings = false
@@ -43,7 +43,7 @@ public struct SettingsDemoView: View {
 //
 //            if initialLaunchCompleted  {
 //                try await HealthStore.requestPermissions()
-//                try await HealthProvider.syncWithHealthKitAndRecalculateAllDays()
+//                try await Provider.syncWithHealthKitAndRecalculateAllDays()
 //            } else {
 //                resetData()
 //            }
@@ -89,7 +89,7 @@ public struct SettingsDemoView: View {
 //            )
 //            print("Created all days in: \(CFAbsoluteTimeGetCurrent()-start)s")
 //
-//            try await HealthProvider.syncWithHealthKitAndRecalculateAllDays()
+//            try await Provider.syncWithHealthKitAndRecalculateAllDays()
 //
 //            initialLaunchCompleted = true
 //        }
@@ -107,25 +107,18 @@ public struct SettingsDemoView: View {
         }
     }
     
-//    @ViewBuilder
     var settingsForm: some View {
-//        if let settingsProvider {
-            SettingsForm(settingsProvider, isPresented: $showingSettings)
-//        }
+        SettingsForm(provider, isPresented: $showingSettings)
     }
     
-//    @ViewBuilder
     func healthDetailsForm(for date: Date) -> some View {
-//        if let settingsProvider {
-            MockHealthDetailsForm(
-                date: date,
-                settingsProvider: settingsProvider,
-                isPresented: Binding<Bool>(
-                    get: { true },
-                    set: { if !$0 { pastDateBeingShown = nil } }
-                )
+        MockHealthDetailsForm(
+            date: date,
+            isPresented: Binding<Bool>(
+                get: { true },
+                set: { if !$0 { pastDateBeingShown = nil } }
             )
-//        }
+        )
     }
     
     var healthDetailsSection: some View {
@@ -181,34 +174,23 @@ import SwiftUI
 
 struct MockHealthDetailsForm: View {
     
-    @Bindable var settingsProvider: SettingsProvider
-
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     @Binding var isPresented: Bool
     
     let date: Date
     
     init(
         date: Date,
-        settingsProvider: SettingsProvider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.date = date
-        self.settingsProvider = settingsProvider
         _isPresented = isPresented
-        
-//        let healthDetails = fetchOrCreateHealthDetailsFromDocuments(date)
-//        let healthProvider = HealthProvider(
-//            healthDetails: healthDetails,
-//            settingsProvider: settingsProvider
-//        )
-//        _healthProvider = State(initialValue: healthProvider)
     }
 
     var body: some View {
-        if let healthProvider {
+        if let provider {
             HealthDetailsForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         } else {
@@ -216,12 +198,10 @@ struct MockHealthDetailsForm: View {
                 .onAppear {
                     Task {
                         let healthDetails = await fetchOrCreateHealthDetailsFromDocuments(date)
-                        let healthProvider = HealthProvider(
-                            healthDetails: healthDetails,
-                            settingsProvider: settingsProvider
-                        )
+                        let provider = Provider()
+                        provider.healthDetails = healthDetails
                         await MainActor.run {
-                            self.healthProvider = healthProvider
+                            self.provider = provider
                         }
                     }
                 }

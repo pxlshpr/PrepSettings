@@ -4,7 +4,7 @@ import PrepShared
 struct DietaryEnergyForm: View {
     
     @Binding var isPresented: Bool
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     
     let date: Date
     
@@ -17,12 +17,12 @@ struct DietaryEnergyForm: View {
         date: Date = Date.now,
         dietaryEnergy: HealthDetails.Maintenance.Adaptive.DietaryEnergy,
         points: Binding<[DietaryEnergyPoint]>,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (HealthDetails.Maintenance.Adaptive.DietaryEnergy) -> ()
     ) {
         self.date = date
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.saveHandler = saveHandler
         _isPresented = isPresented
         
@@ -42,7 +42,7 @@ struct DietaryEnergyForm: View {
         .safeAreaInset(edge: .bottom) { bottomValue }
     }
     
-    var energyUnit: EnergyUnit { healthProvider.settingsProvider.energyUnit }
+    var energyUnit: EnergyUnit { provider.energyUnit }
     
     var bottomValue: some View {
         var energyValue: Double? {
@@ -70,7 +70,7 @@ struct DietaryEnergyForm: View {
                     DietaryEnergyPointForm(
                         date: date,
                         point: point,
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented,
                         saveHandler: { updatedPoint in
                             updatePoint(updatedPoint, for: point.date)
@@ -102,7 +102,7 @@ struct DietaryEnergyForm: View {
             HStack {
                 Text("Period")
                 Spacer()
-                Text(healthProvider.healthDetails.adaptiveMaintenanceIntervalString)
+                Text(provider.healthDetails.adaptiveMaintenanceIntervalString)
             }
         }
     }

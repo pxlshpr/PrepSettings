@@ -6,7 +6,7 @@ struct MeasurementForm: View {
     
     @Environment(\.dismiss) var dismiss
 
-    @Bindable var settingsProvider: SettingsProvider
+    @Bindable var provider: Provider
 
     let type: MeasurementType
     let date: Date
@@ -24,13 +24,13 @@ struct MeasurementForm: View {
     init(
         type: MeasurementType,
         date: Date? = nil,
-        settingsProvider: SettingsProvider,
+        provider: Provider,
         add: @escaping (Int, Double, Date) -> ()
     ) {
         self.date = (date ?? Date.now).startOfDay
         self.type = type
         self.add = add
-        self.settingsProvider = settingsProvider
+        self.provider = provider
     }
     
     var body: some View {
@@ -82,7 +82,7 @@ struct MeasurementForm: View {
     var manualSection: some View {
         MeasurementInputSection(
             type: type,
-            settingsProvider: settingsProvider,
+            provider: provider,
             doubleInput: $doubleInput,
             intInput: $intInput,
             hasFocused: $hasFocusedCustom,

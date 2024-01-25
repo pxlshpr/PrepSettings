@@ -3,7 +3,7 @@ import PrepShared
 
 struct EstimatedMaintenanceForm: View {
 
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
 
     let date: Date
@@ -17,12 +17,12 @@ struct EstimatedMaintenanceForm: View {
     init(
         date: Date,
         estimate: HealthDetails.Maintenance.Estimate,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (HealthDetails.Maintenance.Estimate, Bool) -> ()
     ) {
         self.date = date
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.saveHandler = saveHandler
         _isPresented = isPresented
         
@@ -43,7 +43,7 @@ struct EstimatedMaintenanceForm: View {
         .safeAreaInset(edge: .bottom) { bottomValue }
     }
     
-    var energyUnit: EnergyUnit { healthProvider.settingsProvider.energyUnit }
+    var energyUnit: EnergyUnit { provider.energyUnit }
     
     var bottomValue: some View {
         var energyValue: Double? {
@@ -107,7 +107,7 @@ struct EstimatedMaintenanceForm: View {
                 RestingEnergyForm(
                     date: date,
                     restingEnergy: restingEnergy,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     saveHandler: saveRestingEnergy
                 )
@@ -144,7 +144,7 @@ struct EstimatedMaintenanceForm: View {
                     date: date,
                     activeEnergy: activeEnergy,
                     restingEnergyInKcal: restingEnergy.kcal,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     saveHandler: saveActiveEnergy
                 )

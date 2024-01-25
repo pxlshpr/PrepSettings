@@ -33,10 +33,8 @@ extension DayProvider {
 
         var latestHealthDetails: [HealthDetail: DatedHealthData] = [:]
         
-//        let settings = await fetchSettingsFromDocuments()
-//        let settingsProvider = SettingsProvider(settings: settings)
-        let settingsProvider = SettingsProvider.shared
-        let settings = settingsProvider.settings
+        let provider = Provider.shared
+        let settings = provider.settings
 
         if cancellable {
             try Task.checkCancellation()
@@ -55,13 +53,10 @@ extension DayProvider {
 
             let healthDetails = day.healthDetails
             
-            /// Create a HealthProvider for it (which in turn fetches the latest health details)
-            let healthProvider = HealthProvider(
-                healthDetails: healthDetails,
-                settingsProvider: settingsProvider
-            )
-            
-            await healthProvider.recalculate(
+            let provider = Provider()
+            provider.healthDetails = healthDetails
+
+            await provider.recalculate(
                 latestHealthDetails: latestHealthDetails,
                 settings: settings,
                 days: days
@@ -69,7 +64,7 @@ extension DayProvider {
 
             latestHealthDetails.extractLatestHealthDetails(from: healthDetails)
             
-            day.healthDetails = healthProvider.healthDetails
+            day.healthDetails = provider.healthDetails
 
             if cancellable {
                 try Task.checkCancellation()

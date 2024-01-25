@@ -16,7 +16,7 @@ struct MeasurementInputSection: View {
 
     init(
         type: MeasurementType,
-        settingsProvider: SettingsProvider,
+        provider: Provider,
         doubleInput: Binding<DoubleInput>,
         intInput: Binding<IntInput>,
         hasFocused: Binding<Bool>,
@@ -25,8 +25,8 @@ struct MeasurementInputSection: View {
         handleChanges: @escaping () -> Void
     ) {
         self.type = type
-        self.unitString = settingsProvider.unitString(for: type)
-        self.secondUnitString = settingsProvider.secondUnitString(for: type)
+        self.unitString = provider.unitString(for: type)
+        self.secondUnitString = provider.secondUnitString(for: type)
         _doubleInput = doubleInput
         _intInput = intInput
         _hasFocused = hasFocused

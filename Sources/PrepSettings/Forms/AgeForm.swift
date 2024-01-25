@@ -38,14 +38,14 @@ struct AgeForm: View {
     }
     
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            dateOfBirth: healthProvider.healthDetails.dateOfBirth,
+            date: provider.healthDetails.date,
+            dateOfBirth: provider.healthDetails.dateOfBirth,
             isPresented: isPresented,
-            save: healthProvider.saveDateOfBirth
+            save: provider.saveDateOfBirth
         )
     }
     var body: some View {

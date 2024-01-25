@@ -4,20 +4,20 @@ import PrepShared
 struct MeasurementCell<U : HealthUnit>: View {
 
     let measurement: any Measurable
-    @Bindable var settingsProvider: SettingsProvider
+    @Bindable var provider: Provider
     let isDisabled: Bool
     @Binding var showDeleteButton: Bool
     let deleteAction: () -> ()
 
     init(
         measurement: any Measurable,
-        settingsProvider: SettingsProvider,
+        provider: Provider,
         isDisabled: Bool,
         showDeleteButton: Binding<Bool> = .constant(false),
         deleteAction: @escaping () -> Void
     ) {
         self.measurement = measurement
-        self.settingsProvider = settingsProvider
+        self.provider = provider
         self.isDisabled = isDisabled
         _showDeleteButton = showDeleteButton
         self.deleteAction = deleteAction
@@ -113,7 +113,7 @@ struct MeasurementCell<U : HealthUnit>: View {
     }
 
     var unit: U {
-        settingsProvider.unit(for: U.self) as! U
+        provider.unit(for: U.self) as! U
     }
 
     var intUnitString: String? {

@@ -3,16 +3,16 @@ import PrepShared
 
 public struct HealthDetailsForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     
     @Binding var isPresented: Bool
     @State var dismissDisabled: Bool = false
     
     public init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool>
     ) {
-        self.healthProvider = healthProvider
+        self.provider = provider
         _isPresented = isPresented
     }
     
@@ -55,12 +55,12 @@ public struct HealthDetailsForm: View {
     }
     
     var shouldShowPregnancyStatus: Bool {
-        healthProvider.healthDetails.biologicalSex == .female
-//        && healthProvider.healthDetails.smokingStatus != .smoker
+        provider.healthDetails.biologicalSex == .female
+//        && provider.healthDetails.smokingStatus != .smoker
     }
     
     var shouldShowSmokingStatus: Bool {
-        !healthProvider.healthDetails.pregnancyStatus.isPregnantOrLactating
+        !provider.healthDetails.pregnancyStatus.isPregnantOrLactating
     }
     
     var toolbarContent: some ToolbarContent {
@@ -74,18 +74,10 @@ public struct HealthDetailsForm: View {
     }
     
     func link(for healthDetail: HealthDetail) -> some View {
-        var details: HealthDetails { healthProvider.healthDetails }
-        
-//        @ViewBuilder
-//        var secondaryText: some View {
-//            if let secondary = details.secondaryValueString(for: healthDetail, healthProvider.settingsProvider) {
-//                Text(secondary)
-//                    .foregroundStyle(.secondary)
-//            }
-//        }
+        var details: HealthDetails { provider.healthDetails }
         
         var primaryText: some View {
-            Text(details.valueString(for: healthDetail, healthProvider.settingsProvider))
+            Text(details.valueString(for: healthDetail, provider))
                 .foregroundStyle(details.hasSet(healthDetail) ? .primary : .secondary)
         }
         
@@ -105,13 +97,13 @@ public struct HealthDetailsForm: View {
     
     @ViewBuilder
     var dateSection: some View {
-        if !healthProvider.healthDetails.date.isToday {
-            NoticeSection.legacy(healthProvider.healthDetails.date)
+        if !provider.healthDetails.date.isToday {
+            NoticeSection.legacy(provider.healthDetails.date)
 //            Section {
 //                HStack {
 //                    Text("Date")
 //                    Spacer()
-//                    Text(healthProvider.healthDetails.date.shortDateString)
+//                    Text(provider.healthDetails.date.shortDateString)
 //                }
 //            }
         }
@@ -122,47 +114,47 @@ public struct HealthDetailsForm: View {
         switch route {
         case .maintenance:
             MaintenanceForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .leanBodyMass:
             LeanBodyMassForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .fatPercentage:
             FatPercentageForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .weight:
             WeightForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .height:
             HeightForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .age:
             AgeForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .biologicalSex:
             BiologicalSexForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .preganancyStatus:
             PregnancyStatusForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         case .smokingStatus:
             SmokingStatusForm(
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented
             )
         }

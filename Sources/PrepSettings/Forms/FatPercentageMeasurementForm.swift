@@ -6,7 +6,7 @@ struct FatPercentageMeasurementForm: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     
     @State var time = Date.now
     @State var source: MeasurementSource = .equation
@@ -28,10 +28,10 @@ struct FatPercentageMeasurementForm: View {
     let add: (FatPercentageMeasurement) -> ()
 
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         add: @escaping (FatPercentageMeasurement) -> ()
     ) {
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.add = add
     }
     
@@ -101,7 +101,7 @@ struct FatPercentageMeasurementForm: View {
     func calculateEquationValues() async {
         var dict: [LeanBodyMassAndFatPercentageEquation: Double] = [:]
         for equation in LeanBodyMassAndFatPercentageEquation.allCases {
-            let percent = await healthProvider.calculateFatPercentageInPercent(using: equation)
+            let percent = await provider.calculateFatPercentageInPercent(using: equation)
             dict[equation] = percent
         }
         await MainActor.run { [dict] in
@@ -187,7 +187,7 @@ struct FatPercentageMeasurementForm: View {
                 get: { equation.variables },
                 set: { _ in }
             ),
-            healthProvider: healthProvider,
+            provider: provider,
             date: date,
             isPresented: Binding<Bool>(
                 get: { true },
@@ -306,11 +306,11 @@ struct FatPercentageMeasurementForm: View {
     }
     
     var date: Date {
-        healthProvider.healthDetails.date
+        provider.healthDetails.date
     }
     
     var unit: BodyMassUnit {
-        healthProvider.settingsProvider.bodyMassUnit
+        provider.bodyMassUnit
     }
     
     
@@ -331,18 +331,18 @@ struct FatPercentageMeasurementForm: View {
 }
 
 struct FatPercentageMeasurementFormPreview: View {
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     
     @ViewBuilder
     var body: some View {
-        if let healthProvider {
-            FatPercentageMeasurementForm(healthProvider: healthProvider) { measurement in
+        if let provider {
+            FatPercentageMeasurementForm(provider: provider) { measurement in
                 
             }
         } else {
             Color.clear
                 .task {
-                    var healthDetails = await HealthProvider.fetchOrCreateHealthDetailsFromBackend(Date.now)
+                    var healthDetails = await Provider.fetchOrCreateHealthDetailsFromBackend(Date.now)
                     healthDetails.weight = .init(
                         weightInKg: 95,
                         measurements: [.init(date: Date.now, weightInKg: 95)]
@@ -353,12 +353,11 @@ struct FatPercentageMeasurementFormPreview: View {
                     )
                     healthDetails.biologicalSex = .male
                     healthDetails.ageInYears = 36
-                    let healthProvider = HealthProvider(
-                        healthDetails: healthDetails,
-                        settingsProvider: SettingsProvider.shared
-                    )
+
+                    let provider = Provider()
+                    provider.healthDetails = healthDetails
                     await MainActor.run {
-                        self.healthProvider = healthProvider
+                        self.provider = provider
                     }
                 }
         }

@@ -5,7 +5,7 @@ struct RestingEnergyForm: View {
 
     @Environment(\.scenePhase) var scenePhase
 
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
     
     let date: Date
@@ -38,12 +38,12 @@ struct RestingEnergyForm: View {
     init(
         date: Date,
         restingEnergy: HealthDetails.Maintenance.Estimate.RestingEnergy,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (HealthDetails.Maintenance.Estimate.RestingEnergy, Bool) -> ()
     ) {
         self.date = date
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.saveHandler = saveHandler
         _isPresented = isPresented
 
@@ -51,7 +51,7 @@ struct RestingEnergyForm: View {
         _manualInput = State(initialValue: DoubleInput(
             double: restingEnergy.kcal.convertEnergy(
                 from: .kcal,
-                to: healthProvider.settingsProvider.energyUnit
+                to: provider.energyUnit
             )
         ))
 
@@ -71,7 +71,7 @@ struct RestingEnergyForm: View {
             case .add, .subtract:
                 correction.value.convertEnergy(
                     from: .kcal,
-                    to: healthProvider.settingsProvider.energyUnit
+                    to: provider.energyUnit
                 )
             case .multiply, .divide:
                 correction.value
@@ -135,7 +135,7 @@ struct RestingEnergyForm: View {
         }
     }
     
-    var energyUnit: EnergyUnit { healthProvider.settingsProvider.energyUnit }
+    var energyUnit: EnergyUnit { provider.energyUnit }
 
     var bottomValue: some View {
         var double: Double? {
@@ -180,7 +180,7 @@ struct RestingEnergyForm: View {
                     handleChanges()
                 }
             ),
-            healthProvider: healthProvider,
+            provider: provider,
             date: date,
             isPresented: Binding<Bool>(
                 get: { true },
@@ -272,11 +272,11 @@ struct RestingEnergyForm: View {
     
     func calculateEquationValues() async {
         
-        healthProvider.healthDetails.maintenance.estimate.restingEnergy.preferLeanBodyMass = preferLeanBodyMass
+        provider.healthDetails.maintenance.estimate.restingEnergy.preferLeanBodyMass = preferLeanBodyMass
         
         var dict: [RestingEnergyEquation: Double] = [:]
         for equation in RestingEnergyEquation.allCases {
-            let kcal = await healthProvider.calculateRestingEnergyInKcal(using: equation)
+            let kcal = await provider.calculateRestingEnergyInKcal(using: equation)
             dict[equation] = kcal
         }
         await MainActor.run { [dict] in

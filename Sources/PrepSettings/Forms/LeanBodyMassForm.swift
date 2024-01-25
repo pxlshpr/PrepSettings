@@ -4,7 +4,7 @@ import PrepShared
 
 struct LeanBodyMassForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
     
     let date: Date
@@ -22,32 +22,32 @@ struct LeanBodyMassForm: View {
     init(
         date: Date,
         leanBodyMass: HealthDetails.LeanBodyMass,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         save: @escaping (HealthDetails.LeanBodyMass) -> ()
     ) {
         self.date = date
         self.saveHandler = save
-        self.healthProvider = healthProvider
+        self.provider = provider
         _isPresented = isPresented
         
         _leanBodyMassInKg = State(initialValue: leanBodyMass.leanBodyMassInKg)
         _measurements = State(initialValue: leanBodyMass.measurements)
-        _dailyMeasurementType = State(initialValue: healthProvider.settingsProvider.settings.dailyMeasurementType(for: .leanBodyMass))
+        _dailyMeasurementType = State(initialValue: provider.settings.dailyMeasurementType(for: .leanBodyMass))
         _deletedHealthKitMeasurements = State(initialValue: leanBodyMass.deletedHealthKitMeasurements)
-        _isSynced = State(initialValue: healthProvider.settingsProvider.leanBodyMassIsHealthKitSynced)
+        _isSynced = State(initialValue: provider.leanBodyMassIsHealthKitSynced)
     }
     
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            leanBodyMass: healthProvider.healthDetails.leanBodyMass,
-            healthProvider: healthProvider,
+            date: provider.healthDetails.date,
+            leanBodyMass: provider.healthDetails.leanBodyMass,
+            provider: provider,
             isPresented: isPresented,
-            save: healthProvider.saveLeanBodyMass
+            save: provider.saveLeanBodyMass
         )
     }
 
@@ -81,7 +81,7 @@ struct LeanBodyMassForm: View {
                 ForEach(measurements.converted, id: \.id) { measurement in
                     MeasurementCell<BodyMassUnit>(
                         measurement: measurement,
-                        settingsProvider: healthProvider.settingsProvider,
+                        provider: provider,
                         isDisabled: true,
                         deleteAction: { }
                     )
@@ -97,7 +97,7 @@ struct LeanBodyMassForm: View {
     }
     
     func isSyncedChanged(old: Bool, new: Bool) {
-        healthProvider.setHealthKitSyncing(for: .leanBodyMass, to: new)
+        provider.setHealthKitSyncing(for: .leanBodyMass, to: new)
     }
 
     var explanation: some View {
@@ -126,7 +126,7 @@ struct LeanBodyMassForm: View {
     }
     
     var bodyMassUnit: BodyMassUnit {
-        healthProvider.settingsProvider.bodyMassUnit
+        provider.bodyMassUnit
     }
     
     var bottomValue: some View {
@@ -171,7 +171,7 @@ struct LeanBodyMassForm: View {
     }
     
     var measurementForm: some View {
-        LeanBodyMassMeasurementForm(healthProvider: healthProvider) { measurement in
+        LeanBodyMassMeasurementForm(provider: provider) { measurement in
             measurements.append(measurement)
             //TODO: Add a fat percentage measurement based on the latest weight – with a source of .leanBodyMass
             measurements.sort()
@@ -185,7 +185,7 @@ struct LeanBodyMassForm: View {
             set: { newValue in
                 withAnimation {
                     dailyMeasurementType = newValue
-                    healthProvider.setDailyMeasurementType(for: .leanBodyMass, to: newValue)
+                    provider.setDailyMeasurementType(for: .leanBodyMass, to: newValue)
                     handleChanges()
                 }
             }
@@ -225,7 +225,7 @@ struct LeanBodyMassForm: View {
     
     var measurementsSections: some View {
         MeasurementsSections<BodyMassUnit>(
-            settingsProvider: healthProvider.settingsProvider,
+            provider: provider,
             measurements: Binding<[any Measurable]>(
                 get: { measurements.nonConverted },
                 set: { newValue in
@@ -268,28 +268,26 @@ struct LeanBodyMassForm: View {
 }
 
 struct LeanBodyMassFormPreview: View {
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     
     @ViewBuilder
     var body: some View {
-        if let healthProvider {
+        if let provider {
             NavigationView {
-                LeanBodyMassForm(healthProvider: healthProvider)
+                LeanBodyMassForm(provider: provider)
             }
         } else {
             Color.clear
                 .task {
-                    var healthDetails = await HealthProvider.fetchOrCreateHealthDetailsFromBackend(Date.now)
+                    var healthDetails = await Provider.fetchOrCreateHealthDetailsFromBackend(Date.now)
                     healthDetails.weight = .init(
                         weightInKg: 95,
                         measurements: [.init(date: Date.now, weightInKg: 95)]
                     )
-                    let healthProvider = HealthProvider(
-                        healthDetails: healthDetails,
-                        settingsProvider: SettingsProvider.shared
-                    )
+                    let provider = Provider()
+                    provider.healthDetails = healthDetails
                     await MainActor.run {
-                        self.healthProvider = healthProvider
+                        self.provider = provider
                     }
                 }
         }

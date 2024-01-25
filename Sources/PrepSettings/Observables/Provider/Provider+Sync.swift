@@ -14,8 +14,9 @@ extension Provider {
         
         let start = CFAbsoluteTimeGetCurrent()
 
-//        let settings = await fetchSettingsFromDocuments()
-        let settings = SettingsProvider.shared.settings
+        //TODO: Provider
+        /// [ ] Shouldn't this just use these settings since its a singleton? (unless we're using it for another date when resyncing, but even then wouldn't that just grab the same Settings from the backend?)
+        let settings = Provider.shared.settings
 
         /// Fetch all HealthKit weight samples from start of log (since we're not interested in any before that)
         let logStartDate = await DayProvider.fetchBackendLogStartDate()

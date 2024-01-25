@@ -8,7 +8,7 @@ let MaxAdaptiveWeeks: Int = 2
 
 struct AdaptiveMaintenanceForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
 
     let date: Date
@@ -32,12 +32,12 @@ struct AdaptiveMaintenanceForm: View {
     init(
         date: Date = Date.now,
         adaptive: HealthDetails.Maintenance.Adaptive,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (HealthDetails.Maintenance.Adaptive, Bool) -> ()
     ) {
         self.date = date
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.saveHandler = saveHandler
         _isPresented = isPresented
         
@@ -143,7 +143,7 @@ struct AdaptiveMaintenanceForm: View {
             var weights: [Date : HealthDetails.Weight] = [:]
             for index in 0..<movingAverageInterval.numberOfDays {
                 let date = point.date.startOfDay.moveDayBy(-index)
-                let weight = await HealthProvider.fetchOrCreateBackendWeight(for: date)
+                let weight = await Provider.fetchOrCreateBackendWeight(for: date)
                 weights[date] = weight
             }
             
@@ -156,7 +156,7 @@ struct AdaptiveMaintenanceForm: View {
             }
 
         } else {
-            let weight = await HealthProvider.fetchOrCreateBackendWeight(for: point.date)
+            let weight = await Provider.fetchOrCreateBackendWeight(for: point.date)
             await MainActor.run {
                 startWeight = weight
                 startWeightMovingAverageWeights = [:]
@@ -171,7 +171,7 @@ struct AdaptiveMaintenanceForm: View {
             var weights: [Date : HealthDetails.Weight] = [:]
             for index in 0..<movingAverageInterval.numberOfDays {
                 let date = point.date.startOfDay.moveDayBy(-index)
-                let weight = await HealthProvider.fetchOrCreateBackendWeight(for: date)
+                let weight = await Provider.fetchOrCreateBackendWeight(for: date)
                 if date.isToday {
                     print("Here we go")
                 }
@@ -185,7 +185,7 @@ struct AdaptiveMaintenanceForm: View {
                 .average
 
         } else {
-            let weight = await HealthProvider.fetchOrCreateBackendWeight(for: point.date)
+            let weight = await Provider.fetchOrCreateBackendWeight(for: point.date)
             endWeight = weight
             endWeightMovingAverageWeights = [:]
             weightChange.points?.end.kg = weight.weightInKg
@@ -200,7 +200,7 @@ struct AdaptiveMaintenanceForm: View {
             let date = date.moveDayBy(-(index + 1))
             
             /// Fetch the point if it exists
-            if let point = await HealthProvider.fetchBackendDietaryEnergyPoint(for: date)
+            if let point = await Provider.fetchBackendDietaryEnergyPoint(for: date)
             {
                 print("Fetched existing point for: \(date.shortDateString)")
                 points.append(point)
@@ -218,7 +218,7 @@ struct AdaptiveMaintenanceForm: View {
                 points.append(point)
 
                 /// Set this in the backend too
-                HealthProvider.setBackendDietaryEnergyPoint(point, for: date)
+                Provider.setBackendDietaryEnergyPoint(point, for: date)
             }
             /// Finally, as a fallback—create an exclusionary `DietaryEnergyPoint` for this date
             else
@@ -231,7 +231,7 @@ struct AdaptiveMaintenanceForm: View {
                 points.append(point)
 
                 /// Set this in the backend too
-                HealthProvider.setBackendDietaryEnergyPoint(point, for: date)
+                Provider.setBackendDietaryEnergyPoint(point, for: date)
             }
         }
         print("🍏 Took \(CFAbsoluteTimeGetCurrent()-start)s")
@@ -243,9 +243,9 @@ struct AdaptiveMaintenanceForm: View {
         }
     }
 
-    var energyUnit: EnergyUnit { healthProvider.settingsProvider.energyUnit }
-    var bodyMassUnit: BodyMassUnit { healthProvider.settingsProvider.bodyMassUnit }
-    var energyUnitString: String { healthProvider.settingsProvider.energyUnit.abbreviation }
+    var energyUnit: EnergyUnit { provider.energyUnit }
+    var bodyMassUnit: BodyMassUnit { provider.bodyMassUnit }
+    var energyUnitString: String { provider.energyUnit.abbreviation }
 
     var bottomValue: some View {
         var energyValue: Double? {
@@ -291,7 +291,7 @@ struct AdaptiveMaintenanceForm: View {
                     startWeightMovingAverageWeights: $startWeightMovingAverageWeights,
                     endWeight: $endWeight,
                     endWeightMovingAverageWeights: $endWeightMovingAverageWeights,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     saveHandler: { weightChange, shouldResync in
                         self.weightChange = weightChange
@@ -330,7 +330,7 @@ struct AdaptiveMaintenanceForm: View {
                     date: date,
                     dietaryEnergy: dietaryEnergy,
                     points: $dietaryEnergyPoints,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     saveHandler: { dietaryEnergy in
                         self.dietaryEnergy = dietaryEnergy

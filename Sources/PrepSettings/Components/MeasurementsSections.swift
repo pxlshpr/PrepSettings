@@ -3,7 +3,7 @@ import PrepShared
 
 struct MeasurementsSections<U : HealthUnit>: View {
     
-    @Bindable var settingsProvider: SettingsProvider
+    @Bindable var provider: Provider
     @Binding var measurements: [any Measurable]
     @Binding var deletedHealthKitMeasurements: [any Measurable]
     @Binding var showingForm: Bool
@@ -96,7 +96,7 @@ struct MeasurementsSections<U : HealthUnit>: View {
     func cell(for measurement: any Measurable, disabled: Bool = false) -> some View {
         MeasurementCell<U>(
             measurement: measurement,
-            settingsProvider: settingsProvider,
+            provider: provider,
             isDisabled: disabled,
             deleteAction: {
                 withAnimation {

@@ -4,7 +4,7 @@ import PrepShared
 
 struct WeightChangeForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
     
     let date: Date
@@ -32,12 +32,12 @@ struct WeightChangeForm: View {
         startWeightMovingAverageWeights: Binding<[Date : HealthDetails.Weight]>,
         endWeight: Binding<HealthDetails.Weight?>,
         endWeightMovingAverageWeights: Binding<[Date : HealthDetails.Weight]>,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (WeightChange, Bool) -> ()
     ) {
         self.date = date
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.saveHandler = saveHandler
         
         _type = State(initialValue: weightChange.type)
@@ -49,7 +49,7 @@ struct WeightChangeForm: View {
         }
         _points = State(initialValue: weightChange.points)
         
-        let unit = healthProvider.settingsProvider.bodyMassUnit
+        let unit = provider.bodyMassUnit
         let kg = weightChange.kg
         
         let double: Double? = if let kg {
@@ -147,7 +147,7 @@ struct WeightChangeForm: View {
                         weight: weight,
                         movingAverageWeights: movingAverageWeights,
                         isEndWeight: isEndWeight,
-                        healthProvider: healthProvider,
+                        provider: provider,
                         isPresented: $isPresented,
                         saveHandler: { point, shouldResync in
                             if isEndWeight {
@@ -163,7 +163,7 @@ struct WeightChangeForm: View {
                         Text(point.date.shortDateString)
                         Spacer()
                         if let kg = point.kg {
-                            Text(healthProvider.settingsProvider.bodyMassString(kg))
+                            Text(provider.bodyMassString(kg))
                         } else {
                             Text(NotSetString)
                                 .foregroundStyle(.secondary)
@@ -224,7 +224,7 @@ struct WeightChangeForm: View {
         }
     }
     
-    var bodyMassUnit: BodyMassUnit { healthProvider.settingsProvider.bodyMassUnit }
+    var bodyMassUnit: BodyMassUnit { provider.bodyMassUnit }
 
     var weightChangeInUserUnit: Double? {
         weightChangeInKg.convertBodyMass(from: .kg, to: bodyMassUnit)
@@ -317,7 +317,7 @@ struct WeightChangeForm: View {
 
         return MeasurementInputSection(
             type: .weight,
-            settingsProvider: healthProvider.settingsProvider,
+            provider: provider,
             doubleInput: $doubleInput,
             intInput: $intInput,
             hasFocused: $hasFocusedCustomField,
@@ -326,7 +326,7 @@ struct WeightChangeForm: View {
     }
     
     var intervalString: String {
-        healthProvider.healthDetails.adaptiveMaintenanceIntervalString
+        provider.healthDetails.adaptiveMaintenanceIntervalString
     }
     
     var explanation: some View {
@@ -356,7 +356,7 @@ struct WeightChangeForm: View {
             if points == nil {
                 points = .init(
                     date: date,
-                    interval: healthProvider.healthDetails.maintenance.adaptive.interval
+                    interval: provider.healthDetails.maintenance.adaptive.interval
                 )
             }
             setWeightChangeInKg(points?.weightChangeInKg)

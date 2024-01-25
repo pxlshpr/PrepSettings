@@ -5,7 +5,7 @@ struct ActiveEnergyForm: View {
 
     @Environment(\.scenePhase) var scenePhase
 
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
 
     let date: Date
@@ -40,17 +40,17 @@ struct ActiveEnergyForm: View {
         date: Date,
         activeEnergy: HealthDetails.Maintenance.Estimate.ActiveEnergy,
         restingEnergyInKcal: Double?,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (HealthDetails.Maintenance.Estimate.ActiveEnergy, Bool) -> ()
     ) {
         self.date = date
         self.restingEnergyInKcal = restingEnergyInKcal
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.saveHandler = saveHandler
         _isPresented = isPresented
 
-        let energyUnit = healthProvider.settingsProvider.energyUnit
+        let energyUnit = provider.energyUnit
         _activeEnergyInKcal = State(initialValue: activeEnergy.kcal)
         _manualInput = State(initialValue: DoubleInput(
             double: activeEnergy.kcal.convertEnergy(from: .kcal, to: energyUnit)
@@ -130,7 +130,7 @@ struct ActiveEnergyForm: View {
         }
     }
     
-    var energyUnit: EnergyUnit { healthProvider.settingsProvider.energyUnit }
+    var energyUnit: EnergyUnit { provider.energyUnit }
 
     var bottomValue: some View {
         var double: Double? {

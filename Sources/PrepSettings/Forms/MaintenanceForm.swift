@@ -4,7 +4,7 @@ import PrepShared
 
 struct MaintenanceForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
 
     let date: Date
@@ -22,13 +22,13 @@ struct MaintenanceForm: View {
     init(
         date: Date,
         maintenance: HealthDetails.Maintenance,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (HealthDetails.Maintenance, Bool) -> ()
     ) {
         self.date = date
         self.saveHandler = saveHandler
-        self.healthProvider = healthProvider
+        self.provider = provider
         _isPresented = isPresented
 
         _maintenanceInKcal = State(initialValue: maintenance.kcal)
@@ -39,15 +39,15 @@ struct MaintenanceForm: View {
     }
     
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            maintenance: healthProvider.healthDetails.maintenance,
-            healthProvider: healthProvider,
+            date: provider.healthDetails.date,
+            maintenance: provider.healthDetails.maintenance,
+            provider: provider,
             isPresented: isPresented,
-            saveHandler: healthProvider.saveMaintenance
+            saveHandler: provider.saveMaintenance
         )
     }
     
@@ -69,8 +69,8 @@ struct MaintenanceForm: View {
         .safeAreaInset(edge: .bottom) { bottomValue }
     }
     
-    var energyUnit: EnergyUnit { healthProvider.settingsProvider.energyUnit }
-    var energyUnitString: String { healthProvider.settingsProvider.energyUnit.abbreviation }
+    var energyUnit: EnergyUnit { provider.energyUnit }
+    var energyUnitString: String { provider.energyUnit.abbreviation }
 
     var bottomValue: some View {
         var value: Double? {
@@ -164,7 +164,7 @@ struct MaintenanceForm: View {
                 Text("Adaptive")
                 Spacer()
                 if let kcal = adaptive.kcal {
-                    Text(healthProvider.settingsProvider.energyString(kcal))
+                    Text(provider.energyString(kcal))
                 } else {
                     Text(NotSetString)
                         .foregroundStyle(.secondary)
@@ -176,7 +176,7 @@ struct MaintenanceForm: View {
             AdaptiveMaintenanceForm(
                 date: date,
                 adaptive: adaptive,
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented,
                 saveHandler: { adaptive, shouldResync in
                     self.adaptive = adaptive
@@ -204,7 +204,7 @@ struct MaintenanceForm: View {
                 Text("Estimate")
                 Spacer()
                 if let kcal = estimate.kcal {
-                    Text(healthProvider.settingsProvider.energyString(kcal))
+                    Text(provider.energyString(kcal))
                 } else {
                     Text(NotSetString)
                         .foregroundStyle(.secondary)
@@ -216,7 +216,7 @@ struct MaintenanceForm: View {
             EstimatedMaintenanceForm(
                 date: date,
                 estimate: estimate,
-                healthProvider: healthProvider,
+                provider: provider,
                 isPresented: $isPresented,
                 saveHandler: { estimate, shouldResync in
                     self.estimate = estimate

@@ -13,7 +13,7 @@ extension Provider {
             return
         }
 
-        print("💾 Saving HealthProvider for: \(healthDetails.date.shortDateString)")
+        print("💾 Saving Provider for: \(healthDetails.date.shortDateString)")
 
         daySaveTask?.cancel()
         daySaveTask = Task {
@@ -248,7 +248,7 @@ extension Provider {
         saveSettings()
         if isOn {
             Task {
-                try await HealthProvider.syncWithHealthKitAndRecalculateAllDays()
+                try await Provider.syncWithHealthKitAndRecalculateAllDays()
             }
         }
     }
@@ -259,8 +259,10 @@ extension Provider {
         _ sample: HKQuantitySample,
         for type: HealthKitType
     ) async throws {
-//        let settings = await fetchSettingsFromDocuments()
-        let settings = SettingsProvider.shared.settings
+
+        //TODO: Provider
+        /// [ ] Shouldn't this just use these settings since its a singleton? (unless we're using it for another date when resyncing, but even then wouldn't that just grab the same Settings from the backend?)
+        let settings = Provider.shared.settings
         guard let dailyMeasurementType = settings.dailyMeasurementType(forHealthKitType: type) else {
             return
         }

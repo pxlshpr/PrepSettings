@@ -22,14 +22,14 @@ struct SmokingStatusForm: View {
     }
     
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            smokingStatus: healthProvider.healthDetails.smokingStatus,
+            date: provider.healthDetails.date,
+            smokingStatus: provider.healthDetails.smokingStatus,
             isPresented: isPresented,
-            save: healthProvider.saveSmokingStatus
+            save: provider.saveSmokingStatus
         )
     }
 

@@ -3,15 +3,14 @@ import PrepShared
 
 public struct SettingsForm: View {
     
-    @Bindable var settingsProvider: SettingsProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
     
     public init(
-//        _ settingsProvider: SettingsProvider = SettingsProvider(settings: .init()),
-        _ settingsProvider: SettingsProvider = SettingsProvider.shared,
+        _ provider: Provider = Provider.shared,
         isPresented: Binding<Bool> = .constant(false)
     ) {
-        self.settingsProvider = settingsProvider
+        self.provider = provider
         _isPresented = isPresented
     }
     
@@ -28,9 +27,9 @@ public struct SettingsForm: View {
 
     var energyUnitPicker: some View {
         let binding = Binding<EnergyUnit>(
-            get: { settingsProvider.settings.energyUnit },
+            get: { provider.settings.energyUnit },
             set: { newValue in
-                settingsProvider.saveEnergyUnit(newValue)
+                provider.saveEnergyUnit(newValue)
             }
         )
         return PickerSection(binding, "Energy Unit")
@@ -38,9 +37,9 @@ public struct SettingsForm: View {
     
     var heightUnitPicker: some View {
         let binding = Binding<HeightUnit>(
-            get: { settingsProvider.settings.heightUnit },
+            get: { provider.settings.heightUnit },
             set: { newValue in
-                settingsProvider.saveHeightUnit(newValue)
+                provider.saveHeightUnit(newValue)
             }
         )
         return PickerSection(binding, "Height Unit")
@@ -48,9 +47,9 @@ public struct SettingsForm: View {
     
     var bodyMassUnitPicker: some View {
         let binding = Binding<BodyMassUnit>(
-            get: { settingsProvider.settings.bodyMassUnit },
+            get: { provider.settings.bodyMassUnit },
             set: { newValue in
-                settingsProvider.saveBodyMassUnit(newValue)
+                provider.saveBodyMassUnit(newValue)
             }
         )
         return PickerSection(binding, "Body Mass Unit")

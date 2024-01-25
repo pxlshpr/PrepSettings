@@ -107,7 +107,7 @@ extension Provider {
                 var weights: [Date : HealthDetails.Weight] = [:]
                 for index in 0..<interval.numberOfDays {
                     let date = point.date.startOfDay.moveDayBy(-index)
-//                    let weight = await HealthProvider.fetchOrCreateBackendWeight(for: date)
+//                    let weight = await Provider.fetchOrCreateBackendWeight(for: date)
                     let weight = days[date]?.healthDetails.weight ?? .init()
                     weights[date] = weight
                 }

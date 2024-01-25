@@ -5,7 +5,7 @@ struct DietaryEnergyPointForm: View {
 
     @Environment(\.scenePhase) var scenePhase
 
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
 
     let healthDetailsDate: Date
@@ -35,14 +35,14 @@ struct DietaryEnergyPointForm: View {
         date: Date,
         point: DietaryEnergyPoint,
         averageEnergyInKcal: Double? = nil,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (DietaryEnergyPoint) -> ()
     ) {
         self.healthDetailsDate = date
         self.pointDate = point.date
         self.saveHandler = saveHandler
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.averageEnergyInKcal = averageEnergyInKcal
         _isPresented = isPresented
         
@@ -52,7 +52,7 @@ struct DietaryEnergyPointForm: View {
         _manualInput = State(initialValue: DoubleInput(
             double: kcal.convertEnergy(
                 from: .kcal,
-                to: healthProvider.settingsProvider.energyUnit
+                to: provider.energyUnit
             )
         ))
     }
@@ -297,7 +297,7 @@ struct DietaryEnergyPointForm: View {
         if point.source == .notCounted {
             point.kcal = nil
         }
-        healthProvider.saveDietaryEnergyPoint(point)
+        provider.saveDietaryEnergyPoint(point)
     }
     
     var dietaryEnergyPoint: DietaryEnergyPoint {
@@ -308,7 +308,7 @@ struct DietaryEnergyPointForm: View {
         )
     }
   
-    var energyUnit: EnergyUnit { healthProvider.settingsProvider.energyUnit }
+    var energyUnit: EnergyUnit { provider.energyUnit }
 
     func handleChanges() {
         handleChangesTask?.cancel()
@@ -367,7 +367,7 @@ struct DietaryEnergyPointForm: View {
         }
         
         return DoubleTextFieldSection(
-            title: healthProvider.settingsProvider.unitString(for: .energy),
+            title: provider.unitString(for: .energy),
             doubleInput: $manualInput,
             hasFocused: $hasFocusedCustomField,
             delayFocus: true,

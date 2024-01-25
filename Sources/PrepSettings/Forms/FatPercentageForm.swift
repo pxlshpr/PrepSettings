@@ -4,7 +4,7 @@ import PrepShared
 
 struct FatPercentageForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
     
     let date: Date
@@ -22,32 +22,32 @@ struct FatPercentageForm: View {
     init(
         date: Date,
         fatPercentage: HealthDetails.FatPercentage,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         save: @escaping (HealthDetails.FatPercentage) -> ()
     ) {
         self.date = date
         self.saveHandler = save
-        self.healthProvider = healthProvider
+        self.provider = provider
         _isPresented = isPresented
         
         _percent = State(initialValue: fatPercentage.fatPercentage)
         _measurements = State(initialValue: fatPercentage.measurements)
-        _dailyMeasurementType = State(initialValue: healthProvider.settingsProvider.settings.dailyMeasurementType(for: .fatPercentage))
+        _dailyMeasurementType = State(initialValue: provider.settings.dailyMeasurementType(for: .fatPercentage))
         _deletedHealthKitMeasurements = State(initialValue: fatPercentage.deletedHealthKitMeasurements)
-        _isSynced = State(initialValue: healthProvider.settingsProvider.fatPercentageIsHealthKitSynced)
+        _isSynced = State(initialValue: provider.fatPercentageIsHealthKitSynced)
     }
     
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            fatPercentage: healthProvider.healthDetails.fatPercentage,
-            healthProvider: healthProvider,
+            date: provider.healthDetails.date,
+            fatPercentage: provider.healthDetails.fatPercentage,
+            provider: provider,
             isPresented: isPresented,
-            save: healthProvider.saveFatPercentage
+            save: provider.saveFatPercentage
         )
     }
 
@@ -81,7 +81,7 @@ struct FatPercentageForm: View {
                 ForEach(measurements.converted, id: \.id) { measurement in
                     MeasurementCell<PercentUnit>(
                         measurement: measurement,
-                        settingsProvider: healthProvider.settingsProvider,
+                        provider: provider,
                         isDisabled: true,
                         deleteAction: { }
                     )
@@ -97,7 +97,7 @@ struct FatPercentageForm: View {
     }
     
     func isSyncedChanged(old: Bool, new: Bool) {
-        healthProvider.setHealthKitSyncing(for: .fatPercentage, to: new)
+        provider.setHealthKitSyncing(for: .fatPercentage, to: new)
     }
 
     var explanation: some View {
@@ -146,7 +146,7 @@ struct FatPercentageForm: View {
     }
     
     var measurementForm: some View {
-        FatPercentageMeasurementForm(healthProvider: healthProvider) { measurement in
+        FatPercentageMeasurementForm(provider: provider) { measurement in
             measurements.append(measurement)
             measurements.sort()
             handleChanges()
@@ -159,7 +159,7 @@ struct FatPercentageForm: View {
             set: { newValue in
                 withAnimation {
                     dailyMeasurementType = newValue
-                    healthProvider.setDailyMeasurementType(
+                    provider.setDailyMeasurementType(
                         for: .fatPercentage,
                         to: newValue
                     )
@@ -202,7 +202,7 @@ struct FatPercentageForm: View {
     
     var measurementsSections: some View {
         MeasurementsSections<PercentUnit>(
-            settingsProvider: healthProvider.settingsProvider,
+            provider: provider,
             measurements: Binding<[any Measurable]>(
                 get: { measurements.nonConverted },
                 set: { newValue in
@@ -245,28 +245,26 @@ struct FatPercentageForm: View {
 }
 
 struct FatPercentageFormPreview: View {
-    @State var healthProvider: HealthProvider? = nil
+    @State var provider: Provider? = nil
     
     @ViewBuilder
     var body: some View {
-        if let healthProvider {
+        if let provider {
             NavigationView {
-                FatPercentageForm(healthProvider: healthProvider)
+                FatPercentageForm(provider: provider)
             }
         } else {
             Color.clear
                 .task {
-                    var healthDetails = await HealthProvider.fetchOrCreateHealthDetailsFromBackend(Date.now)
+                    var healthDetails = await Provider.fetchOrCreateHealthDetailsFromBackend(Date.now)
                     healthDetails.weight = .init(
                         weightInKg: 95,
                         measurements: [.init(date: Date.now, weightInKg: 95)]
                     )
-                    let healthProvider = HealthProvider(
-                        healthDetails: healthDetails,
-                        settingsProvider: SettingsProvider.shared
-                    )
+                    let provider = Provider()
+                    provider.healthDetails = healthDetails
                     await MainActor.run {
-                        self.healthProvider = healthProvider
+                        self.provider = provider
                     }
                 }
         }

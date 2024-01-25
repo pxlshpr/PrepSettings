@@ -4,7 +4,7 @@ import PrepShared
 
 struct WeightForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
 
     let date: Date
     
@@ -24,33 +24,33 @@ struct WeightForm: View {
     init(
         date: Date,
         weight: HealthDetails.Weight,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         save: @escaping (HealthDetails.Weight) -> ()
     ) {
         self.date = date
         self.saveHandler = save
-        self.healthProvider = healthProvider
+        self.provider = provider
         _isPresented = isPresented
 
         _weightInKg = State(initialValue: weight.weightInKg)
         _measurements = State(initialValue: weight.measurements)
         _deletedHealthKitMeasurements = State(initialValue: weight.deletedHealthKitMeasurements)
 
-        _dailyMeasurementType = State(initialValue: healthProvider.settingsProvider.settings.dailyMeasurementType(for: .weight))
-        _isSynced = State(initialValue: healthProvider.settingsProvider.weightIsHealthKitSynced)
+        _dailyMeasurementType = State(initialValue: provider.settings.dailyMeasurementType(for: .weight))
+        _isSynced = State(initialValue: provider.weightIsHealthKitSynced)
     }
     
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            weight: healthProvider.healthDetails.weight,
-            healthProvider: healthProvider,
+            date: provider.healthDetails.date,
+            weight: provider.healthDetails.weight,
+            provider: provider,
             isPresented: isPresented,
-            save: healthProvider.saveWeight
+            save: provider.saveWeight
         )
     }
     
@@ -71,7 +71,7 @@ struct WeightForm: View {
     }
     
     func isSyncedChanged(old: Bool, new: Bool) {
-        healthProvider.setHealthKitSyncing(for: .weight, to: new)
+        provider.setHealthKitSyncing(for: .weight, to: new)
     }
 
     var explanation: some View {
@@ -89,7 +89,7 @@ struct WeightForm: View {
     
     var measurementsSections: some View {
         MeasurementsSections<BodyMassUnit>(
-            settingsProvider: healthProvider.settingsProvider,
+            provider: provider,
             measurements: Binding<[any Measurable]>(
                 get: { measurements },
                 set: { newValue in
@@ -109,13 +109,13 @@ struct WeightForm: View {
         )
     }
     
-    var bodyMassUnit: BodyMassUnit { healthProvider.settingsProvider.bodyMassUnit }
+    var bodyMassUnit: BodyMassUnit { provider.bodyMassUnit }
 
     var measurementForm: some View {
         MeasurementForm(
             type: .weight,
             date: date,
-            settingsProvider: healthProvider.settingsProvider
+            provider: provider
         ) { int, double, time in
             let weightInKg = bodyMassUnit.convert(int, double, to: .kg)
             let measurement = WeightMeasurement(date: time, weightInKg: weightInKg)
@@ -183,7 +183,7 @@ struct WeightForm: View {
             set: { newValue in
                 withAnimation {
                     dailyMeasurementType = newValue
-                    healthProvider.setDailyMeasurementType(for: .weight, to: newValue)
+                    provider.setDailyMeasurementType(for: .weight, to: newValue)
                     handleChanges()
                 }
             }

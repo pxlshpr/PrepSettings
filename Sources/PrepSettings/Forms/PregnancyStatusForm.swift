@@ -22,14 +22,14 @@ struct PregnancyStatusForm: View {
     }
     
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            pregnancyStatus: healthProvider.healthDetails.pregnancyStatus,
+            date: provider.healthDetails.date,
+            pregnancyStatus: provider.healthDetails.pregnancyStatus,
             isPresented: isPresented,
-            save: healthProvider.savePregnancyStatus
+            save: provider.savePregnancyStatus
         )
     }
 

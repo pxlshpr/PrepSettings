@@ -4,7 +4,7 @@ import PrepShared
 
 struct HeightForm: View {
 
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     
     let date: Date
 
@@ -24,33 +24,33 @@ struct HeightForm: View {
     init(
         date: Date,
         height: HealthDetails.Height,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         save: @escaping (HealthDetails.Height) -> ()
     ) {
         self.date = date
         self.saveHandler = save
-        self.healthProvider = healthProvider
+        self.provider = provider
         _isPresented = isPresented
                 
         _heightInCm = State(initialValue: height.heightInCm)
         _measurements = State(initialValue: height.measurements)
         _deletedHealthKitMeasurements = State(initialValue: height.deletedHealthKitMeasurements)
         
-        _dailyMeasurementType = State(initialValue: healthProvider.settingsProvider.settings.dailyMeasurementType(for: .weight))
-        _isSynced = State(initialValue: healthProvider.settingsProvider.heightIsHealthKitSynced)
+        _dailyMeasurementType = State(initialValue: provider.settings.dailyMeasurementType(for: .weight))
+        _isSynced = State(initialValue: provider.heightIsHealthKitSynced)
     }
 
     init(
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true)
     ) {
         self.init(
-            date: healthProvider.healthDetails.date,
-            height: healthProvider.healthDetails.height,
-            healthProvider: healthProvider,
+            date: provider.healthDetails.date,
+            height: provider.healthDetails.height,
+            provider: provider,
             isPresented: isPresented,
-            save: healthProvider.saveHeight(_:)
+            save: provider.saveHeight(_:)
         )
     }
     
@@ -76,7 +76,7 @@ struct HeightForm: View {
             set: { newValue in
                 withAnimation {
                     dailyMeasurementType = newValue
-                    healthProvider.setDailyMeasurementType(for: .height, to: newValue)
+                    provider.setDailyMeasurementType(for: .height, to: newValue)
                     handleChanges()
                 }
             }
@@ -107,11 +107,11 @@ struct HeightForm: View {
     }
     
     func isSyncedChanged(old: Bool, new: Bool) {
-        healthProvider.setHealthKitSyncing(for: .height, to: new)
+        provider.setHealthKitSyncing(for: .height, to: new)
     }
     
     var heightUnit: HeightUnit {
-        healthProvider.settingsProvider.heightUnit
+        provider.heightUnit
     }
     
     var calculatedHeightInCm: Double? {
@@ -154,7 +154,7 @@ struct HeightForm: View {
         MeasurementForm(
             type: .height,
             date: date,
-            settingsProvider: healthProvider.settingsProvider
+            provider: provider
         ) { int, double, time in
             let heightInCm = heightUnit.convert(int, double, to: .cm)
             let measurement = HeightMeasurement(date: time, heightInCm: heightInCm)
@@ -209,7 +209,7 @@ struct HeightForm: View {
     
     var measurementsSections: some View {
         MeasurementsSections<HeightUnit>(
-            settingsProvider: healthProvider.settingsProvider,
+            provider: provider,
             measurements: Binding<[any Measurable]>(
                 get: { measurements },
                 set: { newValue in

@@ -7,7 +7,7 @@ let MaxNumberOfMovingAveragePoints = 7
 
 struct WeightChangePointForm: View {
     
-    @Bindable var healthProvider: HealthProvider
+    @Bindable var provider: Provider
     @Binding var isPresented: Bool
     
     let healthDetailsDate: Date
@@ -34,13 +34,13 @@ struct WeightChangePointForm: View {
         weight: Binding<HealthDetails.Weight?>,
         movingAverageWeights: Binding<[Date : HealthDetails.Weight]>,
         isEndWeight: Bool = false,
-        healthProvider: HealthProvider,
+        provider: Provider,
         isPresented: Binding<Bool> = .constant(true),
         saveHandler: @escaping (WeightChangePoint, Bool) -> ()
     ) {
         self.healthDetailsDate = date
         self.pointDate = point.date
-        self.healthProvider = healthProvider
+        self.provider = provider
         self.isEndWeight = isEndWeight
         self.saveHandler = saveHandler
         _isPresented = isPresented
@@ -91,7 +91,7 @@ struct WeightChangePointForm: View {
         "\(isEndWeight ? "Ending" : "Starting") Weight"
     }
     
-    var bodyMassUnit: BodyMassUnit { healthProvider.settingsProvider.bodyMassUnit }
+    var bodyMassUnit: BodyMassUnit { provider.bodyMassUnit }
 
     var bottomValue: some View {
         
@@ -164,9 +164,9 @@ struct WeightChangePointForm: View {
                     self.weight = weight
                 }
                 Task {
-                    let shouldResync = try await healthProvider.saveWeight(weight, for: date)
-                    if date.startOfDay == healthProvider.healthDetails.date.startOfDay {
-                        healthProvider.healthDetails.weight = weight
+                    let shouldResync = try await provider.saveWeight(weight, for: date)
+                    if date.startOfDay == provider.healthDetails.date.startOfDay {
+                        provider.healthDetails.weight = weight
                     }
                     handleChanges(shouldResync)
                 }
@@ -176,7 +176,7 @@ struct WeightChangePointForm: View {
                 WeightForm(
                     date: date,
                     weight: weight,
-                    healthProvider: healthProvider,
+                    provider: provider,
                     isPresented: $isPresented,
                     save: { weight in
                         saveWeight(weight)
@@ -234,7 +234,7 @@ struct WeightChangePointForm: View {
 //                WeightForm(
 //                    date: point.date,
 //                    weight: point.weight,
-//                    healthProvider: healthProvider,
+//                    provider: provider,
 //                    isPresented: $isPresented,
 //                    save: { weight in
 ////                        updateMovingAverageWeight(point, with: weight)
@@ -351,7 +351,7 @@ struct WeightChangePointForm: View {
 //            
 //            for date in allPossibleDatesForMovingAverage {
 //                taskGroup.addTask {
-//                    let weight = await HealthProvider.fetchOrCreateBackendWeight(for: date)
+//                    let weight = await Provider.fetchOrCreateBackendWeight(for: date)
 //                    return (date, weight)
 //                }
 //            }

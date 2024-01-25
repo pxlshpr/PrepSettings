@@ -45,7 +45,7 @@ extension HealthDetails {
 
     func valueString(
         for healthDetail: HealthDetail,
-        _ settingsProvider: SettingsProvider
+        _ provider: Provider
     ) -> String {
         switch healthDetail {
         case .age:
@@ -57,19 +57,19 @@ extension HealthDetails {
         case .biologicalSex:
             biologicalSex.name
         case .weight:
-            weight.valueString(in: settingsProvider.bodyMassUnit)
+            weight.valueString(in: provider.bodyMassUnit)
         case .leanBodyMass:
-            leanBodyMass.valueString(in: settingsProvider.bodyMassUnit)
+            leanBodyMass.valueString(in: provider.bodyMassUnit)
         case .fatPercentage:
             fatPercentage.valueString
         case .height:
-            height.valueString(in: settingsProvider.heightUnit)
+            height.valueString(in: provider.heightUnit)
         case .preganancyStatus:
             pregnancyStatus.name
         case .smokingStatus:
             smokingStatus.name
         case .maintenance:
-            maintenance.valueString(in: settingsProvider.energyUnit)
+            maintenance.valueString(in: provider.energyUnit)
         }
     }
 }
