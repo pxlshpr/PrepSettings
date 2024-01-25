@@ -13,10 +13,13 @@ public typealias DaySaveHandler = ((Day) async throws -> ())
 
     public var settings: Settings = .default
 
+    public var _displayedDate: Date
     public var displayedDay: Day
     public var today: Day
     var previousToday: Day
+    
     var daySaveTask: Task<Void, Error>? = nil
+    var displayedDayChangeTask: Task<Void, Error>? = nil
 
     var handlers: ProviderHandlers? = nil
 
@@ -24,6 +27,7 @@ public typealias DaySaveHandler = ((Day) async throws -> ())
         //TODO: Store these in UserDefaults too for quick access
         let day = Day(dateString: Date.now.dateString)
         self.displayedDay = day
+        self._displayedDate = day.date
         self.today = day
         self.previousToday = day
         
