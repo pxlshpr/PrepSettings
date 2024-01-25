@@ -21,7 +21,7 @@ public typealias DaySaveHandler = ((Day) async throws -> ())
     var daySaveTask: Task<Void, Error>? = nil
     public var displayedDayChangeTask: Task<Void, Error>? = nil
 
-    var handlers: ProviderHandlers? = nil
+    public var handlers: ProviderHandlers? = nil
 
     public init() {
         //TODO: Store these in UserDefaults too for quick access
