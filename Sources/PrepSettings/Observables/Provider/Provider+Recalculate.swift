@@ -2,7 +2,7 @@ import SwiftUI
 import HealthKit
 import PrepShared
 
-extension HealthProvider {
+extension Provider {
     func recalculate(
         latestHealthDetails: [HealthDetail: DatedHealthData],
         settings: Settings,
@@ -29,7 +29,7 @@ extension HealthProvider {
     }
 }
 
-extension HealthProvider {
+extension Provider {
 
     func recalculateLeanBodyMasses() async {
         let initial = healthDetails.leanBodyMass
@@ -52,7 +52,7 @@ extension HealthProvider {
         guard healthDetails.leanBodyMass != initial else { return }
 
         /// Re-set the daily value based on the new measurements
-        let type = settingsProvider.settings.dailyMeasurementType(for: .leanBodyMass)
+        let type = settings.dailyMeasurementType(for: .leanBodyMass)
         healthDetails.leanBodyMass.setDailyMeasurement(for: type)
     }
     
@@ -77,7 +77,7 @@ extension HealthProvider {
         guard healthDetails.fatPercentage != initial else { return }
 
         /// Re-set the daily value based on the new measurements
-        let type = settingsProvider.settings.dailyMeasurementType(for: .fatPercentage)
+        let type = settings.dailyMeasurementType(for: .fatPercentage)
         healthDetails.fatPercentage.setDailyMeasurement(for: type)
     }
 
@@ -166,8 +166,8 @@ extension HealthProvider {
     
     func recalculateRestingEnergy() async {
         let restingEnergy = healthDetails.maintenance.estimate.restingEnergy
-        guard 
-            restingEnergy.source == .equation, 
+        guard
+            restingEnergy.source == .equation,
             let equation = restingEnergy.equation
         else { return }
         let kcal = await calculateRestingEnergyInKcal(using: equation)
@@ -187,7 +187,7 @@ extension HealthProvider {
     }
 }
 
-extension HealthProvider {
+extension Provider {
     func calculateRestingEnergyInKcal(
         using equation: RestingEnergyEquation
     ) async -> Double? {

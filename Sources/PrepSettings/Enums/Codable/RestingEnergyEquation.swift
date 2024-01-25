@@ -138,46 +138,6 @@ extension RestingEnergyEquation {
     }
 }
 
-
-extension HealthProvider {
-    func calculateRestingEnergyInKcal(
-        using equation: RestingEnergyEquation
-    ) async -> Double? {
-        await equation.calculate(
-            ageInYears: ageInYears,
-            biologicalSex: biologicalSex,
-            weightInKg: healthDetails.currentOrLatestWeightInKg,
-            leanBodyMassInKg: healthDetails.currentOrLatestLeanBodyMassInKg,
-            fatPercentage: healthDetails.currentOrLatestFatPercentage,
-            heightInCm: healthDetails.currentOrLatestHeightInCm,
-            preferLeanBodyMass: healthDetails.maintenance.estimate.restingEnergy.preferLeanBodyMass,
-            energyUnit: .kcal
-        )
-    }
-    
-    func calculateFatPercentageInPercent(
-        using equation: LeanBodyMassAndFatPercentageEquation
-    ) async -> Double? {
-        await equation.calculateFatPercentageInPercent(
-            biologicalSex: biologicalSex,
-            weightInKg: healthDetails.currentOrLatestWeightInKg,
-            heightInCm: healthDetails.currentOrLatestHeightInCm,
-            ageInYears: ageInYears
-        )
-    }
-    
-    func calculateLeanBodyMassInKg(
-        using equation: LeanBodyMassAndFatPercentageEquation
-    ) async -> Double? {
-        await equation.calculateLeanBodyMassInKg(
-            biologicalSex: biologicalSex,
-            weightInKg: healthDetails.currentOrLatestWeightInKg,
-            heightInCm: healthDetails.currentOrLatestHeightInCm,
-            ageInYears: ageInYears
-        )
-    }
-
-}
 extension RestingEnergyEquation {
     
     func calculate(
